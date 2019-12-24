@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/topText"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="100dp"
+        android:gravity="start|center_vertical"
+        android:minWidth="60dp"
+        android:text="aaa"
+        android:textSize="16sp"
+        />
+
+    <EditText
+        android:id="@+id/topEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/topText"
+        android:layout_marginEnd="20dp"
+        android:layout_toEndOf="@+id/topText" />
+
+    <TextView
+        android:id="@+id/bottomText"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/topText"
+        android:gravity="start|center_vertical"
+        android:minWidth="60dp"
+        android:text="aaa"
+        android:textSize="16sp"
+        />
+
+    <EditText
+        android:id="@+id/bottomEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/bottomText"
+        android:layout_marginEnd="20dp"
+        android:layout_toEndOf="@+id/bottomText" />
+
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="确定"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/bottomEditText"
+        android:layout_alignStart="@+id/bottomEditText"
+        />
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="取消"
+        android:layout_toEndOf="@+id/confirm"
+        android:layout_alignTop="@+id/confirm"
+        />
+
+
+</RelativeLayout>

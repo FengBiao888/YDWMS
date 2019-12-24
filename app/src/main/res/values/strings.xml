@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">HandsetProject</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string-array name="scan_type">
+        <item>产品打包</item>
+        <item>成品进仓</item>
+        <item>成品出仓 </item>
+        <item>半成品进仓</item>
+        <item>半成品出仓</item>
+        <item>仓位变更</item>
+        <item>产品盘点</item>
+    </string-array>
+</resources>

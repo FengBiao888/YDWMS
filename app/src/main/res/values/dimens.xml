@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="normal_item_min_height">40dp</dimen>
+    <dimen name="item_gap_s">5dp</dimen>
+    <dimen name="item_gap_m">10dp</dimen>
+    <dimen name="item_gap_l">20dp</dimen>
+</resources>
+
