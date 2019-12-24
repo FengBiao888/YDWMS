@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="160dp"
+        >
+
+        <ImageView
+            android:id="@+id/dot1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot5"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot6"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot7"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+        <ImageView
+            android:id="@+id/dot8"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/connecting_dot"
+            android:layout_marginStart="@dimen/item_gap_s"
+            android:visibility="invisible"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_gap_xl"
+        android:text="正在联机，请耐心等待！"
+        android:layout_gravity="center_horizontal"
+        android:textSize="18sp"
+        />
+
+
+</LinearLayout>

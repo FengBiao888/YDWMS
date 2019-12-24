@@ -21,6 +21,11 @@ public class LoginActivity extends AppCompatActivity {
         login = (Button) findViewById( R.id.login );
         scan = (Button) findViewById( R.id.scan );
 
+        connectSetting.setOnClickListener( v -> {
+            Intent intent = new Intent( this, ConnectingActivity.class );
+            startActivity( intent );
+        } );
+
         login.setOnClickListener( v -> {
             Intent intent = new Intent( this, LoginAccountIPSettingActivity.class );
             startActivity( intent );

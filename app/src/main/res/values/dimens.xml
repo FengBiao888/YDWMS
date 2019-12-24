@@ -5,5 +5,6 @@
     <dimen name="item_gap_s">5dp</dimen>
     <dimen name="item_gap_m">10dp</dimen>
     <dimen name="item_gap_l">20dp</dimen>
+    <dimen name="item_gap_xl">30dp</dimen>
 </resources>
 
