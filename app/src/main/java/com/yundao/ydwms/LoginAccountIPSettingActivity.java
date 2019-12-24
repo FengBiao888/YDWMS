@@ -11,5 +11,6 @@ public class LoginAccountIPSettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_loginaccount_ipsetting);
         System.out.println("hello");
+        System.out.println("hello");
     }
 }
