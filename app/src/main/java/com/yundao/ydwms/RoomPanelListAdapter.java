@@ -93,19 +93,19 @@ public class RoomPanelListAdapter extends AbstractPanelListAdapter {
             viewHolder.tv_6.setOnClickListener(listener);
             viewHolder.tv_7.setOnClickListener(listener);
 
-            viewHolder.tv_1.setBackgroundResource(getBackgroundResource(roomDetail.get(1)));
+//            viewHolder.tv_1.setBackgroundResource(getBackgroundResource(roomDetail.get(1)));
             viewHolder.tv_1.setText(getText(roomDetail.get(1)));
-            viewHolder.tv_2.setBackgroundResource(getBackgroundResource(roomDetail.get(2)));
+//            viewHolder.tv_2.setBackgroundResource(getBackgroundResource(roomDetail.get(2)));
             viewHolder.tv_2.setText(getText(roomDetail.get(2)));
-            viewHolder.tv_3.setBackgroundResource(getBackgroundResource(roomDetail.get(3)));
+//            viewHolder.tv_3.setBackgroundResource(getBackgroundResource(roomDetail.get(3)));
             viewHolder.tv_3.setText(getText(roomDetail.get(3)));
-            viewHolder.tv_4.setBackgroundResource(getBackgroundResource(roomDetail.get(4)));
+//            viewHolder.tv_4.setBackgroundResource(getBackgroundResource(roomDetail.get(4)));
             viewHolder.tv_4.setText(getText(roomDetail.get(4)));
-            viewHolder.tv_5.setBackgroundResource(getBackgroundResource(roomDetail.get(5)));
+//            viewHolder.tv_5.setBackgroundResource(getBackgroundResource(roomDetail.get(5)));
             viewHolder.tv_5.setText(getText(roomDetail.get(5)));
-            viewHolder.tv_6.setBackgroundResource(getBackgroundResource(roomDetail.get(6)));
+//            viewHolder.tv_6.setBackgroundResource(getBackgroundResource(roomDetail.get(6)));
             viewHolder.tv_6.setText(getText(roomDetail.get(6)));
-            viewHolder.tv_7.setBackgroundResource(getBackgroundResource(roomDetail.get(7)));
+//            viewHolder.tv_7.setBackgroundResource(getBackgroundResource(roomDetail.get(7)));
             viewHolder.tv_7.setText(getText(roomDetail.get(7)));
             return view;
         }

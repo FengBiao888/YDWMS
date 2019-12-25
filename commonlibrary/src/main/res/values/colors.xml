@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="login_bg">#f2f2f2</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#ffffff</color>
+    <color name="pure_red">#ff0000</color>
+    <color name="black">#000000</color>
+    <color name="color_c8c7cc">#c8c7cc</color>
+    <color name="color_f2f2f2">#f2f2f2</color>
+    <color name="color_458bea">#458bea</color>
+    <color name="color_458be9">#458be9</color>
+    <color name="color_2d3034">#2d3034</color>
+    <color name="color_2E88EF">#2E88EF</color>
+    <color name="color_777">#777</color>
+    <color name="color_333">#333333</color>
+    <color name="color_999">#999</color>
+    <color name="list_pressed_color">#e3e3e3</color>
+    <color name="color_f74c32">#f74c32</color>
+    <color name="color_03357a">#03357a</color>
+    <color name="color_6a7177">#6a7177</color>
+
+    <!-- V1.2 -->
+    <color name="input_hint_color">#cccccc</color>
+    <color name="divider_color">#d9d9d9</color>
+    <color name="color_4e638f">#4e638f</color>
+    <color name="color_b2b2b2">#b2b2b2</color>
+    <color name="color_a2c5f4">#a2c5f4</color>
+    <color name="msg_h_line">#d9d9d9</color>
+
+    <color name="date_picker_bg">#FFFFFF</color>
+    <color name="date_picker_divider">#11112233</color>
+    <color name="date_picker_text_dark">#333333</color>
+
+</resources>

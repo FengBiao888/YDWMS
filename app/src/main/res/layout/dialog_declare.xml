@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp20"
+        android:layout_marginRight="@dimen/dp20"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:background="@drawable/white_border_corner_small">
+
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/dp15"
+            android:lineSpacingExtra="@dimen/line_extra"
+            android:textSize="@dimen/text_size_16sp"
+            android:text="确定是否上传记录"
+            android:textColor="@color/black"
+            android:background="@color/transparent"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            android:padding="@dimen/dp12">
+
+            <TextView
+                android:id="@+id/btn_positive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp10"
+                android:layout_weight="50"
+                android:gravity="center"
+                android:text="是"
+                android:background="@drawable/selector_blue_solid"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16sp" />
+
+            <View
+                android:id="@+id/middle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:background="@color/transparent"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp10"
+                android:layout_weight="50"
+                android:gravity="center"
+                android:textColor="@drawable/selector_blue_text"
+                android:background="@drawable/selector_blue_shadow"
+                android:text="否"
+                android:textSize="@dimen/text_size_16sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

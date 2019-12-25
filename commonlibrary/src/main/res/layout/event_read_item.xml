@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        style="@style/edititem_backgroud_other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+    <com.nf.android.eoa.widget.CircleImageView
+        android:id="@+id/user_head"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        />
+
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_gravity="center_vertical"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/read_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="right|center_vertical"
+        android:textColor="@color/color_2d3034"
+        android:textSize="@dimen/text_size_11sp"
+        />
+
+
+</LinearLayout>
+<View
+android:layout_width="match_parent"
+android:layout_height="@dimen/divider_height"
+android:background="@color/divider_color" />
+    </LinearLayout>

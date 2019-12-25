@@ -10,7 +10,5 @@ public class LoginAccountIPSettingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_loginaccount_ipsetting);
-        System.out.println("hello");
-        System.out.println("hello");
     }
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+      android:id="@+id/extra_file"
+        style="@style/edititem_backgroud_other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="类型"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <ImageView
+            android:id="@+id/item_extrafilebtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:background="@drawable/icon_approve_add"
+            android:text="请选择"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_11sp"
+            android:layout_alignTop="@+id/item_name"
+          android:layout_alignParentRight="true"
+          />
+
+        <LinearLayout
+            android:id="@+id/extra_file_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp12"
+            android:orientation="vertical"
+            android:layout_below="@+id/item_name"
+            android:visibility="gone"
+          >
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider_color" />
+</LinearLayout>

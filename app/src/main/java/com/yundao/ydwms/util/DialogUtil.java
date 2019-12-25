@@ -1,10 +1,15 @@
 package com.yundao.ydwms.util;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -225,6 +230,39 @@ public class DialogUtil {
             }
 
         }
+    }
+
+    public static Dialog showDeclareDialog(Activity context, String tips, View.OnClickListener rightClickListener ){
+        Dialog dialog = new Dialog(context, R.style.ActionSheetDialogStyle);
+        dialog.setCancelable( false );
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View viewDialog = inflater.inflate(R.layout.dialog_declare, null);
+        TextView comment = viewDialog.findViewById( R.id.content );
+        TextView left = viewDialog.findViewById( R.id.btn_cancel );
+        TextView right = viewDialog.findViewById( R.id.btn_positive );
+        comment.setText( tips );
+        left.setOnClickListener(v -> dialog.cancel());
+        right.setOnClickListener(v -> {
+            v.setTag( comment.getText().toString() );
+            rightClickListener.onClick( v );
+            dialog.cancel();
+        });
+
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        context.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        int width = outMetrics.widthPixels;
+        int height = outMetrics.heightPixels ;
+        //获取当前Activity所在的窗体
+        Window dialogWindow = dialog.getWindow();
+        //设置Dialog从窗体底部弹出
+        dialogWindow.setGravity( Gravity.BOTTOM );
+        dialogWindow.setDimAmount( 0.45f );
+//        dialogWindow.setBackgroundDrawableResource( R.color.black );
+        //设置dialog的宽高为屏幕的宽高
+        ViewGroup.LayoutParams layoutParams = new  ViewGroup.LayoutParams(width, height);
+        dialog.setContentView(viewDialog, layoutParams);
+
+        return dialog ;
     }
 
 }

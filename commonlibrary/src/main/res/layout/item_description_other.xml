@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	<TextView android:id="@+id/title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textSize="@dimen/text_size_24sp"
+		android:textColor="@color/black"
+		android:textStyle="bold"
+		android:text="欢迎加入"
+		android:gravity="center_horizontal"/>
+
+	<TextView android:id="@+id/descriptions"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textSize="@dimen/text_size_14sp"
+		android:textColor="@color/color_333"
+		android:gravity="left"
+		android:text=""
+		android:lineSpacingExtra="@dimen/line_extra"
+		android:layout_marginTop="@dimen/dp25"
+		android:layout_marginBottom="@dimen/dp20"/>
+</LinearLayout>

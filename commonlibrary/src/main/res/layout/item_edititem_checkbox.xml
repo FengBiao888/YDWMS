@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:descendantFocusability="beforeDescendants"
+    android:id="@+id/ll_toggle">
+
+    <CheckedTextView
+        android:id="@+id/bu_toggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkMark="@drawable/toggle_selector"
+        android:checked="false"
+        android:gravity="center_vertical"
+        android:text="允许员工补打卡"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_16sp"
+        android:background="@color/white"
+        android:padding="@dimen/index_padding"/>
+
+<!--    <LinearLayout
+        style="@style/edititem_backgroud_other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckedTextView
+            android:id="@+id/bu_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkMark="@drawable/toggle_selector"
+            android:checked="false"
+            android:gravity="center_vertical"
+            android:text="允许员工补打卡"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp"/>
+
+    </LinearLayout>-->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider_color" />
+</LinearLayout>

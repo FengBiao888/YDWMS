@@ -12,4 +12,11 @@ public class YDWMSApplication extends Application {
         }
         return instance;
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        instance = this;
+    }
 }

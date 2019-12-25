@@ -4,42 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:ignore="MissingDefaultResource">
+    tools:ignore="MissingDefaultResource"
+    android:background="@color/white"
+    >
 
-    <include android:id="@+id/topPanel" layout="@layout/layout_top_operator_state"></include>
+    <com.nf.android.common.titlebar.SimpleToolbar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include android:id="@+id/topPanel" layout="@layout/layout_top_operator_state"
+        android:layout_below="@+id/titleBar" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="@dimen/item_gap_s"
+        android:layout_marginBottom="@dimen/item_gap_s"
+        ></include>
 
     <LinearLayout
         android:id="@+id/btns_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:paddingTop="@dimen/item_gap_s"
+        android:paddingBottom="@dimen/item_gap_s"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/delete"
+            android:id="@+id/confirm"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_height="40dp"
+            android:text="上传"
             android:layout_weight="1"
-            android:text="删除" />
-
-        <Button
-            android:id="@+id/print"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:text="打印" />
-
-        <Button
-            android:id="@+id/close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_weight="1"
-            android:text="关闭" />
+            android:background="@drawable/selector_blue_solid"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_20sp"
+            />
 
     </LinearLayout>
 
@@ -50,7 +50,10 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/btns_parent"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:paddingTop="@dimen/item_gap_s"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,7 +64,7 @@
                 android:id="@+id/bar_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_gap_m"
+                android:layout_marginEnd="@dimen/item_gap_s"
                 android:gravity="center_vertical"
                 android:minHeight="@dimen/normal_item_min_height"
                 android:text="条码"
@@ -71,9 +74,14 @@
             <EditText
                 android:id="@+id/bar_code_value"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:minHeight="@dimen/normal_item_min_height" />
+                android:minHeight="@dimen/normal_item_min_height"
+                android:layout_margin="@dimen/dp5"
+                android:textColor="@color/black"
+                android:background="@drawable/edittext_gray_border"
+                android:singleLine="true"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -94,7 +102,7 @@
                         android:id="@+id/material"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="料号"
@@ -104,9 +112,13 @@
                     <EditText
                         android:id="@+id/material_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        />
 
                 </LinearLayout>
 
@@ -117,7 +129,7 @@
                         android:id="@+id/specification"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="规格"
@@ -127,9 +139,13 @@
                     <EditText
                         android:id="@+id/specificationl_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        />
 
                 </LinearLayout>
 
@@ -140,7 +156,7 @@
                         android:id="@+id/pack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="包装"
@@ -150,9 +166,13 @@
                     <EditText
                         android:id="@+id/pack_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        />
 
                 </LinearLayout>
 
@@ -172,7 +192,7 @@
                         android:id="@+id/product_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="品名"
@@ -182,9 +202,12 @@
                     <EditText
                         android:id="@+id/product_name_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"/>
 
                 </LinearLayout>
 
@@ -195,7 +218,7 @@
                         android:id="@+id/number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="卷号"
@@ -205,9 +228,12 @@
                     <EditText
                         android:id="@+id/number_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"/>
 
                 </LinearLayout>
 
@@ -218,7 +244,7 @@
                         android:id="@+id/remark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_m"
+                        android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
                         android:text="备注"
@@ -228,9 +254,12 @@
                     <EditText
                         android:id="@+id/remark_value"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:minHeight="@dimen/normal_item_min_height" />
+                        android:layout_margin="@dimen/dp5"
+                        android:background="@drawable/edittext_gray_border"
+                        android:singleLine="true"
+                        android:textColor="@color/black"/>
 
                 </LinearLayout>
 
@@ -241,18 +270,30 @@
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/gap"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_gap_m"
+        android:background="#F5F5F5"
+        android:layout_above="@+id/product_info_parent"
+        />
+
     <sysu.zyb.panellistlibrary.PanelListLayout
         android:id="@+id/id_pl_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/topPanel"
-        android:layout_above="@+id/product_info_parent"
+        android:layout_above="@+id/gap"
         >
 
         <ListView
             android:id="@+id/id_lv_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:divider="#EDEDED"
+            android:dividerHeight="1px"
+            />
 
     </sysu.zyb.panellistlibrary.PanelListLayout>
 

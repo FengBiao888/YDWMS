@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/list_selector" >
+
+
+    <ImageView
+        android:id="@+id/left_icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/dp12"
+        android:text="类型"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dp30"
+        android:layout_marginTop="@dimen/dp10"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_17sp"
+        android:gravity="start"
+        android:text="aaabbbbaaabbbbaaabbbbaaabbbbaaabbbbaaabbbb"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintBottom_toTopOf="@+id/text2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        />
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp10"
+        android:layout_marginEnd="@dimen/dp30"
+        android:gravity="start"
+        android:textColor="@color/color_999"
+        android:textSize="@dimen/text_size_14sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:text="aaabbbbaaabbbbaaabbbbaaabbbbaaabbbbaaabbbbaaab"
+        app:layout_constraintBottom_toBottomOf="@+id/line"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/text1"
+        android:layout_marginTop="@dimen/dp3"/>
+
+    <TextView
+        android:id="@+id/item_right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="@dimen/dp10"
+        android:layout_marginEnd="@dimen/dp12"
+        android:layout_marginTop="@dimen/dp10"
+        android:drawableRight="@drawable/arrow_normal"
+        android:gravity="start"
+        android:singleLine="true"
+        android:textColor="@android:color/black"
+        android:textColorHint="@color/input_hint_color"
+        android:textSize="@dimen/text_size_16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"/>
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/view_stub"
+        android:layout_width="1px"
+        android:layout_height="50dp"
+        android:layout_marginLeft="@dimen/dp12"
+        app:layout_constraintStart_toEndOf="@id/left_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.45" />
+
+</android.support.constraint.ConstraintLayout>

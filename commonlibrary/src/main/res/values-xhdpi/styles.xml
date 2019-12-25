@@ -1,0 +1,47 @@
+<resources>
+    <style name="edititem_backgroud_other">
+        <item name="android:paddingLeft">@dimen/index_padding</item>
+        <item name="android:paddingRight">@dimen/index_padding</item>
+        <item name="android:paddingTop">@dimen/index_padding</item>
+        <item name="android:paddingBottom">@dimen/index_padding</item>
+        <item name="android:background">@drawable/list_selector</item>
+    </style>
+
+    <style name="date_picker_dialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/date_picker_bg</item>
+    </style>
+
+    <declare-styleable name="Lock9View">
+        <attr name="lock9_nodeSrc" format="color|reference" />
+        <attr name="lock9_nodeOnSrc" format="color|reference" />
+        <attr name="lock9_node_error_OnSrc" format="color|reference" />
+        <attr name="lock9_nodeSize" format="dimension" />
+        <attr name="lock9_nodeAreaExpand" format="dimension" />
+        <attr name="lock9_nodeNormalSize" format="dimension" />
+        <attr name="lock9_nodeOnAnim" format="reference" />
+        <attr name="lock9_lineColor" format="color" />
+        <attr name="lock9_error_lineColor" format="color" />
+        <attr name="lock9_lineWidth" format="dimension" />
+        <attr name="lock9_padding" format="dimension" />
+        <attr name="lock9_spacing" format="dimension" />
+        <attr name="lock9_autoLink" format="boolean" />
+        <attr name="lock9_linkage" format="boolean" />
+        <attr name="lock9_enableVibrate" format="boolean" />
+        <attr name="lock9_vibrateTime" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="PEditTextView">
+        <attr name="length" format="integer" />
+        <attr name="box_padding" format="dimension" />
+        <attr name="round" format="dimension" />
+        <attr name="focus_color" format="color" />
+        <attr name="normal_color" format="color" />
+        <attr name="text_color" format="color" />
+        <attr name="is_password" format="boolean" />
+    </declare-styleable>
+
+</resources>

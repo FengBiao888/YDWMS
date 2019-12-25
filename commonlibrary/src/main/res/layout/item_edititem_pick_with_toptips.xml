@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/item_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="@dimen/dp12"
+        android:layout_marginTop="@dimen/dp20"
+        android:text="类型"
+        android:textColor="@color/pure_red"
+        android:textSize="@dimen/text_size_14sp" />
+
+    <View android:layout_width="match_parent" android:layout_height="@dimen/divider_height" android:background="@color/divider_color" />
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@drawable/list_selector"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50" >
+
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp12"
+            android:maxEms="6"
+            android:minEms="6"
+            android:text="类型类型"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/item_right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:drawableRight="@drawable/arrow_normal"
+            android:gravity="left"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textColorHint="@color/input_hint_color"
+            android:textSize="@dimen/text_size_16sp"
+            android:layout_marginRight="@dimen/dp12"
+            android:layout_marginStart="@dimen/dp5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/item_name"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/divider_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider_color" />
+
+</LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/white">
+
+  <TextView
+    android:id="@+id/tv_title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp12"
+    android:layout_marginLeft="@dimen/dp12"
+    android:text="议题一"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    android:textColor="@color/black"
+    android:textSize="@dimen/text_size_16sp"/>
+
+  <View
+    android:id="@+id/view_left"
+    android:layout_width="0dp"
+    android:layout_height="3dp"
+    android:layout_marginTop="5dp"
+    app:layout_constraintStart_toStartOf="@+id/tv_title"
+    app:layout_constraintEnd_toEndOf="@+id/tv_title"
+    app:layout_constraintTop_toBottomOf="@+id/tv_title"
+    android:background="@color/color_458bea"/>
+
+  <View
+    android:id="@+id/view_right"
+    android:layout_width="0dp"
+    android:layout_height="@dimen/divider_height"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/view_left"
+    app:layout_constraintBottom_toBottomOf="@+id/view_left"
+    android:background="@color/divider_color" />
+
+
+</android.support.constraint.ConstraintLayout>

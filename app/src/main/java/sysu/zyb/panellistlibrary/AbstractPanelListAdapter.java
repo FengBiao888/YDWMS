@@ -81,6 +81,7 @@ public abstract class AbstractPanelListAdapter {
     private String columnColor = "#607D8B";//default color of column
     private String titleColor = "#CFD8DC";//default color of title
     private String rowColor = "#CDDC39";//default color of title
+    private String titleTextColor = "#000000";//default color of title
 
     private Drawable rowDivider;
     private Drawable columnDivider;
@@ -225,6 +226,10 @@ public abstract class AbstractPanelListAdapter {
      */
     public void setTitleColor(String titleColor) {
         this.titleColor = titleColor;
+    }
+
+    public void setTitleTextColor(String titleTextColor) {
+        this.titleTextColor = titleTextColor;
     }
 
     /**
@@ -406,9 +411,11 @@ public abstract class AbstractPanelListAdapter {
         }
         tv_title.getPaint().setFakeBoldText(true);
         tv_title.setGravity(Gravity.CENTER);
+        tv_title.setTextColor( Color.parseColor( titleTextColor ));
         tv_title.setBackgroundColor(Color.parseColor(titleColor));
         tv_title.setId(View.generateViewId());//设置一个随机id，这样可以保证不冲突
         RelativeLayout.LayoutParams lp_tv_title = new RelativeLayout.LayoutParams(titleWidth, titleHeight);
+        lp_tv_title.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
         pl_root.addView(tv_title, lp_tv_title);
 
         // 2. row（LinearLayout --> MyHorizontalScrollView --> PanelListLayout）
@@ -421,19 +428,23 @@ public abstract class AbstractPanelListAdapter {
         mhsv_row.addView(ll_row);//暂时先不给ll_row添加子view，等布局画出来了再添加
         mhsv_row.setId(View.generateViewId());
         RelativeLayout.LayoutParams lp_mhsv_row = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, titleHeight);
-        lp_mhsv_row.addRule(RelativeLayout.END_OF, tv_title.getId());
+        lp_mhsv_row.addRule(RelativeLayout.START_OF, tv_title.getId());
         lp_mhsv_row.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         pl_root.addView(mhsv_row, lp_mhsv_row);
+
 
         // 3. column （ListView --> PanelListLayout）
         lv_column = new ListView(context);
 //        lv_column.setFastScrollEnabled(false);
         lv_column.setBackgroundColor(Color.parseColor(columnColor));
         lv_column.setId(View.generateViewId());
+        lv_column.setDividerHeight( 20 );
+
         lv_column.setVerticalScrollBarEnabled(false);//去掉滚动条
 //        lv_column.setDivider(context.getResources().getDrawable(R.drawable.column_item_divider));
         RelativeLayout.LayoutParams lp_lv_column = new RelativeLayout.LayoutParams(titleWidth, ViewGroup.LayoutParams.MATCH_PARENT);
         lp_lv_column.addRule(RelativeLayout.BELOW, tv_title.getId());
+        lp_lv_column.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
         pl_root.addView(lv_column, lp_lv_column);
 
         // 4. content (ListView --> MyHorizontalScrollView --> SwipeRefreshLayout --> PanelListLayout)
@@ -448,7 +459,7 @@ public abstract class AbstractPanelListAdapter {
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         Log.d(TAG, "reorganizeViewGroup: " + onRefreshListener.toString());
         RelativeLayout.LayoutParams lp_srl = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        lp_srl.addRule(RelativeLayout.RIGHT_OF, lv_column.getId());
+        lp_srl.addRule(RelativeLayout.LEFT_OF, lv_column.getId());
         lp_srl.addRule(RelativeLayout.BELOW, tv_title.getId());
         pl_root.addView(swipeRefreshLayout, lp_srl);
         if (initPosition == 0) {
@@ -531,6 +542,7 @@ public abstract class AbstractPanelListAdapter {
             rowItem.setWidth(widthArray[i]);//设置宽度
             rowItem.setHeight(titleHeight);//设置高度
             rowItem.setGravity(Gravity.CENTER);
+            rowItem.setTextColor( Color.parseColor( titleTextColor ) );
             ll_row.addView(rowItem);
         }
     }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dp50"
+    android:orientation="vertical">
+
+    <LinearLayout
+        style="@style/edititem_backgroud_other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="类型"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <EditText
+            android:id="@+id/et_item_input"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="请填写语种"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <TextView
+            android:id="@+id/item_right"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:drawableRight="@drawable/arrow_normal"
+            android:ellipsize="middle"
+            android:gravity="right"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textColorHint="@color/input_hint_color"
+            android:textSize="@dimen/text_size_16sp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider_color" />
+
+</LinearLayout>

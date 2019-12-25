@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/checkbox_checked"
+        android:visibility="gone"/>
+    <CheckedTextView
+        android:id="@+id/ct_read_agreement"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/agree_selector"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:checked="true"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:text="我已阅读并接受"
+        android:layout_marginLeft="10dp"/>
+    <TextView android:id="@+id/tv_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/color_2E88EF"
+        android:layout_marginLeft="5dp"/>
+
+</LinearLayout>
