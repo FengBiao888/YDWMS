@@ -8,14 +8,18 @@ package com.yundao.ydwms.protocal;
  */
 public class URLConstant {
 
-     public static String BASE_URL = "https://test.southhr.cn"; //新外网地址
+     public static String BASE_URL = "http://121.201.76.121:8086/"; //新外网地址
      public static String BASE_H5_URL = "https://test.southhr.cn"; //新外网地址
     /**
      * 登录
      */
-    public static String LOGIN = "/phone/login/loginNew";
+    public static final String LOGIN = "/auth/login" ;
     /**
-     * 登录
+     * 产品查询
      */
-    public static String PHONE_LOGIN = "/phone/login/login";
+    public static final String PRODUCTION_LOG = "/api/productionLog";
+    /**
+     * 产品进仓
+     */
+    public static final String PRODUCTION_INCOMING = "api/goProduction";
 }

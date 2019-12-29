@@ -23,7 +23,9 @@ import com.nf.android.common.listmodule.listitems.EditItemSubmitButton;
 import com.nf.android.common.listmodule.listitems.ItemCheckbox;
 import com.nf.android.common.listmodule.listitems.ItemOneTextView;
 import com.nf.android.common.widget.TimePickerDialogView;
+import com.yundao.ydwms.util.ToastUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,8 +39,6 @@ import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INCOMING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INVENTORY;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_OUTGOING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_PACKAGING;
-import static com.yundao.ydwms.ScanTypeEnum.SEMI_PRODUCT_INCOMING;
-import static com.yundao.ydwms.ScanTypeEnum.SEMI_PRODUCT_OUTGOING;
 import static com.yundao.ydwms.ScanTypeEnum.WAREHOUSE_CHANGING;
 
 public class ScanListActivity extends BaseAbsListItemActivity {
@@ -81,20 +81,12 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         productIncoming.setExtraObj(ScanTypeEnum.PRODUCT_INCOMING);
         productIncoming.setClickListener( clickListener );
 
-        ItemCheckbox semiProductIncoming = new ItemCheckbox( getActivity(), SEMI_PRODUCT_INCOMING.getCodeName() );
-        clickListener = new WorkDayClickListener( semiProductIncoming );
-        semiProductIncoming.setExtraObj( SEMI_PRODUCT_INCOMING );
-        semiProductIncoming.setClickListener( clickListener );
 
         ItemCheckbox productOutgoing = new ItemCheckbox( getActivity(), PRODUCT_OUTGOING.getCodeName() );
         clickListener = new WorkDayClickListener( productOutgoing );
         productOutgoing.setExtraObj( PRODUCT_OUTGOING );
         productOutgoing.setClickListener( clickListener );
 
-        ItemCheckbox semiProduceOutgoing = new ItemCheckbox( getActivity(), SEMI_PRODUCT_OUTGOING.getCodeName() );
-        semiProduceOutgoing.setExtraObj( SEMI_PRODUCT_OUTGOING );
-        clickListener = new WorkDayClickListener( semiProduceOutgoing );
-        semiProduceOutgoing.setClickListener( clickListener );
 
         ItemCheckbox warehouseChanging = new ItemCheckbox( getActivity(), WAREHOUSE_CHANGING.getCodeName() );
         warehouseChanging.setExtraObj( WAREHOUSE_CHANGING );
@@ -112,16 +104,12 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         productInventory.setClickListener( clickListener );
 
         list.add( productIncoming );
-        list.add( semiProductIncoming );
         list.add( productOutgoing );
-        list.add( semiProduceOutgoing );
         list.add( warehouseChanging );
         list.add( productPackaging );
         list.add( productInventory );
         checkboxes.add( productIncoming );
-        checkboxes.add( semiProductIncoming );
         checkboxes.add( productOutgoing );
-        checkboxes.add( semiProduceOutgoing );
         checkboxes.add( warehouseChanging );
         checkboxes.add( productPackaging );
         checkboxes.add( productInventory );
@@ -131,7 +119,13 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         confirm = new EditItemSubmitButton(getActivity(), "确定");
         confirm.setBtnBgLayoutId( R.drawable.selector_blue_solid );
         confirm.setSpecifyClickListener( v ->{
+            if( checkboxSelected == null ){
+                ToastUtil.showShortToast( "请选择扫描仓库类型" );
+                return ;
+            }
             Intent intent = new Intent( getActivity(), ProductPackagingActivity.class );
+            intent.putExtra( "pickScanType", (Serializable) checkboxSelected.getExtraObj());
+
             startActivity( intent );
         }, R.id.bottom_submit);
         list.add(confirm);

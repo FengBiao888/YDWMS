@@ -1,5 +1,8 @@
 package com.yundao.ydwms.retrofit;
 
+import android.text.TextUtils;
+
+import com.yundao.ydwms.YDWMSApplication;
 import com.yundao.ydwms.protocal.Log;
 
 import java.io.IOException;
@@ -25,21 +28,10 @@ public class LoggingInterceptor implements Interceptor {
         Request original = chain.request();
         //添加头部信息
         Request.Builder requestBuilder = original.newBuilder();
-//        requestBuilder
-//      .header("User-Agent", "YourAppName")
-//      .header("Accept", "application/vnd.yourapi.v1.full+json")
-//                .addHeader("PHONEMODEL", SysUtil.getPhoneModel()) //手机机型
-//                //.addHeader("UUID", TextUtils.isEmpty(EOAApplication.getInstance().IMEI) ? "":EOAApplication.getInstance().IMEI) //手机标识码
-//                .addHeader("UUID", TextUtils.isEmpty(SharedPreferenceUtil.getString(SharedPreferenceUtil.DEVICE_IMEI, "")) ? "":SharedPreferenceUtil.getString(SharedPreferenceUtil.DEVICE_IMEI, "")) //手机标识码
-//                .addHeader("OS", "ANDROID") //系统类型 ANDROID/IOS
-//                .addHeader("OS_VERSION", SysUtil.getAndroidVersionNumber()) //系统版本
-//                .addHeader("APP_VERSION", "android_yft_" + String.valueOf(EOAApplication.getInstance().APPLICATION_VERSION)) //客户端版本
-//                .addHeader("T_VERSION", "3"); //接口控制版本 值变动由后台和客户端协商
-//
-//        if (!TextUtils.isEmpty(UserInfoBean.getInstance().getToken_id())) {
-//            Log.i(TAG, "TOKENID==>" + UserInfoBean.getInstance().getToken_id());
-//            requestBuilder.addHeader("TOKENID", UserInfoBean.getInstance().getToken_id());
-//        }
+        String authorization = YDWMSApplication.getInstance().getAuthorization();
+        if( ! TextUtils.isEmpty(authorization) ) {
+            requestBuilder.addHeader("Authorization", "Bearer " + authorization);
+        }
         requestBuilder.method(original.method(), original.body());
         Request request = requestBuilder.build();
 

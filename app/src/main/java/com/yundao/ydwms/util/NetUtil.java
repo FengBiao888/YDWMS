@@ -10,7 +10,7 @@ public class NetUtil {
 
 	private static final String TAG = "";
 
-	private static NetworkInfo getCurrentActiveNetworkInfo(Context context) {
+	public static NetworkInfo getCurrentActiveNetworkInfo(Context context) {
 		NetworkInfo networkInfo = null;
 		// 获取手机所有连接管理对象（包括对wi-fi,net,gsm,cdma等连接的管理）
 		ConnectivityManager connectivityManager = (ConnectivityManager) context

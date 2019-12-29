@@ -14,8 +14,6 @@ public enum ScanTypeEnum {
     PRODUCT_PACKAGING( "产品打包", 1),
     PRODUCT_INCOMING( "成品进仓", 2 ),
     PRODUCT_OUTGOING( "成品出仓", 3 ),
-    SEMI_PRODUCT_INCOMING( "半成品进仓", 4 ),
-    SEMI_PRODUCT_OUTGOING( "半成品出仓", 5 ),
     WAREHOUSE_CHANGING( "仓位变更",6 ),
     PRODUCT_INVENTORY( "产品盘点",7 );
 

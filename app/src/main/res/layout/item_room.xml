@@ -8,61 +8,78 @@
     android:gravity="center_vertical">
 
     <TextView
-        android:id="@+id/id_tv_01"
+        android:id="@+id/index"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="01"/>
+        android:minWidth="20dp"
+        tools:text="序号"/>
 
     <TextView
-        android:id="@+id/id_tv_02"
+        android:id="@+id/bar_code"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="02"/>
+        android:minWidth="20dp"
+        tools:text="条码"/>
+
     <TextView
-        android:id="@+id/id_tv_03"
+        android:id="@+id/product_name"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="03"/>
+        android:minWidth="20dp"
+        tools:text="品名"/>
     <TextView
-        android:id="@+id/id_tv_04"
+        android:id="@+id/splice"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="04"/>
+        android:minWidth="20dp"
+        tools:text="驳口"/>
     <TextView
-        android:id="@+id/id_tv_05"
+        android:id="@+id/train"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="05"/>
+        android:minWidth="20dp"
+        tools:text="班次"/>
     <TextView
-        android:id="@+id/id_tv_06"
+        android:id="@+id/materielModel"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="06"/>
+        android:minWidth="20dp"
+        tools:text="规格"/>
     <TextView
+        android:id="@+id/packing"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="包装"/>
+    <!--<TextView
         android:id="@+id/id_tv_07"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -70,7 +87,85 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        tools:text="07"/>
+        tools:text="班组"/>-->
+    <TextView
+        android:id="@+id/machine"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="机台"/>
+    <TextView
+        android:id="@+id/trayNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="托盘"/>
+    <TextView
+        android:id="@+id/length"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="米数"/>
+    <TextView
+        android:id="@+id/tareWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="皮重"/>
+    <TextView
+        android:id="@+id/netWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="净重"/>
+    <!--<TextView
+        android:id="@+id/id_tv_07"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        tools:text="卷长"/>-->
+    <TextView
+        android:id="@+id/volume"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="20dp"
+        tools:text="卷号"/>
+    <!--<TextView
+        android:id="@+id/id_tv_07"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        tools:text="分切数量"/>-->
 
 
 </sysu.zyb.panellistlibrary.CheckableLinearLayout>

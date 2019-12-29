@@ -82,6 +82,7 @@ public abstract class AbstractPanelListAdapter {
     private String titleColor = "#CFD8DC";//default color of title
     private String rowColor = "#CDDC39";//default color of title
     private String titleTextColor = "#000000";//default color of title
+    private int columnDividerHeight;
 
     private Drawable rowDivider;
     private Drawable columnDivider;
@@ -114,6 +115,7 @@ public abstract class AbstractPanelListAdapter {
     private List<List<String>> contentDataList;
     private List<Integer> itemWidthList;
     private int itemHeight = 150;// 默认150px 的高度
+
 
     /**
      * constructor
@@ -343,7 +345,7 @@ public abstract class AbstractPanelListAdapter {
             contentAdapter = new DefaultContentAdapter(context, R.layout.defaultcontentitem,
                     contentDataList, itemWidthList, itemHeight, lv_content);
         }
-
+        removeViewContect();
         reorganizeViewGroup();
 
         mhsv_row.setOnHorizontalScrollListener(horizontalScrollListener);
@@ -383,7 +385,24 @@ public abstract class AbstractPanelListAdapter {
         }
     }
 
-
+    public void removeViewContect(){
+        pl_root.removeAllViews();//外层的根布局
+        TextView tv_title;//左上角的title
+        if( ll_row != null )
+            ll_row.removeAllViews();//上方的表头
+        if( lv_column != null )
+//            lv_column.removeAllViews();//左边的表头
+        if( lv_content != null )
+//            lv_content.removeAllViews();//中间的内容部分
+        if( ll_contentItem != null )
+            ll_contentItem.removeAllViews();//中间的内容部分的子布局
+        if( swipeRefreshLayout != null)
+            swipeRefreshLayout.removeAllViews();//中间ListView外层的下拉刷新布局
+        if( mhsv_row != null )
+            mhsv_row.removeAllViews();
+        if(mhsv_content != null)
+            mhsv_content.removeAllViews();
+    }
     /**
      * 核心代码：
      * 整理重组整个表的布局
@@ -438,7 +457,6 @@ public abstract class AbstractPanelListAdapter {
 //        lv_column.setFastScrollEnabled(false);
         lv_column.setBackgroundColor(Color.parseColor(columnColor));
         lv_column.setId(View.generateViewId());
-        lv_column.setDividerHeight( 20 );
 
         lv_column.setVerticalScrollBarEnabled(false);//去掉滚动条
 //        lv_column.setDivider(context.getResources().getDrawable(R.drawable.column_item_divider));
@@ -486,8 +504,9 @@ public abstract class AbstractPanelListAdapter {
         if (ll_contentItem != null) {
             columnItemHeight = ll_contentItem.getHeight();
             lv_column.setAdapter(getColumnAdapter());
-            if (columnDivider != null) {
+            if (columnDivider != null && columnDividerHeight != 0 ) {
                 lv_column.setDivider(columnDivider);
+                lv_column.setDividerHeight( columnDividerHeight );
             }
         }
     }
@@ -610,6 +629,10 @@ public abstract class AbstractPanelListAdapter {
             columnAdapter = new ColumnAdapter(context, android.R.layout.simple_list_item_1, getColumnDataList());
         }
         return columnAdapter;
+    }
+
+    public void setColumnDividerHeight(int columnDividerHeight) {
+        this.columnDividerHeight = columnDividerHeight;
     }
 
     /**
