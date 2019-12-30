@@ -111,9 +111,11 @@ public class RoomPanelListAdapter extends AbstractPanelListAdapter {
             viewHolder.packing.setText( info.packing );
             viewHolder.machine.setText( info.machine );
             viewHolder.trayNumber.setText( info.trayNumber );
-            viewHolder.length.setText( info.length );
-            viewHolder.tareWeight.setText( info.tareWeight == null ? "" : info.tareWeight.toString() );
-            viewHolder.netWeight.setText( info.netWeight == null ? "": info.netWeight.toString() );
+            viewHolder.length.setText( info.length + "" );
+//            viewHolder.tareWeight.setText( info.tareWeight == null ? "" : info.tareWeight.toString() );
+//            viewHolder.netWeight.setText( info.netWeight == null ? "": info.netWeight.toString() );
+            viewHolder.tareWeight.setText( info.tareWeight + "" );
+            viewHolder.netWeight.setText( info.netWeight + "" );
             viewHolder.volume.setText( info.volume );
 //            viewHolder.tv_1.setBackgroundResource(getBackgroundResource(roomDetail.get(1)));
 //            viewHolder.tv_1.setText(getText(roomDetail.get(1)));

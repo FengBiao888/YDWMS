@@ -7,7 +7,7 @@ public class ProductInfo {
     public long id;
 
     // 客户id
-    public long customerId;
+    public String customerId;
 
     // 客户简称
     public String customerAbbreviation;
@@ -31,7 +31,7 @@ public class ProductInfo {
     public String volume;
 
     // 长度
-    public String length;
+    public int length;
 
     // 驳口
     public String splice;

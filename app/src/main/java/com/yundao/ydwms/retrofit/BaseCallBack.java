@@ -49,8 +49,11 @@ public class BaseCallBack<T> implements Callback<T> {
         Log.e(TAG, "BaseCallBack call can not cast to Call<? extends BaseRespone>)!!!");
 //      e.printStackTrace();
       }
-      if (response.body() == null) {
-        ToastUtil.showShortToast("服务器未知异常，请重试");
+      if (response.code() != 200 && response.code() != 204) {
+        if (response.errorBody() != null) {
+          String s = response.errorBody().source().toString();
+          ToastUtil.showShortToast(s);
+        }
       }
     }
   }
@@ -84,4 +87,5 @@ public class BaseCallBack<T> implements Callback<T> {
   public void printFailureRe(Response<? extends BaseRespone> respone){
 
   }
+
 }

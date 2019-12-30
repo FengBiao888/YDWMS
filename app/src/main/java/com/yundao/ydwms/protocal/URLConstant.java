@@ -22,4 +22,24 @@ public class URLConstant {
      * 产品进仓
      */
     public static final String PRODUCTION_INCOMING = "api/goProduction";
+    /**
+     * 产品出仓
+     */
+    public static final String PRODUCTION_OUTGOING = "api/outProduction";
+    /**
+     * 仓位变更
+     */
+    public static final String CHANGE_WAREHOUSE_POSITION = "api/changeWarehousePosition";
+    /**
+     * 产品加工
+     */
+    public static final String PRODUCTION_MACHINING = "api/machiningProduction";
+    /**
+     * 产品加工
+     */
+    public static final String PRODUCTION_BALING = "api/baling";
+    /**
+     * 是否该月盘点过
+     */
+    public static final String PRODUCTION_IS_CHECKED = "api/isChecked";
 }

@@ -37,6 +37,7 @@ import butterknife.BindView;
 
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INCOMING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INVENTORY;
+import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_MACHINING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_OUTGOING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_PACKAGING;
 import static com.yundao.ydwms.ScanTypeEnum.WAREHOUSE_CHANGING;
@@ -98,6 +99,11 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         clickListener = new WorkDayClickListener( productPackaging );
         productPackaging.setClickListener( clickListener );
 
+        ItemCheckbox productMachining = new ItemCheckbox( getActivity(), PRODUCT_MACHINING.getCodeName() );
+        productMachining.setExtraObj( PRODUCT_MACHINING );
+        clickListener = new WorkDayClickListener( productMachining );
+        productMachining.setClickListener( clickListener );
+
         ItemCheckbox productInventory = new ItemCheckbox( getActivity(), PRODUCT_INVENTORY.getCodeName() );
         productInventory.setExtraObj( PRODUCT_INVENTORY );
         clickListener = new WorkDayClickListener( productInventory );
@@ -106,10 +112,12 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         list.add( productIncoming );
         list.add( productOutgoing );
         list.add( warehouseChanging );
+        list.add( productMachining );
         list.add( productPackaging );
         list.add( productInventory );
         checkboxes.add( productIncoming );
         checkboxes.add( productOutgoing );
+        checkboxes.add( productMachining );
         checkboxes.add( warehouseChanging );
         checkboxes.add( productPackaging );
         checkboxes.add( productInventory );

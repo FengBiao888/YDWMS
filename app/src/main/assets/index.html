@@ -1,0 +1,60 @@
+<html>
+<style type="text/css">
+    table{
+        border-collapse: collapse;
+    }
+    table,table tr td {
+        border:1px solid #000;
+    }
+    table tr td{
+        padding: 5px 10px;
+    }
+    .left {
+            width: 50%;    /*这里是百分比或者像素值，对应下面的center就是百分比或者像素值*/
+            height: 40px;
+            float: left;
+            text-align:left;
+     }
+    .right {
+        width: 50%;  /*这里是百分比或者像素值，对应下面的center就是百分比或者像素值*/
+        height: 40px;
+        float: right;
+        text-align:right;
+    }
+    .center {
+            /*两种方式均可（一）margin(二)margin-left、margin-right*/
+            /*（一）、用这种方式上面的left和right中的width是百分比或者像素值都可以*/
+            margin: auto;
+		}
+</style>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript">
+		function onSaveCallback(src){
+			document.getElementById("test").src = src;
+		}
+	</script>
+</head>
+<body>
+<h1>客户名：{{custemName}}</h1>
+<div id="middle">
+    <div class="left">
+        <text style="font-size:20px">托盘号{{trayNumber}}</text>
+    </div>
+    <div class="right">
+        <text style="font-size:20px">日 期{{date}}</text>
+    </div>
+</div>
+<table width="100%" border="1">
+    <tr>
+        <td width="25%" style="text-align:center"><text style="font-size:20px">规格</text></th>
+        <td width="25%" style="text-align:center"><text style="font-size:20px">编号</text></th>
+        <td width="25%" style="text-align:center"><text style="font-size:20px">重量</text></th>
+        <td width="25%" style="text-align:center"><text style="font-size:20px">米数</text></th>
+    </tr>
+</table>
+<div style="margin-top:5px" align="center" ><img id="test" src="" onclick=""/></div>
+<div style="margin-top:5px" align="center">123123123123</div>
+
+</body>
+</html>

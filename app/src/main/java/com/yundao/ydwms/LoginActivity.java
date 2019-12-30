@@ -16,6 +16,7 @@ import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
+import com.yundao.ydwms.util.ToastUtil;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -72,7 +73,12 @@ public class LoginActivity extends AppCompatActivity {
                         if( body != null && response.code() == 200 ){
                             YDWMSApplication.getInstance().setAuthorization( body.token );
                             YDWMSApplication.getInstance().setUser( body.user );
+                            setResult( RESULT_OK );
                             finish();
+                        }else{
+                            YDWMSApplication.getInstance().setAuthorization( "" );
+                            YDWMSApplication.getInstance().setUser( null );
+                            ToastUtil.showShortToast( "数据异常，请重试" );
                         }
                     }
 

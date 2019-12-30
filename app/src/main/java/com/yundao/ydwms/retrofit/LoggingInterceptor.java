@@ -4,12 +4,14 @@ import android.text.TextUtils;
 
 import com.yundao.ydwms.YDWMSApplication;
 import com.yundao.ydwms.protocal.Log;
+import com.yundao.ydwms.protocal.URLConstant;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -26,11 +28,18 @@ public class LoggingInterceptor implements Interceptor {
     public okhttp3.Response intercept(Chain chain) throws IOException {
         //获得请求信息，此处如有需要可以添加headers信息
         Request original = chain.request();
+        HttpUrl httpUrl = chain.request().url();
+        String url = httpUrl.url().toString();
+
         //添加头部信息
+//        if( )
         Request.Builder requestBuilder = original.newBuilder();
         String authorization = YDWMSApplication.getInstance().getAuthorization();
         if( ! TextUtils.isEmpty(authorization) ) {
             requestBuilder.addHeader("Authorization", "Bearer " + authorization);
+        }
+        if( url.contains(URLConstant.PRODUCTION_INCOMING) ){//Content-Type: application/json
+            requestBuilder.addHeader("Content-Type", "application/json");
         }
         requestBuilder.method(original.method(), original.body());
         Request request = requestBuilder.build();
@@ -38,9 +47,8 @@ public class LoggingInterceptor implements Interceptor {
         //打印请求信息
         syso("url:" + request.url());
         syso("method:" + request.method());
-        syso("request headers==========");
         Headers requestHeaders = request.headers();
-        syso(requestHeaders.toString());
+        syso("request headers=========="+ requestHeaders.toString());
 //    syso("request-body:" + request.body());
         RequestBody requestBody = request.body();
         String body = null;

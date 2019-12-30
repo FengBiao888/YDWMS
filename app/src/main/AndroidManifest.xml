@@ -44,6 +44,8 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+
+        <service android:name=".print.PrintJobMonitorService"/>
     </application>
 
 </manifest>

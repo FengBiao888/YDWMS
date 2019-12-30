@@ -12,34 +12,44 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintJob;
+import android.print.PrintManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
+import com.google.zxing.WriterException;
 import com.nf.android.common.base.ImmersiveBaseActivity;
+import com.yundao.ydwms.print.PrintJobMonitorService;
 import com.yundao.ydwms.protocal.ProductInfo;
-import com.yundao.ydwms.protocal.request.LoginRequest;
+import com.yundao.ydwms.protocal.request.PackeResourse;
+import com.yundao.ydwms.protocal.request.ProductionVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
+import com.yundao.ydwms.util.BitmapUtil;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
@@ -49,7 +59,8 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
 
     private final static String SCAN_ACTION = ScanManager.ACTION_DECODE;//default action
 
-    private String[] codes = new String[]{ "15774952757321", "15774952757331","15774952757341","15774952757351" };
+//    private String[] codes = new String[]{ "15774952757321", "15774952757331","15774952757341","15774952757351" };
+    private String[] codes = new String[]{ "15774952757331", "15774952757351" };
     private int codeIndex = 0 ;
 //    @BindView(R.id.id_pl_root)
     PanelListLayout pl_root;
@@ -78,6 +89,9 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
     @BindView( R.id.remark_value )
     EditText remarkValue ;
 
+    private PrintManager mgr = null;
+    private WebView wv = null;
+    PrintJob print ;
 
     AbstractPanelListAdapter adapter;
     List<ProductInfo> roomList = new ArrayList<>();
@@ -143,6 +157,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
         pl_root = findViewById( R.id.id_pl_root ) ;
         lv_content = findViewById( R.id.id_lv_content ) ;
 
+        mgr = (PrintManager) getSystemService(PRINT_SERVICE);
 
         adapter = new RoomPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
         adapter.setTitleWidth( 40 );
@@ -164,22 +179,85 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
 
 
         submit.setOnClickListener( v->{
-//            DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
-//                productionIncoming( getActivity(), true );
-//            } )
-//            .show();
-            productionLog( getActivity(), true, codes[codeIndex] );
+            DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
+                if( anEnum.equals( ScanTypeEnum.PRODUCT_INCOMING  ) ) {
+                    productionIncoming(getActivity(), true);
+                }else if( anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING  ) ){
+                    changeWarehousePositon( getActivity(), true, remarkValue.getText().toString() );
+                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_MACHINING  ) ){
+                    productionMachining( getActivity(), true );
+                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_OUTGOING  ) ){
+                    productionOutgoing( getActivity(), true );
+                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
+                    baling( getActivity(), true , "2019-11" );
+                }
+                else if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
+                    if( codeIndex < codes.length ) {
+                        productionLog(getActivity(), true, codes[codeIndex]);
+                    }else{
+                        PackeResourse resourse = new PackeResourse();
+                        long timeMillis = System.currentTimeMillis();
+                        resourse.barCode = timeMillis + "2" ;
+                        resourse.dateline = timeMillis ;
+                        int totalLength = 0 ;
+                        BigDecimal totalWeight = null ;
+                        for( int i = 0 ; i < roomList.size() ; i ++ ){
+                            ProductInfo productInfo = roomList.get(i);
+                            if( TextUtils.isEmpty( resourse.trayNumber ) && ! TextUtils.isEmpty( productInfo.trayNumber ) ){
+                                resourse.trayNumber = productInfo.trayNumber ;
+                            }
+                            if( TextUtils.isEmpty( resourse.customerId ) && ! TextUtils.isEmpty( productInfo.customerId ) ){
+                                resourse.customerId = productInfo.customerId ;
+                            }
+                            if( TextUtils.isEmpty( resourse.customerName ) && ! TextUtils.isEmpty( productInfo.customerAbbreviation ) ){
+                                resourse.customerName = productInfo.customerAbbreviation ;
+                            }
+                            if( TextUtils.isEmpty( resourse.materielCode ) && ! TextUtils.isEmpty( productInfo.materielCode ) ){
+                                resourse.materielCode = productInfo.materielCode ;
+                            }
+                            if( TextUtils.isEmpty( resourse.materielModel ) && ! TextUtils.isEmpty( productInfo.materielModel ) ){
+                                resourse.materielModel = productInfo.materielModel ;
+                            }
+                            if( TextUtils.isEmpty( resourse.materielName ) && ! TextUtils.isEmpty( productInfo.materielName ) ){
+                                resourse.materielName = productInfo.materielName ;
+                            }
+                            totalLength += productInfo.length ;
+
+                            if( productInfo.netWeight != null ) {
+                                if( totalWeight == null ){
+                                    totalWeight = productInfo.netWeight ;
+                                }else {
+                                    totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
+                                }
+                            }
+                        }
+                        resourse.meter = totalLength + "" ;
+                        resourse.number = roomList.size() ;
+                        resourse.netWeight = totalWeight ;
+                        resourse.productionLogs = roomList ;
+                        baling( getActivity(), true, resourse );
+                    }
+                }
+            } )
+            .show();
+//            productionLog( getActivity(), true, codes[codeIndex] );
         } );
 
         if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY )
                 || anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING )
-
+                || anEnum.equals( ScanTypeEnum.PRODUCT_INCOMING  )
                 ){
             remark.setText( "仓位" );
+            if( anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING ) ){
+                remarkValue.setText( "15774952757123" );
+            }
         }
 
         if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
             submit.setText( "产品打包" );
+//            15774952757321，15774952757331，15774952757341，15774952757351
+
+
         }
     }
 
@@ -315,7 +393,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                                 }
                                 if( ! isInit ){
                                     pl_root.setAdapter(adapter);
-//                                    isInit = true ;
+                                    isInit = true ;
                                 }else{
                                     adapter.notifyDataSetChanged();
                                 }
@@ -332,29 +410,217 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
         List<String> list = new ArrayList<>();
         list.add( "15774952757321" );
         list.add( "15774952757331" );
-        list.add( "15774952757341" );
+//        list.add( "15774952757341" );
 
-        String[] aabbcc = new String[]{ "15774952757321","15774952757331", "15774952757341" };
-        LoginRequest request = new LoginRequest();
-
+        ProductionVo vo = new ProductionVo();
+        vo.codes = list ;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
                 .build(activity);
 
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),json);
-
         PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.productionIncoming( body )
+        postRequestInterface.productionIncoming( vo )
                 .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
                     @Override
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
+                        if( response.code() == 200 || response.code() == 204 ){
+                            ToastUtil.showShortToast( "进仓成功" );
+                        }
                     }
 
                 });
 
+    }
+
+    //15774952757321，15774952757331，15774952757341，15774952757351
+    public void productionOutgoing(Activity activity, boolean showProgressDialog ){
+
+        List<String> list = new ArrayList<>();
+        list.add( "15774952757321" );
+        list.add( "15774952757331" );
+//        list.add( "15774952757341" );
+
+        ProductionVo vo = new ProductionVo();
+        vo.codes = list ;
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.productionOutgoing( vo )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 200 || response.code() == 204 ){
+                            ToastUtil.showShortToast( "出仓成功" );
+                        }
+                    }
+
+                });
+
+    }
+
+    //15774952757321，15774952757331，15774952757341，15774952757351
+    public void productionMachining(Activity activity, boolean showProgressDialog ){
+
+        List<String> list = new ArrayList<>();
+        list.add( "15774952757321" );
+        list.add( "15774952757331" );
+//        list.add( "15774952757341" );
+
+        ProductionVo vo = new ProductionVo();
+        vo.codes = list ;
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.productionMachining( vo )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 200 || response.code() == 204 ){
+                            ToastUtil.showShortToast( "加工成功" );
+                        }
+                    }
+
+                });
+
+    }
+
+    //15774952757321，15774952757331，15774952757341，15774952757351
+    public void changeWarehousePositon(Activity activity, boolean showProgressDialog, String wearhouseCode ){
+
+        List<String> list = new ArrayList<>();
+        list.add( "15774952757321" );
+        list.add( "15774952757331" );
+//        list.add( "15774952757341" );
+
+        ProductionVo vo = new ProductionVo();
+//        vo.codes = list ;
+        vo.code = "15774952757321" ;
+        vo.warehouseCode = wearhouseCode;
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.changeWarehousePositon( vo )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 200 || response.code() == 204 ){
+                            ToastUtil.showShortToast( "仓位变更成功" );
+                        }
+                    }
+
+                });
+
+    }
+
+    public void baling(Activity activity, boolean showProgressDialog, PackeResourse vo){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.baling( vo )
+                .enqueue(new BaseCallBack<PackeResourse>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<PackeResourse> call, Response<PackeResourse> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 201 ){
+                            ToastUtil.showShortToast( "打包成功" );
+                            printReport( "123123123123" );
+                        }
+                    }
+                });
+
+    }
+
+    public void baling(Activity activity, boolean showProgressDialog, String yearMonth){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.monthIsChecked( yearMonth )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 200 ){
+                        }
+                    }
+                });
+
+    }
+
+    private void printReport(String barcodeStr) {
+//        Template tmpl =
+//                Mustache.compiler().compile(getString(R.string.report_body));
+        WebView print = prepPrintWebView( "packaging", barcodeStr );
+//        print.loadData( tmpl.execute(new TpsReportContext(prose.getText().toString()) ),
+//                "text/html; charset=UTF-8", null);
+        print.loadUrl( "file:///android_asset/index.html");
+    }
+
+    private WebView prepPrintWebView(final String name, String barcodeStr) {
+        WebView result = getWebView();
+
+
+        result.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if( !url.equals( "file:///android_asset/index.html" ) ) {
+
+                }else{
+                    try {
+                        String url1 = "javascript:onSaveCallback('data:image/png;base64," + BitmapUtil.bitmaptoString(BitmapUtil.CreateOneDCode(barcodeStr)) + "')";
+                        System.out.println("url1: " + url1);
+                        view.loadUrl(url1);
+                        print = print(name, view.createPrintDocumentAdapter(),
+                                new PrintAttributes.Builder().build());
+
+                    } catch (WriterException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        return (result);
+    }
+
+
+    private WebView getWebView() {
+        if (wv == null) {
+            wv = new WebView(this);
+            WebSettings settings = wv.getSettings();
+
+            //支持JavaScript
+            settings.setJavaScriptEnabled(true);
+            settings.setJavaScriptCanOpenWindowsAutomatically(false); //支持通过JS打开新窗口
+
+        }
+
+        return (wv);
+    }
+
+    private PrintJob print(String name, PrintDocumentAdapter adapter,
+                           PrintAttributes attrs) {
+        startService(new Intent(this, PrintJobMonitorService.class));
+
+        return (mgr.print(name, adapter, attrs));
     }
 }

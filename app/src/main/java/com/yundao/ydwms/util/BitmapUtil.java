@@ -25,7 +25,7 @@ public class BitmapUtil {
 
         // 生成一维条码,编码时指定大小,不要生成了图片以后再进行缩放,这样会模糊导致识别失败
         BitMatrix matrix = new MultiFormatWriter().encode(content,
-                BarcodeFormat.CODE_128, 500, 200);
+                BarcodeFormat.CODE_128, 300, 60);
         int width = matrix.getWidth();
         int height = matrix.getHeight();
         int[] pixels = new int[width * height];
