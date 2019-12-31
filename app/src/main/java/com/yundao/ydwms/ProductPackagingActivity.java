@@ -1,8 +1,10 @@
 package com.yundao.ydwms;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
@@ -11,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Vibrator;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
@@ -42,9 +45,12 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.BitmapUtil;
+import com.yundao.ydwms.util.DateFormatUtils;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,10 +135,11 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
 
     };
     private Enum anEnum ;
+    private String printFilePath;
 
     @Override
     protected void setTitleBar() {
-        titleBar.setTitleMainText( "产品打包" );
+        titleBar.setTitleMainText( ( (ScanTypeEnum)anEnum ).getCodeName() );
     }
 
     @Override
@@ -144,11 +151,13 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
     protected void initIntent(Intent intent) {
         super.initIntent(intent);
         anEnum = (Enum) intent.getSerializableExtra( "pickScanType" );
+
     }
 
     @Override
     public void initView(Bundle var1) {
 
+        printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -188,10 +197,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                     productionMachining( getActivity(), true );
                 }else if( anEnum.equals( ScanTypeEnum.PRODUCT_OUTGOING  ) ){
                     productionOutgoing( getActivity(), true );
-                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
-                    baling( getActivity(), true , "2019-11" );
-                }
-                else if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
+                } else if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
                     if( codeIndex < codes.length ) {
                         productionLog(getActivity(), true, codes[codeIndex]);
                     }else{
@@ -237,6 +243,8 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                         resourse.productionLogs = roomList ;
                         baling( getActivity(), true, resourse );
                     }
+                }else if( codeIndex < codes.length ) {
+                    productionLog(getActivity(), true, codes[codeIndex]);
                 }
             } )
             .show();
@@ -250,14 +258,15 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
             remark.setText( "仓位" );
             if( anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING ) ){
                 remarkValue.setText( "15774952757123" );
+            }else if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
+                monthIsChecked( getActivity(), true );
+                remarkValue.setText( "15774952757123" );
             }
         }
 
         if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
             submit.setText( "产品打包" );
 //            15774952757321，15774952757331，15774952757341，15774952757351
-
-
         }
     }
 
@@ -398,6 +407,10 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                                     adapter.notifyDataSetChanged();
                                 }
                                 codeIndex ++ ;
+
+                                if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
+                                    pdaCheck( activity, true, content[0] );
+                                }
                             }
                         }
                     }
@@ -540,6 +553,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 201 ){
                             ToastUtil.showShortToast( "打包成功" );
+                            writeHtml( vo );
                             printReport( "123123123123" );
                         }
                     }
@@ -547,19 +561,51 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
 
     }
 
-    public void baling(Activity activity, boolean showProgressDialog, String yearMonth){
+    public void monthIsChecked(Activity activity, boolean showProgressDialog){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
                 .build(activity);
 
         PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.monthIsChecked( yearMonth )
+        postRequestInterface.monthIsChecked( )
                 .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
                     @Override
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
-                        if( response.code() == 200 ){
+                        if( response.code() == 400 ){//未盘点
+                            Dialog dialog = DialogUtil.showDeclareDialog(activity, "上月未消盘点", false, v -> {} );
+                            dialog.show();
+                        }else{
+                            Dialog dialog = DialogUtil.showDeclareDialog(activity, "上月已盘点", v -> {
+                            });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    finish();
+                                }
+                            });
+                        }
+                    }
+                });
+
+    }
+
+    public void pdaCheck(Activity activity, boolean showProgressDialog, ProductInfo info){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        info.classify = 1 ;
+        postRequestInterface.pdaCheck( info )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if ( response.code() == 400  ){
+                            ToastUtil.showShortToast( "盘点失败" );
                         }
                     }
                 });
@@ -572,7 +618,76 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
         WebView print = prepPrintWebView( "packaging", barcodeStr );
 //        print.loadData( tmpl.execute(new TpsReportContext(prose.getText().toString()) ),
 //                "text/html; charset=UTF-8", null);
-        print.loadUrl( "file:///android_asset/index.html");
+
+        print.loadUrl("file://" + printFilePath);
+    }
+
+    private void writeHtml(PackeResourse vo){
+
+        File dataFile = new File(Environment.getExternalStorageDirectory(), "print.html");
+        try {
+            if (!dataFile.exists()) {
+                dataFile.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(dataFile);
+            fos.write( htmltext( vo ).getBytes( "utf-8") );
+            fos.flush();
+            fos.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String htmltext(PackeResourse vo){
+        StringBuffer buffer = new StringBuffer( );
+        buffer.append("<style type=\"text/css\">\n" +
+                "    table{ border-collapse: collapse; }\n" +
+                "    table,table tr td { border:1px solid #000; }\n" +
+                "    table tr td{ padding: 5px 10px; }\n" +
+                "    .left { width: 50%; height: 40px; float: left; text-align:left; }\n" +
+                "    .right { width: 50%; height: 40px; float: right; text-align:right; }\n" +
+                "    .center { margin: auto; }\n" +
+                "</style>\n" +
+                "<head>\n" +
+                "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
+                "    <script type=\"text/javascript\">\n" +
+                "\t\tfunction onSaveCallback(src){ document.getElementById(\"test\").src = src; }\n" +
+                "\t</script>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1>客户名：").append( vo.customerName ).append("</h1>\n" +
+                "<div id=\"middle\">\n" +
+                "    <div class=\"left\"><text style=\"font-size:20px\">托盘号：").append( vo.trayNumber ).append("</text> </div>\n" +
+                "    <div class=\"right\"><text style=\"font-size:20px\">日 期：").append(DateFormatUtils.long2Str( vo.dateline, false ) ).append("</text></div>\n" +
+                "</div>\n" +
+                "<table width=\"100%\" border=\"1\">\n" +
+                "    <tr>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">规格</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">编号</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">重量</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">米数</text></th>\n" +
+                "    </tr>\n");
+                for( int i = 0 ; i < vo.productionLogs.size() ; i ++ ){
+                    ProductInfo productInfo = vo.productionLogs.get(i);
+                    buffer.append( "    <tr>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.materielModel ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.materielCode ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.netWeight == null ? "" : productInfo.netWeight.toString() ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.length ).append("</text></th>\n" ) ;
+                    buffer.append("    </tr>\n");
+                }
+                buffer.append( "    <tr>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">合计</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.productionLogs.size() ).append("件").append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.netWeight == null ? "" : vo.netWeight.toString() ).append("KG").append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.meter ).append("M").append("</text></th>\n" )
+                      .append( "    </tr>\n");
+                buffer.append("</table>\n" +
+                "<div style=\"margin-top:5px\" align=\"center\" ><img id=\"test\" src=\"\" onclick=\"\"/></div>\n" +
+                "<div style=\"margin-top:5px\" align=\"center\">123123123123</div>\n" +
+                "</body>\n" +
+                "</html>").append("\n");
+        return buffer.toString() ;
     }
 
     private WebView prepPrintWebView(final String name, String barcodeStr) {
@@ -582,7 +697,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
         result.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                if( !url.equals( "file:///android_asset/index.html" ) ) {
+                if( !url.equals( "file://" + printFilePath ) ) {
 
                 }else{
                     try {

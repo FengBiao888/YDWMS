@@ -49,12 +49,12 @@ public class BaseCallBack<T> implements Callback<T> {
         Log.e(TAG, "BaseCallBack call can not cast to Call<? extends BaseRespone>)!!!");
 //      e.printStackTrace();
       }
-      if (response.code() != 200 && response.code() != 204) {
-        if (response.errorBody() != null) {
-          String s = response.errorBody().source().toString();
-          ToastUtil.showShortToast(s);
-        }
-      }
+//      if (response.code() != 200 && response.code() != 204) {
+//        if (response.errorBody() != null) {
+//          String s = response.errorBody().source().toString();
+//          ToastUtil.showShortToast(s);
+//        }
+//      }
     }
   }
 

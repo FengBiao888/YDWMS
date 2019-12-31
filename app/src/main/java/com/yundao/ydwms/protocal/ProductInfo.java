@@ -6,6 +6,9 @@ public class ProductInfo {
 
     public long id;
 
+    public String balingId ;
+
+    public long classify ;//类别,盘点时传1
     // 客户id
     public String customerId;
 
@@ -44,6 +47,9 @@ public class ProductInfo {
 
     // 毛重
     public BigDecimal grossWeight;
+
+    //班组
+    public String team;
 
     // 班次
     public String train;
@@ -95,5 +101,7 @@ public class ProductInfo {
     public String warehouseName;
     // 仓位名
     public String warehousePositionName;
+
+    public long etectTime ;
 
 }

@@ -38,7 +38,7 @@ public class LoggingInterceptor implements Interceptor {
         if( ! TextUtils.isEmpty(authorization) ) {
             requestBuilder.addHeader("Authorization", "Bearer " + authorization);
         }
-        if( url.contains(URLConstant.PRODUCTION_INCOMING) ){//Content-Type: application/json
+        if( url.contains(URLConstant.PRODUCTION_OUTGOING) ){//Content-Type: application/json
             requestBuilder.addHeader("Content-Type", "application/json");
         }
         requestBuilder.method(original.method(), original.body());

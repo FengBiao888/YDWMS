@@ -3,6 +3,7 @@ package com.yundao.ydwms.retrofit;
 
 import android.support.design.widget.BaseTransientBottomBar;
 
+import com.yundao.ydwms.protocal.ProductInfo;
 import com.yundao.ydwms.protocal.URLConstant;
 import com.yundao.ydwms.protocal.request.LoginRequest;
 import com.yundao.ydwms.protocal.request.PackeResourse;
@@ -11,6 +12,8 @@ import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 
+import java.math.BigDecimal;
+import java.security.Timestamp;
 import java.util.List;
 
 import okhttp3.RequestBody;
@@ -64,7 +67,7 @@ public interface PostRequestService {
     @PUT(URLConstant.PRODUCTION_MACHINING)
     Call<BaseRespone> productionMachining(@Body ProductionVo requestBody);
     /**
-     * 产品进仓接口
+     * 改变仓库
      * @return
      */
     @Headers({"Content-Type: application/json"})
@@ -82,6 +85,12 @@ public interface PostRequestService {
      * @return
      */
     @GET(URLConstant.PRODUCTION_IS_CHECKED)
-    Call<BaseRespone> monthIsChecked(@Query("date") String date );
+    Call<BaseRespone> monthIsChecked( );
+    /**
+     * 产品进仓接口
+     * @return
+     */
+    @PUT(URLConstant.PRODUCTION_PDA_CHECK)
+    Call<BaseRespone> pdaCheck(@Body ProductInfo info);
 
 }

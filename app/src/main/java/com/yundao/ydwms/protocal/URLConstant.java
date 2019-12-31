@@ -42,4 +42,8 @@ public class URLConstant {
      * 是否该月盘点过
      */
     public static final String PRODUCTION_IS_CHECKED = "api/isChecked";
+    /**
+     * 盘点
+     */
+    public static final String PRODUCTION_PDA_CHECK = "api/PDACheck";
 }
