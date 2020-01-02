@@ -77,7 +77,7 @@ public class RoomPanelListAdapter extends AbstractPanelListAdapter {
 //            Map<Integer,Integer> roomDetail = roomList.get(position).getRoomDetail();
             //这种设置监听的方式并不是性能最优的，其实可以像复用ViewHolder一样复用监听器，每次改变监听的position参数即可
             //监听器作为一个tag-Object存放在convertView中。可能需要调试一下，不过应该没问题，有需要的自己可以动手试试
-            RoomClickListener listener = new RoomClickListener(position);
+//            RoomClickListener listener = new RoomClickListener(position);
 
             if (convertView == null){
                 view = LayoutInflater.from(parent.getContext()).inflate(itemResourceId,parent,false);
@@ -88,21 +88,21 @@ public class RoomPanelListAdapter extends AbstractPanelListAdapter {
                 viewHolder = (ViewHolder) view.getTag();
             }
 
-            viewHolder.index.setOnClickListener(listener);
-            viewHolder.bar_code.setOnClickListener(listener);
-            viewHolder.product_name.setOnClickListener(listener);
-            viewHolder.splice.setOnClickListener(listener);
-            viewHolder.train.setOnClickListener(listener);
-            viewHolder.materielModel.setOnClickListener(listener);
-            viewHolder.packing.setOnClickListener(listener);
-            viewHolder.machine.setOnClickListener(listener);
-            viewHolder.trayNumber.setOnClickListener(listener);
-            viewHolder.length.setOnClickListener(listener);
-            viewHolder.tareWeight.setOnClickListener(listener);
-            viewHolder.netWeight.setOnClickListener(listener);
-            viewHolder.volume.setOnClickListener(listener);
+//            viewHolder.index.setOnClickListener(listener);
+//            viewHolder.bar_code.setOnClickListener(listener);
+//            viewHolder.product_name.setOnClickListener(listener);
+//            viewHolder.splice.setOnClickListener(listener);
+//            viewHolder.train.setOnClickListener(listener);
+//            viewHolder.materielModel.setOnClickListener(listener);
+//            viewHolder.packing.setOnClickListener(listener);
+//            viewHolder.machine.setOnClickListener(listener);
+//            viewHolder.trayNumber.setOnClickListener(listener);
+//            viewHolder.length.setOnClickListener(listener);
+//            viewHolder.tareWeight.setOnClickListener(listener);
+//            viewHolder.netWeight.setOnClickListener(listener);
+//            viewHolder.volume.setOnClickListener(listener);
 
-            viewHolder.index.setText( position + "" );
+            viewHolder.index.setText( ( position + 1 ) + "" );
             viewHolder.bar_code.setText( info.barCode );
             viewHolder.product_name.setText( info.materielName );
             viewHolder.splice.setText( info.splice );

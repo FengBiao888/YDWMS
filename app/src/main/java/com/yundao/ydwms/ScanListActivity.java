@@ -23,6 +23,7 @@ import com.nf.android.common.listmodule.listitems.EditItemSubmitButton;
 import com.nf.android.common.listmodule.listitems.ItemCheckbox;
 import com.nf.android.common.listmodule.listitems.ItemOneTextView;
 import com.nf.android.common.widget.TimePickerDialogView;
+import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.io.Serializable;
@@ -35,6 +36,7 @@ import java.util.List;
 import butterknife.BindArray;
 import butterknife.BindView;
 
+import static com.yundao.ydwms.ScanTypeEnum.HALF_PRODUCT_OUTGOING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INCOMING;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_INVENTORY;
 import static com.yundao.ydwms.ScanTypeEnum.PRODUCT_MACHINING;
@@ -61,6 +63,8 @@ public class ScanListActivity extends BaseAbsListItemActivity {
 
     @Override
     public void initView(Bundle var1) {
+
+
     }
 
     @Override
@@ -72,7 +76,12 @@ public class ScanListActivity extends BaseAbsListItemActivity {
     public List<? extends AbsListItem> getItemList() {
         List<AbsListItem> list = new ArrayList<>();
 
-        ItemOneTextView workday = new ItemOneTextView(getActivity(), "操作员：红组", Color.parseColor( "#303030"));
+        String username = "" ;
+        User user = YDWMSApplication.getInstance().getUser();
+        if( user != null ){
+            username = user.username ;
+        }
+        ItemOneTextView workday = new ItemOneTextView(getActivity(), "操作员：" + username, Color.parseColor( "#303030"));
         workday.setEnabled( false );
         workday.setGravity(Gravity.LEFT);
         list.add(workday);
@@ -102,7 +111,12 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         ItemCheckbox productMachining = new ItemCheckbox( getActivity(), PRODUCT_MACHINING.getCodeName() );
         productMachining.setExtraObj( PRODUCT_MACHINING );
         clickListener = new WorkDayClickListener( productMachining );
-        productMachining.setClickListener( clickListener );
+        productMachining.setClickListener( clickListener ) ;
+
+        ItemCheckbox halfProductionOutgoing = new ItemCheckbox( getActivity(), HALF_PRODUCT_OUTGOING.getCodeName() );
+        halfProductionOutgoing.setExtraObj( HALF_PRODUCT_OUTGOING );
+        clickListener = new WorkDayClickListener( halfProductionOutgoing );
+        halfProductionOutgoing.setClickListener( clickListener );
 
         ItemCheckbox productInventory = new ItemCheckbox( getActivity(), PRODUCT_INVENTORY.getCodeName() );
         productInventory.setExtraObj( PRODUCT_INVENTORY );
@@ -112,11 +126,13 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         list.add( productIncoming );
         list.add( productOutgoing );
         list.add( warehouseChanging );
+        list.add( halfProductionOutgoing );
         list.add( productMachining );
         list.add( productPackaging );
         list.add( productInventory );
         checkboxes.add( productIncoming );
         checkboxes.add( productOutgoing );
+        checkboxes.add( halfProductionOutgoing );
         checkboxes.add( productMachining );
         checkboxes.add( warehouseChanging );
         checkboxes.add( productPackaging );

@@ -60,6 +60,13 @@ public interface PostRequestService {
     @PUT(URLConstant.PRODUCTION_OUTGOING)
     Call<BaseRespone> productionOutgoing(@Body ProductionVo requestBody);
     /**
+     * 半产品出仓接口
+     * @return
+     */
+    @Headers({"Content-Type: application/json"})
+    @PUT(URLConstant.HALF_PRODUCTION_OUTGOING)
+    Call<BaseRespone> halfProductionOutgoing(@Body ProductionVo requestBody);
+    /**
      * 产品加工
      * @return
      */

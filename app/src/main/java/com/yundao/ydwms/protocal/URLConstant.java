@@ -27,6 +27,10 @@ public class URLConstant {
      */
     public static final String PRODUCTION_OUTGOING = "api/outProduction";
     /**
+     * 产品出仓
+     */
+    public static final String HALF_PRODUCTION_OUTGOING = "api/outHalfProduction";
+    /**
      * 仓位变更
      */
     public static final String CHANGE_WAREHOUSE_POSITION = "api/changeWarehousePosition";

@@ -1,12 +1,12 @@
 package com.yundao.ydwms.protocal;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
-public class ProductInfo {
+public class ProductInfo implements Serializable{
 
-    public long id;
-
-    public String balingId ;
+    public String id;
 
     public long classify ;//类别,盘点时传1
     // 客户id
@@ -34,8 +34,9 @@ public class ProductInfo {
     public String volume;
 
     // 长度
-    public int length;
-
+    public long length;
+    //出库状态，1为已出库
+    public int state = 0 ;
     // 驳口
     public String splice;
 
@@ -97,11 +98,40 @@ public class ProductInfo {
     public String cancel;
     // 托盘号
     public String trayNumber;
+
+    public String createBy ;
+
+    public String createTime ;
+
+    public String updateTime ;
+
+    public String productionTime ;
+
+    public String delFlag ;
     // 仓库名
     public String warehouseName;
     // 仓位名
     public String warehousePositionName;
 
-    public long etectTime ;
+//    public Timestamp etectTime ;
 
+    public String remark ;
+
+    public String balingId ;
+
+    @Override
+    public boolean equals(Object obj) {
+        if( obj instanceof ProductInfo ){
+            return barCode.equals( ((ProductInfo) obj).barCode );
+        }
+        return super.equals(obj);
+    }
+
+    public boolean isSameType( ProductInfo info ){
+        if( materielName.equals( info.materielName ) && materielModel.equals( materielModel )){
+            return true ;
+        }else{
+            return false ;
+        }
+    }
 }

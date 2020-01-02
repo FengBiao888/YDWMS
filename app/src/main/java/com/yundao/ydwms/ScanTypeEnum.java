@@ -12,9 +12,10 @@ public enum ScanTypeEnum {
 //        <item>仓位变更</item>
 //        <item>产品盘点</item>
     PRODUCT_PACKAGING( "产品打包", 1),
-    PRODUCT_INCOMING( "成品进仓", 2 ),
-    PRODUCT_OUTGOING( "成品出仓", 3 ),
+    PRODUCT_INCOMING( "产品进仓", 2 ),
+    PRODUCT_OUTGOING( "产品出仓", 3 ),
     PRODUCT_MACHINING( "半成品加工", 4 ),
+    HALF_PRODUCT_OUTGOING( "半成品出仓", 5 ),
     WAREHOUSE_CHANGING( "仓位变更",6 ),
     PRODUCT_INVENTORY( "产品盘点",7 );
 

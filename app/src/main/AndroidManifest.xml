@@ -37,6 +37,10 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+        <activity android:name=".ProductCatalogueActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
         <activity android:name=".ConnectingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
