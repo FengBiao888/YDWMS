@@ -1,7 +1,7 @@
 package com.yundao.ydwms;
 
 import android.app.Application;
-
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.protocal.respone.User;
 
 public class YDWMSApplication extends Application {
@@ -21,7 +21,7 @@ public class YDWMSApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        SharedPreferenceUtil.initPreference(this);
         instance = this;
     }
 

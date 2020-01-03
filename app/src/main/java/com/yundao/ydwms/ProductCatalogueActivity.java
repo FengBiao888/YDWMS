@@ -81,7 +81,14 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
 
     @Override
     protected void setTitleBar() {
-        titleBar.setTitleMainText( "产品分类" );
+        titleBar.setTitleMainText( "产品分类" )
+            .setRightText( "完成" )
+            .setRightTitleClickListener( v -> {
+                Intent intent = new Intent();
+                intent.putExtra( "productInfoList", roomList );
+                setResult( dataChanged ? RESULT_OK : RESULT_CANCELED, intent ) ;
+                finish();
+            } );
     }
 
     @Override
@@ -110,7 +117,7 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
         lv_content = findViewById( R.id.id_lv_content ) ;
 
 
-        adapter = new RoomPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
+        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
         adapter.setTitleWidth( 40 );
         adapter.setTitleHeight( 40 );
         adapter.setRowColor( "#4396FF" );
@@ -186,16 +193,6 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
             } );
             return view;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if( dataChanged ){
-            Intent intent = new Intent();
-            intent.putExtra( "productInfoList", roomList );
-        }
-        setResult( dataChanged ? RESULT_OK : RESULT_CANCELED ) ;
-        finish();
     }
 
     @Override

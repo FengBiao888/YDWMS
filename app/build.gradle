@@ -1,6 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    signingConfigs {
+        config {
+            keyAlias 'android.keystore'
+            keyPassword '7ff505ee93'
+            storeFile file('../android.keystore')
+            storePassword '7ff505ee93'
+        }
+    }
+
     compileSdkVersion 27
     buildToolsVersion '27.0.2'
     defaultConfig {
@@ -12,9 +22,19 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            //signingConfig signingConfigs.config
+            zipAlignEnabled false
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.config
+            renderscriptDebuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'  // 加载默认混淆配置文件
+            zipAlignEnabled true
         }
     }
     compileOptions {

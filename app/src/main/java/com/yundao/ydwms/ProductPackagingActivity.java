@@ -2,6 +2,7 @@ package com.yundao.ydwms;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +15,8 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
@@ -27,6 +30,7 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +38,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.zxing.WriterException;
+import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.nf.android.common.base.ImmersiveBaseActivity;
 import com.yundao.ydwms.print.PrintJobMonitorService;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -41,6 +46,7 @@ import com.yundao.ydwms.protocal.request.PackeResourse;
 import com.yundao.ydwms.protocal.request.ProductionVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
@@ -51,6 +57,7 @@ import com.yundao.ydwms.util.ToastUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,324 +68,129 @@ import retrofit2.Response;
 import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
 import sysu.zyb.panellistlibrary.PanelListLayout;
 
-public class ProductPackagingActivity extends ImmersiveBaseActivity {
-
-    private final static String SCAN_ACTION = ScanManager.ACTION_DECODE;//default action
-
-//    private String[] codes = new String[]{ "15774952757321", "15774952757331","15774952757341","15774952757351" };
-    private String[] codes = new String[]{ "15774952757331", "15774952757351" };
-    private int codeIndex = 0 ;
-//    @BindView(R.id.id_pl_root)
-    PanelListLayout pl_root;
-//    @BindView(R.id.id_lv_content)
-    ListView lv_content;
-    @BindView( R.id.confirm )
-    Button submit ;
-    @BindView( R.id.operator )
-    TextView operator ;
-    @BindView( R.id.state )
-    TextView totalCount ;
-    @BindView( R.id.bar_code_value )
-    EditText barCode ;
-    @BindView( R.id.material_value )
-    EditText material ;
-    @BindView( R.id.product_name_value )
-    EditText productName ;
-    @BindView( R.id.specificationl_value )
-    EditText specification ;
-    @BindView( R.id.number_value )
-    EditText number ;
-    @BindView( R.id.pack_value )
-    EditText pack ;
-    @BindView( R.id.remark )
-    TextView remark ;
-    @BindView( R.id.remark_value )
-    EditText remarkValue ;
+public class ProductPackagingActivity extends ProductBaseActivity {
 
     private PrintManager mgr = null;
     private WebView wv = null;
     PrintJob print ;
-
-    AbstractPanelListAdapter adapter;
-    List<ProductInfo> roomList = new ArrayList<>();
-
-    private Vibrator mVibrator;
-    private ScanManager mScanManager;
-    private SoundPool soundpool = null;
-    private int soundid;
-    private String barcodeStr;
-    private boolean isScaning = false;
+    private String printFilePath;
     private boolean isInit = false ;
 
-    List<String> columnDataList = new ArrayList<>();
-
-    private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
+    Dialog printProgress ;
+    private int tempTime = 0 ;//轮循尝试次数
+    private String printBarCode ;
+    private Handler printJobHandler = new Handler(){
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            isScaning = false;
-            soundpool.play(soundid, 1, 1, 0, 0, 1);
-            barCode.setText("");
-            mVibrator.vibrate(100);
-
-            byte[] barcode = intent.getByteArrayExtra(ScanManager.DECODE_DATA_TAG);
-            int barcodelen = intent.getIntExtra(ScanManager.BARCODE_LENGTH_TAG, 0);
-            byte temp = intent.getByteExtra(ScanManager.BARCODE_TYPE_TAG, (byte) 0);
-            android.util.Log.i("debug", "----codetype--" + temp);
-            barcodeStr = new String(barcode, 0, barcodelen);
-            barCode.append(" length："  +barcodelen);
-            barCode.append(" barcode："  +barcodeStr);
-            //showScanResult.setText(barcodeStr);
-
+        public void dispatchMessage(Message msg) {
+            super.dispatchMessage(msg);
+            if( print != null ){
+                System.out.println( "print_state:" + print.getInfo().getState() );
+                String barcode = (String) msg.obj;
+                if( print.isCancelled() || print.isFailed() ){
+                    if( printProgress != null && printProgress.isShowing() ){
+                        printProgress.dismiss();
+                    }
+                    DialogUtil.showDeclareDialog( getActivity(), "用户取消或打印失败\n是否需要重新打印", v -> {
+                        printReport( barcode );
+                    } ).show();
+                }else if( print.isCompleted() ){
+                    if( printProgress != null && printProgress.isShowing() ){
+                        printProgress.dismiss();
+                    }
+                    print = null ;
+                    DialogUtil.showDeclareDialog( getActivity(), "打印成功", false, null).show();
+                }else{
+                    if( tempTime ++ < 100 ) {
+                        Message message = printJobHandler.obtainMessage();
+                        message.obj = msg.obj;
+                        printJobHandler.sendMessageDelayed(message, 1000);
+                    }else{
+                        print.cancel();
+                    }
+                }
+            }
         }
-
     };
-    private Enum anEnum ;
-    private String printFilePath;
-
-    @Override
-    protected void setTitleBar() {
-        titleBar.setTitleMainText( ( (ScanTypeEnum)anEnum ).getCodeName() );
-    }
-
-    @Override
-    protected int getLayout() {
-        return R.layout.activity_product_packaging ;
-    }
-
-    @Override
-    protected void initIntent(Intent intent) {
-        super.initIntent(intent);
-        anEnum = (Enum) intent.getSerializableExtra( "pickScanType" );
-
-    }
 
     @Override
     public void initView(Bundle var1) {
-
+        super.initView(var1);
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        initRoomData();
-
-        pl_root = findViewById( R.id.id_pl_root ) ;
-        lv_content = findViewById( R.id.id_lv_content ) ;
-
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
-
-        adapter = new RoomPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
-        adapter.setTitleWidth( 40 );
-        adapter.setTitleHeight( 40 );
-        adapter.setRowColor( "#4396FF" );
-        adapter.setTitleColor( "#4396FF" );
-        adapter.setColumnColor( "#FFFFFF" );
-        adapter.setColumnDivider( new ColorDrawable( 0xFFEDEDED ) );
-        adapter.setColumnDividerHeight( 1 );
-        adapter.setTitleTextColor( "#494BFF" );
-//        adapter.setRowDivider( new ColorDrawable( 0x494BFF ) );
-//        adapter.setColumnDivider( new ColorDrawable( 0x494BFF ) );
-        adapter.setRowDataList(generateRowData());
-        adapter.setColumnDataList( columnDataList );
-        adapter.setColumnAdapter( new ColumnAdapter( columnDataList ) );
-        adapter.setTitle("操作");
-//        adapter.setRowColor("#0288d1");
-//        adapter.setColumnColor("#81d4fa");
-
-
         submit.setOnClickListener( v->{
-            DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
-                if( anEnum.equals( ScanTypeEnum.PRODUCT_INCOMING  ) ) {
-                    productionIncoming(getActivity(), true);
-                }else if( anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING  ) ){
-                    changeWarehousePositon( getActivity(), true, remarkValue.getText().toString() );
-                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_MACHINING  ) ){
-                    productionMachining( getActivity(), true );
-                }else if( anEnum.equals( ScanTypeEnum.PRODUCT_OUTGOING  ) ){
-                    productionOutgoing( getActivity(), true );
-                } else if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
-                    if( codeIndex < codes.length ) {
-                        productionLog(getActivity(), true, codes[codeIndex]);
-                    }else{
-                        PackeResourse resourse = new PackeResourse();
-                        long timeMillis = System.currentTimeMillis();
-                        resourse.barCode = timeMillis + "2" ;
-                        resourse.dateline = timeMillis ;
-                        int totalLength = 0 ;
-                        BigDecimal totalWeight = null ;
-                        for( int i = 0 ; i < roomList.size() ; i ++ ){
-                            ProductInfo productInfo = roomList.get(i);
-                            if( TextUtils.isEmpty( resourse.trayNumber ) && ! TextUtils.isEmpty( productInfo.trayNumber ) ){
-                                resourse.trayNumber = productInfo.trayNumber ;
-                            }
-                            if( TextUtils.isEmpty( resourse.customerId ) && ! TextUtils.isEmpty( productInfo.customerId ) ){
-                                resourse.customerId = productInfo.customerId ;
-                            }
-                            if( TextUtils.isEmpty( resourse.customerName ) && ! TextUtils.isEmpty( productInfo.customerAbbreviation ) ){
-                                resourse.customerName = productInfo.customerAbbreviation ;
-                            }
-                            if( TextUtils.isEmpty( resourse.materielCode ) && ! TextUtils.isEmpty( productInfo.materielCode ) ){
-                                resourse.materielCode = productInfo.materielCode ;
-                            }
-                            if( TextUtils.isEmpty( resourse.materielModel ) && ! TextUtils.isEmpty( productInfo.materielModel ) ){
-                                resourse.materielModel = productInfo.materielModel ;
-                            }
-                            if( TextUtils.isEmpty( resourse.materielName ) && ! TextUtils.isEmpty( productInfo.materielName ) ){
-                                resourse.materielName = productInfo.materielName ;
-                            }
-                            totalLength += productInfo.length ;
+            if( !TextUtils.isEmpty( printBarCode ) ){
+                DialogUtil.showDeclareDialog( getActivity(), "产品已打包，是否打印打包数据", v1 -> {
+                    printReport( printBarCode );
+                } ).show();
+            }else {
+                DialogUtil.showDeclareDialog(getActivity(), "确定是否打包", v1 -> {
 
-                            if( productInfo.netWeight != null ) {
-                                if( totalWeight == null ){
-                                    totalWeight = productInfo.netWeight ;
-                                }else {
-                                    totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                }
+                    PackeResourse resourse = new PackeResourse();
+                    long timeMillis = System.currentTimeMillis();
+                    resourse.barCode = timeMillis + "2";
+                    resourse.dateline = timeMillis;
+                    int totalLength = 0;
+                    BigDecimal totalWeight = null;
+                    for (int i = 0; i < roomList.size(); i++) {
+                        ProductInfo productInfo = roomList.get(i);
+                        if (TextUtils.isEmpty(resourse.trayNumber) && !TextUtils.isEmpty(productInfo.trayNumber)) {
+                            resourse.trayNumber = productInfo.trayNumber;
+                        }
+                        if (TextUtils.isEmpty(resourse.customerId) && !TextUtils.isEmpty(productInfo.customerId)) {
+                            resourse.customerId = productInfo.customerId;
+                        }
+                        if (TextUtils.isEmpty(resourse.customerName) && !TextUtils.isEmpty(productInfo.customerAbbreviation)) {
+                            resourse.customerName = productInfo.customerAbbreviation;
+                        }
+                        if (TextUtils.isEmpty(resourse.materielCode) && !TextUtils.isEmpty(productInfo.materielCode)) {
+                            resourse.materielCode = productInfo.materielCode;
+                        }
+                        if (TextUtils.isEmpty(resourse.materielModel) && !TextUtils.isEmpty(productInfo.materielModel)) {
+                            resourse.materielModel = productInfo.materielModel;
+                        }
+                        if (TextUtils.isEmpty(resourse.materielName) && !TextUtils.isEmpty(productInfo.materielName)) {
+                            resourse.materielName = productInfo.materielName;
+                        }
+                        totalLength += productInfo.length;
+
+                        if (productInfo.netWeight != null) {
+                            if (totalWeight == null) {
+                                totalWeight = productInfo.netWeight;
+                            } else {
+                                totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
                             }
                         }
-                        resourse.meter = totalLength + "" ;
-                        resourse.number = roomList.size() ;
-                        resourse.netWeight = totalWeight ;
-                        resourse.productionLogs = roomList ;
-                        baling( getActivity(), true, resourse );
                     }
-                }else if( codeIndex < codes.length ) {
-                    productionLog(getActivity(), true, codes[codeIndex]);
-                }
-            } )
-            .show();
-//            productionLog( getActivity(), true, codes[codeIndex] );
+                    resourse.meter = totalLength + "";
+                    resourse.number = roomList.size();
+                    resourse.netWeight = totalWeight;
+                    resourse.productionLogs = roomList;
+                    baling(getActivity(), true, resourse);
+
+                }).show();
+            }
         } );
 
-        if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY )
-                || anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING )
-                || anEnum.equals( ScanTypeEnum.PRODUCT_INCOMING  )
-                ){
-            remark.setText( "仓位" );
-            if( anEnum.equals( ScanTypeEnum.WAREHOUSE_CHANGING ) ){
-                remarkValue.setText( "15774952757123" );
-            }else if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
-                monthIsChecked( getActivity(), true );
-                remarkValue.setText( "15774952757123" );
-            }
-        }
+        submit.setText( "产品打包" );
+    }
 
-        if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
-            submit.setText( "产品打包" );
-//            15774952757321，15774952757331，15774952757341，15774952757351
-        }
+    @Override
+    public void dealwithBarcode(String barcodeStr) {
+        productionLog( getActivity(), true, barcodeStr );
+    }
+
+    @Override
+    public boolean barcodeHasSpecialCondition() {
+        return false;
     }
 
     /**
-     * 初始化房间列表和房间信息
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
      */
-    private void initRoomData() {
-//        for (int i = 201;i<221;i++){
-//            Room room = new Room(i);
-//            room.setRoomDetail(Utility.generateRandomRoomDetail());
-//            roomList.add(room);
-//        }
-    }
-
-    private List<String> generateRowData(){
-        List<String> rowDataList = new ArrayList<>();
-        rowDataList.add("序号");
-        rowDataList.add("条码");
-        rowDataList.add("品名");
-        rowDataList.add("驳口");
-        rowDataList.add("班次");
-        rowDataList.add("规格");
-        rowDataList.add("包装");
-        rowDataList.add("机台");
-        rowDataList.add("托盘");
-        rowDataList.add("米数");
-        rowDataList.add("皮重");
-        rowDataList.add("净重");
-        rowDataList.add("卷号");
-        return rowDataList;
-    }
-
-    private List<String> generateColumnData(){
-//        for (Room room : roomList){
-//            columnDataList.add(String.valueOf(room.getRoomNo()));
-//        }
-        return columnDataList;
-    }
-
-    class ColumnAdapter extends BaseAdapter{
-
-        List<String> roomNumber ;
-
-        ColumnAdapter( List<String> roomNumber ){
-            this.roomNumber = roomNumber ;
-        }
-
-        @Override
-        public int getCount() {
-            return roomNumber == null ? 0 : roomNumber.size() ;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return roomNumber == null ? null : roomNumber.get( position );
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = View.inflate( getActivity(), R.layout.layout_delete_icon, null );
-            view.setOnClickListener( v->{
-                ToastUtil.showLongToast( "删除" + getItem( position ) );
-            } );
-            return view;
-        }
-    }
-
-    private void initScan() {
-        // TODO Auto-generated method stub
-        mScanManager = new ScanManager();
-        mScanManager.openScanner();
-
-        mScanManager.switchOutputMode( 0);
-        soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
-        soundid = soundpool.load("/etc/Scan_new.ogg", 1);
-
-    }
-
-    @Override
-    protected void onResume() {
-        // TODO Auto-generated method stub
-        super.onResume();
-        initScan();
-        barCode.setText("");
-        IntentFilter filter = new IntentFilter();
-        int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME, PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
-        String[] value_buf = mScanManager.getParameterString(idbuf);
-        if(value_buf != null && value_buf[0] != null && !value_buf[0].equals("")) {
-            filter.addAction(value_buf[0]);
-        } else {
-            filter.addAction(SCAN_ACTION);
-        }
-
-        registerReceiver(mScanReceiver, filter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(mScanManager != null) {
-            mScanManager.stopDecode();
-            isScaning = false;
-        }
-        unregisterReceiver(mScanReceiver);
-    }
-
-
     public void productionLog(Activity activity, boolean showProgressDialog, String code){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
@@ -386,159 +198,78 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                 .build(activity);
 
         PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.productionLog( code )
+        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog(code);
+
+        productQueryResponeCall
                 .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
                     @Override
                     public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
                         super.onResponse(call, response);
                         ProductQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
-                            int totalElements = body.totalElements;
+//                            int totalElements = body.totalElements;
                             ProductInfo[] content = body.content;
-                            if( totalElements == content.length ){
+                            if(/* totalElements == content.length && */content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
+                                    ProductInfo info = content[i];
+//                                    if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
+                                    if( info.state == 1 ){ //产品打包，如果是已打包
+                                        ToastUtil.showShortToast( "该产品已打包");
+                                        barCode.setText( "" );
+//                                        continue;
+                                    }
+                                    if( "半成口".equals( info.materielType ) ){
+                                        DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
+                                        barCode.setText( "" );
+                                        continue;
+                                    }else if( roomList.size() > 0 && !roomList.get(0).isSameType( info ) ){//产品类型不同
+                                        DialogUtil.showDeclareDialog(getActivity(), "不是同一个产品规格不可以一起打包", false, "我知道了", null).show();
+                                        barCode.setText( "" );
+                                        continue;
+                                    }
+
                                     columnDataList.add( "delete" );
-                                    roomList.add( content[i] );
+                                    roomList.add( info );
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    } else {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    setProductInfo( info );
                                 }
-                                if( ! isInit ){
-                                    pl_root.setAdapter(adapter);
-                                    isInit = true ;
-                                }else{
-                                    adapter.notifyDataSetChanged();
-                                }
-                                codeIndex ++ ;
-
-                                if( anEnum.equals( ScanTypeEnum.PRODUCT_INVENTORY ) ){
-                                    pdaCheck( activity, true, content[0] );
-                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
                             }
+                        }else if( response.code() == 400 ){
+                            ToastUtil.showShortToast( "不能识别该产品" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }
                 });
     }
 
-    //15774952757321，15774952757331，15774952757341，15774952757351
-    public void productionIncoming(Activity activity, boolean showProgressDialog ){
-
-        List<String> list = new ArrayList<>();
-        list.add( "15774952757321" );
-        list.add( "15774952757331" );
-//        list.add( "15774952757341" );
-
-        ProductionVo vo = new ProductionVo();
-        vo.codes = list ;
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.productionIncoming( vo )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "进仓成功" );
-                        }
-                    }
-
-                });
-
-    }
-
-    //15774952757321，15774952757331，15774952757341，15774952757351
-    public void productionOutgoing(Activity activity, boolean showProgressDialog ){
-
-        List<String> list = new ArrayList<>();
-        list.add( "15774952757321" );
-        list.add( "15774952757331" );
-//        list.add( "15774952757341" );
-
-        ProductionVo vo = new ProductionVo();
-        vo.codes = list ;
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.productionOutgoing( vo )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "出仓成功" );
-                        }
-                    }
-
-                });
-
-    }
-
-    //15774952757321，15774952757331，15774952757341，15774952757351
-    public void productionMachining(Activity activity, boolean showProgressDialog ){
-
-        List<String> list = new ArrayList<>();
-        list.add( "15774952757321" );
-        list.add( "15774952757331" );
-//        list.add( "15774952757341" );
-
-        ProductionVo vo = new ProductionVo();
-        vo.codes = list ;
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.productionMachining( vo )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "加工成功" );
-                        }
-                    }
-
-                });
-
-    }
-
-    //15774952757321，15774952757331，15774952757341，15774952757351
-    public void changeWarehousePositon(Activity activity, boolean showProgressDialog, String wearhouseCode ){
-
-        List<String> list = new ArrayList<>();
-        list.add( "15774952757321" );
-        list.add( "15774952757331" );
-//        list.add( "15774952757341" );
-
-        ProductionVo vo = new ProductionVo();
-//        vo.codes = list ;
-        vo.code = "15774952757321" ;
-        vo.warehouseCode = wearhouseCode;
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.changeWarehousePositon( vo )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "仓位变更成功" );
-                        }
-                    }
-
-                });
-
-    }
-
+    /**
+     * 产品打包接口
+     * @param activity
+     * @param showProgressDialog
+     * @param vo
+     */
     public void baling(Activity activity, boolean showProgressDialog, PackeResourse vo){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
@@ -554,35 +285,21 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                         if( response.code() == 201 ){
                             ToastUtil.showShortToast( "打包成功" );
                             writeHtml( vo );
-                            printReport( "123123123123" );
-                        }
-                    }
-                });
-
-    }
-
-    public void monthIsChecked(Activity activity, boolean showProgressDialog){
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.monthIsChecked( )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 400 ){//未盘点
-                            Dialog dialog = DialogUtil.showDeclareDialog(activity, "上月未消盘点", false, v -> {} );
-                            dialog.show();
-                        }else{
-                            Dialog dialog = DialogUtil.showDeclareDialog(activity, "上月已盘点", v -> {
-                            });
-                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            printReport( vo.barCode );
+                            printBarCode = vo.barCode ;
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
                                 @Override
-                                public void onDismiss(DialogInterface dialog) {
-                                    finish();
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
                                 }
                             });
                         }
@@ -591,34 +308,8 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
 
     }
 
-    public void pdaCheck(Activity activity, boolean showProgressDialog, ProductInfo info){
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        info.classify = 1 ;
-        postRequestInterface.pdaCheck( info )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if ( response.code() == 400  ){
-                            ToastUtil.showShortToast( "盘点失败" );
-                        }
-                    }
-                });
-
-    }
-
     private void printReport(String barcodeStr) {
-//        Template tmpl =
-//                Mustache.compiler().compile(getString(R.string.report_body));
         WebView print = prepPrintWebView( "packaging", barcodeStr );
-//        print.loadData( tmpl.execute(new TpsReportContext(prose.getText().toString()) ),
-//                "text/html; charset=UTF-8", null);
-
         print.loadUrl("file://" + printFilePath);
     }
 
@@ -684,7 +375,7 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
                       .append( "    </tr>\n");
                 buffer.append("</table>\n" +
                 "<div style=\"margin-top:5px\" align=\"center\" ><img id=\"test\" src=\"\" onclick=\"\"/></div>\n" +
-                "<div style=\"margin-top:5px\" align=\"center\">123123123123</div>\n" +
+                "<div style=\"margin-top:5px\" align=\"center\">").append( vo.barCode ).append("</div>\n" +
                 "</body>\n" +
                 "</html>").append("\n");
         return buffer.toString() ;
@@ -693,20 +384,22 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
     private WebView prepPrintWebView(final String name, String barcodeStr) {
         WebView result = getWebView();
 
-
         result.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                if( !url.equals( "file://" + printFilePath ) ) {
-
-                }else{
+                if( url.equals( "file://" + printFilePath )  ) {
                     try {
+                        //生成1维码，显示到网页中。
                         String url1 = "javascript:onSaveCallback('data:image/png;base64," + BitmapUtil.bitmaptoString(BitmapUtil.CreateOneDCode(barcodeStr)) + "')";
-                        System.out.println("url1: " + url1);
                         view.loadUrl(url1);
                         print = print(name, view.createPrintDocumentAdapter(),
                                 new PrintAttributes.Builder().build());
-
+                        printProgress = DialogUtil.getProgressDialog( getActivity(), "正在打印，请稍候") ;
+                        printProgress.setCancelable( false );
+                        printProgress.show();
+                        Message msg = printJobHandler.obtainMessage();
+                        msg.obj = barcodeStr ;
+                        printJobHandler.sendMessageDelayed(msg, 1000);
                     } catch (WriterException e) {
                         e.printStackTrace();
                     }
@@ -717,25 +410,20 @@ public class ProductPackagingActivity extends ImmersiveBaseActivity {
         return (result);
     }
 
-
     private WebView getWebView() {
         if (wv == null) {
             wv = new WebView(this);
             WebSettings settings = wv.getSettings();
-
             //支持JavaScript
             settings.setJavaScriptEnabled(true);
             settings.setJavaScriptCanOpenWindowsAutomatically(false); //支持通过JS打开新窗口
-
         }
-
         return (wv);
     }
 
     private PrintJob print(String name, PrintDocumentAdapter adapter,
                            PrintAttributes attrs) {
         startService(new Intent(this, PrintJobMonitorService.class));
-
         return (mgr.print(name, adapter, attrs));
     }
 }

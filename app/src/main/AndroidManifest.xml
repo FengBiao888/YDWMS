@@ -33,6 +33,30 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+        <activity android:name=".ProductIncomingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".HalfProductOutgoingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductHouseChangingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductInventoryActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductMachineActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductOutgoingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
         <activity android:name=".ProductPackagingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 

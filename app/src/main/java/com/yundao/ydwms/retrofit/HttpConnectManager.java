@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.yundao.ydwms.protocal.URLConstant;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,11 +93,8 @@ public class HttpConnectManager {
     long conntectTimeOut ;
 
     public HttpConnectManager build(Context activity) {
-//      if( SharedPreferenceUtil.getInt(SharedPreferenceUtil.SERVER_ADDRESS_CONFIG_TYPE,0 ) == 1 ){
-//        baseUrl = SharedPreferenceUtil.getString( SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL );
-//      }else{
-        baseUrl = URLConstant.BASE_URL ;
-//      }
+
+      baseUrl = SharedPreferenceUtil.getString( SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL ) ;
 
       HttpConnectManager httpConnectManager = new HttpConnectManager(activity, this);
 

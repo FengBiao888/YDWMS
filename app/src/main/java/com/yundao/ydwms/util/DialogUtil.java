@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -236,13 +237,20 @@ public class DialogUtil {
         return showDeclareDialog( context, tips, true, rightClickListener );
     }
 
-    public static Dialog showDeclareDialog(Activity context, String tips, boolean rightVisiable, View.OnClickListener rightClickListener ){
+    public static Dialog showDeclareDialog(Activity context, String tips, boolean rightVisiable, View.OnClickListener confirmClickListener ){
+        return DialogUtil.showDeclareDialog(context, tips, rightVisiable, "", confirmClickListener );
+    }
+
+    public static Dialog showDeclareDialog(Activity context, String tips, boolean rightVisiable, String positionBtnText, View.OnClickListener confirmClickListener ){
         Dialog dialog = new Dialog(context, R.style.ActionSheetDialogStyle);
         dialog.setCancelable( false );
         LayoutInflater inflater = LayoutInflater.from(context);
         View viewDialog = inflater.inflate(R.layout.dialog_declare, null);
         TextView comment = viewDialog.findViewById( R.id.content );
         TextView left = viewDialog.findViewById( R.id.btn_positive );
+        if( !TextUtils.isEmpty(positionBtnText) ){
+            left.setText( positionBtnText );
+        }
         TextView right = viewDialog.findViewById( R.id.btn_cancel );
         right.setVisibility( rightVisiable ? View.VISIBLE : View.GONE );
         viewDialog.findViewById( R.id.middle ).setVisibility(  rightVisiable ? View.VISIBLE : View.GONE );
@@ -250,7 +258,9 @@ public class DialogUtil {
         right.setOnClickListener(v -> dialog.cancel());
         left.setOnClickListener(v -> {
             v.setTag( comment.getText().toString() );
-            rightClickListener.onClick( v );
+            if(confirmClickListener != null ){
+                confirmClickListener.onClick( v );
+            }
             dialog.cancel();
         });
 

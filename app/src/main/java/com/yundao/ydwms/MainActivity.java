@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_main);
 
-        connectSetting = (Button) findViewById( R.id.connect_setting );
-        login = (Button) findViewById( R.id.login );
-        scan = (Button) findViewById( R.id.scan );
+        connectSetting = findViewById( R.id.connect_setting );
+        login = findViewById( R.id.login );
+        scan = findViewById( R.id.scan );
 
         connectSetting.setOnClickListener( v -> {
 //            Intent intent = new Intent( this, ConnectingActivity.class );

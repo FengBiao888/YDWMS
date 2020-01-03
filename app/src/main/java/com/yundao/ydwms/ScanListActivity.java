@@ -147,9 +147,29 @@ public class ScanListActivity extends BaseAbsListItemActivity {
                 ToastUtil.showShortToast( "请选择扫描仓库类型" );
                 return ;
             }
-            Intent intent = new Intent( getActivity(), ProductPackagingActivity.class );
-            intent.putExtra( "pickScanType", (Serializable) checkboxSelected.getExtraObj());
-
+            Intent intent = null;
+            if( ScanTypeEnum.PRODUCT_INCOMING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductIncomingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.PRODUCT_OUTGOING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductOutgoingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.PRODUCT_INVENTORY.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductInventoryActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.PRODUCT_MACHINING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductMachineActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.HALF_PRODUCT_OUTGOING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), HalfProductOutgoingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.WAREHOUSE_CHANGING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductHouseChangingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.PRODUCT_PACKAGING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), ProductPackagingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }
             startActivity( intent );
         }, R.id.bottom_submit);
         list.add(confirm);

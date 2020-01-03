@@ -81,14 +81,20 @@ public interface PostRequestService {
     @PUT(URLConstant.CHANGE_WAREHOUSE_POSITION)
     Call<BaseRespone> changeWarehousePositon(@Body ProductionVo requestBody);
     /**
-     * 产品进仓接口
+     * 产品打包码
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @POST(URLConstant.PRODUCTION_BALING)
     Call<PackeResourse> baling(@Body PackeResourse resourse);
     /**
-     * 产品进仓接口
+     * 产品出仓码的打包码查询
+     * @return
+     */
+    @GET(URLConstant.PRODUCTION_BALING)
+    Call<ProductQueryRespone> balingQuery(@Query("barCode") String barCode);
+    /**
+     * 当月是否盘点
      * @return
      */
     @GET(URLConstant.PRODUCTION_IS_CHECKED)
