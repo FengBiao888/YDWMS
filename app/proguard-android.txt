@@ -138,12 +138,14 @@
    public void *(android.view.View);
 }
 
+-keep public class android.device.ScanManager { *; }
+
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
 
--keepclassmembers class com.nf.android.eoa.protocol.response.**{<fields>; }
+-keepclassmembers class com.yundao.ydwms.protocal.response.**{<fields>; }
 
 -keep class * implements android.os.Parcelable {
   public static final android.os.Parcelable$Creator *;
