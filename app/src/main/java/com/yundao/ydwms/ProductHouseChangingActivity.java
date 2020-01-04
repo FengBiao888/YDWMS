@@ -3,6 +3,7 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -32,7 +33,7 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
 
     @Override
     public boolean barcodeHasSpecialCondition() {
-        if( roomList.size() > 0 ){
+        if( foucusEditText == null && roomList.size() > 0 ){
             ToastUtil.showShortToast( "一次只能操作一个仓位变更" );
             return true ;
         }
@@ -42,7 +43,12 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+
         submit.setOnClickListener( v->{
+            if( roomList.size() == 0 ){
+                ToastUtil.showShortToast( "请先扫条形码" );
+                return ;
+            }
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
                 changeWarehousePositon( getActivity(), true, remarkValue.getText().toString() );
             }).show();

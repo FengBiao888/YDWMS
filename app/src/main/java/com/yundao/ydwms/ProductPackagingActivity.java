@@ -119,6 +119,10 @@ public class ProductPackagingActivity extends ProductBaseActivity {
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
         submit.setOnClickListener( v->{
+            if( roomList.size() == 0 ){
+                ToastUtil.showShortToast( "请先扫条形码" );
+                return ;
+            }
             if( !TextUtils.isEmpty( printBarCode ) ){
                 DialogUtil.showDeclareDialog( getActivity(), "产品已打包，是否打印打包数据", v1 -> {
                     printReport( printBarCode );
@@ -212,11 +216,10 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                             if(/* totalElements == content.length && */content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductInfo info = content[i];
-//                                    if( anEnum.equals( ScanTypeEnum.PRODUCT_PACKAGING ) ){
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
                                         barCode.setText( "" );
-//                                        continue;
+                                        continue;
                                     }
                                     if( "半成口".equals( info.materielType ) ){
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();

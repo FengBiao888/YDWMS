@@ -94,7 +94,7 @@ public class HttpConnectManager {
 
     public HttpConnectManager build(Context activity) {
 
-      baseUrl = SharedPreferenceUtil.getString( SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL ) ;
+      baseUrl = SharedPreferenceUtil.getStringWithoutAES( SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL ) ;
 
       HttpConnectManager httpConnectManager = new HttpConnectManager(activity, this);
 

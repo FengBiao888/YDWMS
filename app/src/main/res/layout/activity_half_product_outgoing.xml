@@ -39,6 +39,19 @@
             android:background="@drawable/selector_blue_solid"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_20sp"
+            android:layout_marginEnd="@dimen/item_gap_s"
+            />
+
+        <Button
+            android:id="@+id/modify"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="修改"
+            android:layout_weight="1"
+            android:background="@drawable/selector_blue_solid"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_20sp"
+            android:layout_marginStart="@dimen/item_gap_s"
             />
 
     </LinearLayout>

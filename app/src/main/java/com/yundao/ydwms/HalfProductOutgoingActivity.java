@@ -3,6 +3,8 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.Button;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -67,13 +69,37 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
     }
 
     @Override
+    protected int getLayout() {
+        return R.layout.activity_half_product_outgoing ;
+    }
+
+    @Override
     public void initView(Bundle var1) {
         super.initView(var1);
         submit.setOnClickListener( v->{
+            if( roomList.size() == 0 ){
+                ToastUtil.showShortToast( "请先扫条形码" );
+                return ;
+            }
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
                 halfProductionOutgoing(getActivity(), true);
             }).show();
         });
+        Button modify = findViewById( R.id.modify );
+        modify.setOnClickListener( v -> {
+            if( clickedProductInfo != null ) {
+                clickedProductInfo.barCode = barCode.getText().toString() ;
+                clickedProductInfo.materielCode = material.getText().toString() ;
+                clickedProductInfo.materielName = productName.getText().toString() ;
+                clickedProductInfo.materielModel = specification.getText().toString() ;
+                clickedProductInfo.volume = volume.getText().toString() ;
+                clickedProductInfo.packing = pack.getText().toString() ;
+                clickedProductInfo.remark = remarkValue.getText().toString() ;
+                halfProductionModify(getActivity(), true, clickedProductInfo);
+            }else{
+                ToastUtil.showShortToast( "请选择半成品" );
+            }
+        } );
     }
 
     /**
@@ -166,6 +192,49 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
                             ToastUtil.showShortToast( "半成品出仓成功" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                });
+    }
+
+    /**
+     * 半成品信息修改
+     * @param activity
+     * @param showProgressDialog
+     */
+    public void halfProductionModify(Activity activity, boolean showProgressDialog, ProductInfo productInfo ){
+
+        ProductionVo vo = new ProductionVo();
+        vo.codes = genCodes() ;
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.halfProductionModify( productInfo )
+                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 200 || response.code() == 204 ){
+                            ToastUtil.showShortToast( "半成品信息修改成功" );
                         }else if( response.code() == 401 ){
                             ToastUtil.showShortToast( "登录过期，请重新登录" );
                             AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );

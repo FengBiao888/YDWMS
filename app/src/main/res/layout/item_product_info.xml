@@ -15,7 +15,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="序号"/>
 
     <TextView
@@ -26,7 +26,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="条码"/>
 
     <TextView
@@ -37,7 +37,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="100dp"
         tools:text="品名"/>
     <TextView
         android:id="@+id/splice"
@@ -47,7 +47,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="驳口"/>
     <TextView
         android:id="@+id/train"
@@ -57,7 +57,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="班次"/>
     <TextView
         android:id="@+id/materielModel"
@@ -67,7 +67,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="200dp"
         tools:text="规格"/>
     <TextView
         android:id="@+id/packing"
@@ -77,7 +77,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="包装"/>
     <!--<TextView
         android:id="@+id/id_tv_07"
@@ -96,7 +96,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="机台"/>
     <TextView
         android:id="@+id/trayNumber"
@@ -106,7 +106,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="托盘"/>
     <TextView
         android:id="@+id/length"
@@ -116,7 +116,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="米数"/>
     <TextView
         android:id="@+id/tareWeight"
@@ -126,7 +126,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="皮重"/>
     <TextView
         android:id="@+id/netWeight"
@@ -136,7 +136,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="净重"/>
     <!--<TextView
         android:id="@+id/id_tv_07"
@@ -155,7 +155,7 @@
         android:paddingStart="@dimen/item_gap_m"
         android:paddingEnd="@dimen/item_gap_m"
         android:textColor="@color/black"
-        android:minWidth="20dp"
+        android:minWidth="50dp"
         tools:text="卷号"/>
     <!--<TextView
         android:id="@+id/id_tv_07"

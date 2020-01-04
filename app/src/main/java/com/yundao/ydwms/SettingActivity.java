@@ -36,7 +36,7 @@ public class SettingActivity extends BaseAbsListItemActivity {
         itemList.add( oneTextView );
 
         serverIP = new EditItemInput(getActivity(), "服务器IP地址", false, "");
-        String customIp = SharedPreferenceUtil.getString(SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL);
+        String customIp = SharedPreferenceUtil.getStringWithoutAES(SharedPreferenceUtil.CUSTOM_IP, URLConstant.BASE_URL);
         if( !TextUtils.isEmpty(customIp) ){
             serverIP.setInputMessage(customIp);
         }
@@ -59,7 +59,7 @@ public class SettingActivity extends BaseAbsListItemActivity {
         confirm.setBtnBgLayoutId( R.drawable.selector_blue_solid );
         confirm.setSpecifyClickListener( v -> {
             if ((serverIP.getInputMessage().startsWith("http://") || serverIP.getInputMessage().startsWith("https://")) ) {
-                SharedPreferenceUtil.putString( SharedPreferenceUtil.CUSTOM_IP, serverIP.getInputMessage() );
+                SharedPreferenceUtil.putStringWithoutAES( SharedPreferenceUtil.CUSTOM_IP, serverIP.getInputMessage() );
                 ToastUtil.showShortToast( "服务器地址设置成功" );
                 finish();
             }else {

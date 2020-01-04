@@ -1,65 +1,23 @@
 package com.yundao.ydwms;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.device.ScanManager;
-import android.device.scanner.configuration.PropertyID;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Vibrator;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintJob;
-import android.print.PrintManager;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.google.zxing.WriterException;
-import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.nf.android.common.base.ImmersiveBaseActivity;
-import com.yundao.ydwms.print.PrintJobMonitorService;
 import com.yundao.ydwms.protocal.ProductInfo;
-import com.yundao.ydwms.protocal.request.PackeResourse;
-import com.yundao.ydwms.protocal.request.ProductionVo;
-import com.yundao.ydwms.protocal.respone.BaseRespone;
-import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
-import com.yundao.ydwms.protocal.respone.User;
-import com.yundao.ydwms.retrofit.BaseCallBack;
-import com.yundao.ydwms.retrofit.HttpConnectManager;
-import com.yundao.ydwms.retrofit.PostRequestService;
-import com.yundao.ydwms.util.BitmapUtil;
-import com.yundao.ydwms.util.DateFormatUtils;
 import com.yundao.ydwms.util.DialogUtil;
-import com.yundao.ydwms.util.ToastUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import retrofit2.Call;
-import retrofit2.Response;
 import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
 import sysu.zyb.panellistlibrary.PanelListLayout;
 
@@ -117,7 +75,7 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
         lv_content = findViewById( R.id.id_lv_content ) ;
 
 
-        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
+        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_product_info);
         adapter.setTitleWidth( 40 );
         adapter.setTitleHeight( 40 );
         adapter.setRowColor( "#4396FF" );

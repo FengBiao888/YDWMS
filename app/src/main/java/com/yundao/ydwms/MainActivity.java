@@ -14,6 +14,7 @@ import com.yundao.ydwms.protocal.respone.LoginRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
+import com.yundao.ydwms.util.ToastUtil;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         } );
 
         scan.setOnClickListener( v -> {
+            if( YDWMSApplication.getInstance().getUser() == null ){
+                ToastUtil.showShortToast( "请先登录" );
+                return ;
+            }
             Intent intent = new Intent( this, ScanListActivity.class );
             startActivity( intent );
         });

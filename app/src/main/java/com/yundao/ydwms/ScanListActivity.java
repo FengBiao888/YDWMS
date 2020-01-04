@@ -87,40 +87,40 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         list.add(workday);
 
         ItemCheckbox productIncoming = new ItemCheckbox( getActivity(), ScanTypeEnum.PRODUCT_INCOMING.getCodeName() );
-        WorkDayClickListener clickListener = new WorkDayClickListener( productIncoming );
+        ScanTypeClickListener clickListener = new ScanTypeClickListener( productIncoming );
         productIncoming.setExtraObj(ScanTypeEnum.PRODUCT_INCOMING);
         productIncoming.setClickListener( clickListener );
 
 
         ItemCheckbox productOutgoing = new ItemCheckbox( getActivity(), PRODUCT_OUTGOING.getCodeName() );
-        clickListener = new WorkDayClickListener( productOutgoing );
+        clickListener = new ScanTypeClickListener( productOutgoing );
         productOutgoing.setExtraObj( PRODUCT_OUTGOING );
         productOutgoing.setClickListener( clickListener );
 
 
         ItemCheckbox warehouseChanging = new ItemCheckbox( getActivity(), WAREHOUSE_CHANGING.getCodeName() );
         warehouseChanging.setExtraObj( WAREHOUSE_CHANGING );
-        clickListener = new WorkDayClickListener( warehouseChanging );
+        clickListener = new ScanTypeClickListener( warehouseChanging );
         warehouseChanging.setClickListener( clickListener );
 
         ItemCheckbox productPackaging = new ItemCheckbox( getActivity(), PRODUCT_PACKAGING.getCodeName() );
         productPackaging.setExtraObj( PRODUCT_PACKAGING );
-        clickListener = new WorkDayClickListener( productPackaging );
+        clickListener = new ScanTypeClickListener( productPackaging );
         productPackaging.setClickListener( clickListener );
 
         ItemCheckbox productMachining = new ItemCheckbox( getActivity(), PRODUCT_MACHINING.getCodeName() );
         productMachining.setExtraObj( PRODUCT_MACHINING );
-        clickListener = new WorkDayClickListener( productMachining );
+        clickListener = new ScanTypeClickListener( productMachining );
         productMachining.setClickListener( clickListener ) ;
 
         ItemCheckbox halfProductionOutgoing = new ItemCheckbox( getActivity(), HALF_PRODUCT_OUTGOING.getCodeName() );
         halfProductionOutgoing.setExtraObj( HALF_PRODUCT_OUTGOING );
-        clickListener = new WorkDayClickListener( halfProductionOutgoing );
+        clickListener = new ScanTypeClickListener( halfProductionOutgoing );
         halfProductionOutgoing.setClickListener( clickListener );
 
         ItemCheckbox productInventory = new ItemCheckbox( getActivity(), PRODUCT_INVENTORY.getCodeName() );
         productInventory.setExtraObj( PRODUCT_INVENTORY );
-        clickListener = new WorkDayClickListener( productInventory );
+        clickListener = new ScanTypeClickListener( productInventory );
         productInventory.setClickListener( clickListener );
 
         list.add( productIncoming );
@@ -141,6 +141,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
 
         list.add( new BlankItem( getActivity(), 30, false) );
         confirm = new EditItemSubmitButton(getActivity(), "确定");
+        confirm.setTextSize( 20 );
         confirm.setBtnBgLayoutId( R.drawable.selector_blue_solid );
         confirm.setSpecifyClickListener( v ->{
             if( checkboxSelected == null ){
@@ -176,19 +177,11 @@ public class ScanListActivity extends BaseAbsListItemActivity {
 
         return list;
     }
-
-    private boolean checkValid() {
-
-
-        return true ;
-    }
-
-
-
-    class WorkDayClickListener implements View.OnClickListener{
+    
+    class ScanTypeClickListener implements View.OnClickListener{
 
         ItemCheckbox checkbox ;
-        public WorkDayClickListener( ItemCheckbox checkbox ) {
+        public ScanTypeClickListener( ItemCheckbox checkbox ) {
             this.checkbox = checkbox ;
         }
 

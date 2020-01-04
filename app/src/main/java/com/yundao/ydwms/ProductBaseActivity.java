@@ -76,6 +76,7 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
     private int soundid;
 
     List<String> columnDataList = new ArrayList<>();
+    public ProductInfo clickedProductInfo ;
 
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
@@ -90,21 +91,21 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             byte temp = intent.getByteExtra(ScanManager.BARCODE_TYPE_TAG, (byte) 0);
             android.util.Log.i("debug", "----codetype--" + temp);
             String barcodeStr = new String(barcode, 0, barcodelen);
-            if( foucusEditText != null ){
-                if( foucusEditText == barCode ){ //条码
-                    ProductInfo productInfo = new ProductInfo();
-                    productInfo.barCode = barcodeStr ;
-                    if( roomList.contains( productInfo ) ){
-                        ToastUtil.showShortToast( "该产品已在列表中" );
-                        return ;
-                    }
+            if( foucusEditText != null && "仓位".equals( remark.getText().toString() )){
+                foucusEditText.setText( barcodeStr );
+                foucusEditText.clearFocus();
+                foucusEditText = null ;
+            }else{
+                ProductInfo productInfo = new ProductInfo();
+                productInfo.barCode = barcodeStr ;
+                if( roomList.contains( productInfo ) ){
+                    ToastUtil.showShortToast( "该产品已在列表中" );
+                    return ;
+                }
 
-                    if( !barcodeHasSpecialCondition() ){
-                        foucusEditText.setText( barcodeStr );
-                        dealwithBarcode( barcodeStr );
-                    }
-                }else if( foucusEditText == remarkValue && "仓位".equals( remark.getText().toString() ) ){
-                    foucusEditText.setText( barcodeStr );
+                if( !barcodeHasSpecialCondition() ){
+                    barCode.setText( barcodeStr );
+                    dealwithBarcode( barcodeStr );
                 }
             }
 
@@ -126,7 +127,7 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
 
     @Override
     protected int getLayout() {
-        return R.layout.activity_product_packaging ;
+        return R.layout.activity_product_normal;
     }
 
     @Override
@@ -147,18 +148,11 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             operator.setText( "操作员：" + user.username );
         }
 
-        View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if( hasFocus ){
-                    foucusEditText = (EditText) v;
-                }
-            }
-        };
-        barCode.setOnFocusChangeListener(focusChangeListener);
-        remarkValue.setOnFocusChangeListener( focusChangeListener );
+        remarkValue.setOnClickListener( v -> {
+            foucusEditText = (EditText) v;
+        } );
 
-        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_room);
+        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_product_info);
         adapter.setTitleWidth( 40 );
         adapter.setTitleHeight( 40 );
         adapter.setRowColor( "#4396FF" );
@@ -174,6 +168,7 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
 
         lv_content.setOnItemClickListener((parent, view, position, id) -> {
             ProductInfo productInfo = roomList.get(position);
+            clickedProductInfo = productInfo ;
             setProductInfo(productInfo);
         });
 
@@ -189,6 +184,16 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         if( "备注".equals( remark.getText() ) ){
             remarkValue.setText( productInfo.remark );
         }
+    }
+
+    protected void clearProductInfo(){
+        barCode.setText( "" );
+        material.setText( "" );
+        productName.setText( "" );
+        specification.setText( "" );
+        volume.setText( "" );
+        pack.setText( "" );
+        remarkValue.setText( "" );
     }
 
     private List<String> generateRowData(){
@@ -239,9 +244,9 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
                 DialogUtil.showDeclareDialog( getActivity(), "确认要删除该条数据吗?", v1 -> {
                    roomList.remove( position );
                    columnDataList.remove( position );
+                   clearProductInfo();
                    totalCount.setText( "合计：" + roomList.size() + "件" );
                    adapter.notifyDataSetChanged();
-
                 }).show();
             } );
             return view;

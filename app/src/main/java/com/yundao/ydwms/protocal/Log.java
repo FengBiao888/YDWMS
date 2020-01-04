@@ -8,7 +8,8 @@ import com.yundao.ydwms.BuildConfig;
  */
 public class Log {
 
-    public static final boolean isDebug = BuildConfig.DEBUG;
+//    public static final boolean isDebug = BuildConfig.DEBUG;
+    public static final boolean isDebug = true ;
 
     /**
      * Debug输出Log日志
