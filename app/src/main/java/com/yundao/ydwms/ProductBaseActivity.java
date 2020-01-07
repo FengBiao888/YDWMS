@@ -36,49 +36,50 @@ import sysu.zyb.panellistlibrary.PanelListLayout;
 
 public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
 
-    public final static String SCAN_ACTION = ScanManager.ACTION_DECODE;//default action
+    public final static String SCAN_ACTION = ScanManager.ACTION_DECODE;//扫码广播的default action
 
     @BindView(R.id.id_pl_root)
-    public PanelListLayout pl_root;
+    public PanelListLayout pl_root; //产品信息父Layout
     @BindView(R.id.id_lv_content)
-    public  ListView lv_content;
+    public  ListView lv_content; //产品信息列表
     @BindView( R.id.confirm )
-    public Button submit ;
+    public Button submit ; //确定按钮
     @BindView( R.id.operator )
-    public TextView operator ;
+    public TextView operator ; //操作员
     @BindView( R.id.state )
-    public  TextView totalCount ;
+    public TextView totalCount ; //总条数
     @BindView( R.id.bar_code_value )
-    public EditText barCode ;
+    public EditText barCode ; //条码
     @BindView( R.id.material_value )
-    public EditText material ;
+    public EditText material ; //料号
     @BindView( R.id.product_name_value )
-    public  EditText productName ;
+    public  EditText productName ; //品名
     @BindView( R.id.specificationl_value )
-    public EditText specification ;
+    public EditText specification ; //规格
     @BindView( R.id.number_value )
-    public  EditText volume ;
+    public  EditText volume ; //卷号
     @BindView( R.id.pack_value )
-    public EditText pack ;
+    public EditText pack ; //包装
     @BindView( R.id.remark )
-    public TextView remark ;
+    public TextView remark ; //备注或者是仓位的文字描述
     @BindView( R.id.remark_value )
-    public EditText remarkValue ;
+    public EditText remarkValue ; //备注或者是仓位的输入内容
 
-    public  EditText foucusEditText ;
+    public  EditText foucusEditText ;//获取焦点的EditText
+    protected Enum anEnum ; //传输过来的扫码类型
 
-    AbstractPanelListAdapter adapter;
-    ArrayList<ProductInfo> roomList = new ArrayList<>();
+    AbstractPanelListAdapter adapter ;//产品列表adapter
+    ArrayList<ProductInfo> productInfos = new ArrayList<>(); //显示出来的产品列表
+    List<String> deleteOperators = new ArrayList<>();//最右侧删除用的操作栏，与productInfos数目保持一致
 
-    private Vibrator mVibrator;
-    private ScanManager mScanManager;
-    private SoundPool soundpool = null;
-    private int soundid;
+    private Vibrator mVibrator; //打扫成功后的震动器
+    private ScanManager mScanManager; //扫码manager
+    private SoundPool soundpool = null;//打包成功后bee一声
+    private int soundid; //声音文件id
 
-    List<String> columnDataList = new ArrayList<>();
-    public ProductInfo clickedProductInfo ;
+    public ProductInfo clickedProductInfo ;//点击选中的产品信息
 
-    private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mScanReceiver = new BroadcastReceiver() { //扫码结果广播监听
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -98,14 +99,14 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             }else{
                 ProductInfo productInfo = new ProductInfo();
                 productInfo.barCode = barcodeStr ;
-                if( roomList.contains( productInfo ) ){
+                if( productInfos.contains( productInfo ) ){
                     ToastUtil.showShortToast( "该产品已在列表中" );
                     return ;
                 }
 
-                if( !barcodeHasSpecialCondition() ){
+                if( !barcodeHasSpecialCondition() ){ //子类实现判断对于结果是否有特殊情况操作
                     barCode.setText( barcodeStr );
-                    dealwithBarcode( barcodeStr );
+                    dealwithBarcode( barcodeStr );//子类实现方法，对于扫码结果如何操作
                 }
             }
 
@@ -113,18 +114,31 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
 
     };
 
+    /**
+     * 子类实现判断对于结果是否有特殊情况操作
+     * @param barcodeStr
+     */
     public abstract void dealwithBarcode(String barcodeStr);
 
+    /**
+     * 子类实现方法，对于扫码结果如何操作
+     * @return
+     */
     public abstract boolean barcodeHasSpecialCondition();
 
-    protected Enum anEnum ;
-
+    /**
+     * 设置顶部标题栏
+     */
     @Override
     protected void setTitleBar() {
         titleBar.setTitleMainText( ( (ScanTypeEnum)anEnum ).getCodeName() );
 
     }
 
+    /**
+     * 返回布局文件id，子类实现可对展示内容作修改
+     * @return
+     */
     @Override
     protected int getLayout() {
         return R.layout.activity_product_normal;
@@ -136,6 +150,10 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         anEnum = (Enum) intent.getSerializableExtra( "pickScanType" );
     }
 
+    /**
+     * 父类的初始化方法，这里初始化大部分设置，子类可重写方法作特殊处理
+     * @param var1
+     */
     @Override
     public void initView(Bundle var1) {
 
@@ -152,7 +170,8 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             foucusEditText = (EditText) v;
         } );
 
-        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, roomList, R.layout.item_product_info);
+        //产品信息的初始化
+        adapter = new ProductionPanelListAdapter(this, pl_root, lv_content, productInfos, R.layout.item_product_info);
         adapter.setTitleWidth( 40 );
         adapter.setTitleHeight( 40 );
         adapter.setRowColor( "#4396FF" );
@@ -162,18 +181,22 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         adapter.setColumnDividerHeight( 1 );
         adapter.setTitleTextColor( "#494BFF" );
         adapter.setRowDataList(generateRowData());
-        adapter.setColumnDataList( columnDataList );
-        adapter.setColumnAdapter( new ColumnAdapter( columnDataList ) );
+        adapter.setColumnDataList(deleteOperators);
+        adapter.setColumnAdapter( new ColumnAdapter(deleteOperators) );
         adapter.setTitle("操作");
-
+        //产品内容列表点击事情
         lv_content.setOnItemClickListener((parent, view, position, id) -> {
-            ProductInfo productInfo = roomList.get(position);
+            ProductInfo productInfo = productInfos.get(position);
             clickedProductInfo = productInfo ;
             setProductInfo(productInfo);
         });
 
     }
 
+    /**
+     * 根据ProductInfo塞入界面显示的条码，卷号等信息。
+     * @param productInfo
+     */
     protected void setProductInfo(ProductInfo productInfo) {
         barCode.setText( productInfo.barCode );
         material.setText( productInfo.materielCode );
@@ -186,6 +209,9 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         }
     }
 
+    /**
+     * 清除界面信息
+     */
     protected void clearProductInfo(){
         barCode.setText( "" );
         material.setText( "" );
@@ -196,6 +222,10 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         remarkValue.setText( "" );
     }
 
+    /**
+     * 产品信息标题栏
+     * @return
+     */
     private List<String> generateRowData(){
         List<String> rowDataList = new ArrayList<>();
         rowDataList.add("序号");
@@ -214,22 +244,25 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         return rowDataList;
     }
 
+    /**
+     * 删除操作栏的适配器
+     */
     class ColumnAdapter extends BaseAdapter{
 
-        List<String> roomNumber ;
+        List<String> deleteList ;
 
         ColumnAdapter( List<String> roomNumber ){
-            this.roomNumber = roomNumber ;
+            this.deleteList = roomNumber ;
         }
 
         @Override
         public int getCount() {
-            return roomNumber == null ? 0 : roomNumber.size() ;
+            return deleteList == null ? 0 : deleteList.size() ;
         }
 
         @Override
         public Object getItem(int position) {
-            return roomNumber == null ? null : roomNumber.get( position );
+            return deleteList == null ? null : deleteList.get( position );
         }
 
         @Override
@@ -242,17 +275,21 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             View view = View.inflate( getActivity(), R.layout.layout_delete_icon, null );
             view.setOnClickListener( v->{
                 DialogUtil.showDeclareDialog( getActivity(), "确认要删除该条数据吗?", v1 -> {
-                   roomList.remove( position );
-                   columnDataList.remove( position );
-                   clearProductInfo();
-                   totalCount.setText( "合计：" + roomList.size() + "件" );
-                   adapter.notifyDataSetChanged();
+                    //产品栏删除对应条目录
+                    productInfos.remove( position );
+                    deleteOperators.remove( position );
+                    clearProductInfo();
+                    totalCount.setText( "合计：" + productInfos.size() + "件" );
+                    adapter.notifyDataSetChanged();
                 }).show();
             } );
             return view;
         }
     }
 
+    /**
+     * 扫一维码功能的初始化
+     */
     private void initScan() {
         // TODO Auto-generated method stub
         mScanManager = new ScanManager();
@@ -261,13 +298,13 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         mScanManager.switchOutputMode( 0);
         soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
         soundid = soundpool.load("/etc/Scan_new.ogg", 1);
-
     }
 
     @Override
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
+        //扫一维码功能的初始化
         initScan();
         IntentFilter filter = new IntentFilter();
         int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME, PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
@@ -277,23 +314,28 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
         } else {
             filter.addAction(SCAN_ACTION);
         }
-
+        //注册接收广播
         registerReceiver(mScanReceiver, filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        //反注册广播
         if(mScanManager != null) {
             mScanManager.stopDecode();
         }
         unregisterReceiver(mScanReceiver);
     }
 
+    /**
+     * 根据产品列表，获取一维码集合
+     * @return
+     */
     public List<String> genCodes(){
         List<String> list = new ArrayList<>();
-        for( int i = 0 ; i < roomList.size() ; i ++ ){
-            list.add( roomList.get(i).barCode );
+        for(int i = 0; i < productInfos.size() ; i ++ ){
+            list.add( productInfos.get(i).barCode );
         }
         return list ;
     }

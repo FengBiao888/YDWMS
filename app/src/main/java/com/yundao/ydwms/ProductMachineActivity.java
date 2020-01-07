@@ -3,7 +3,6 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -16,8 +15,6 @@ import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -40,7 +37,7 @@ public class ProductMachineActivity extends ProductBaseActivity {
     public void initView(Bundle var1) {
         super.initView(var1);
         submit.setOnClickListener( v->{
-            if( roomList.size() == 0 ){
+            if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
@@ -81,15 +78,15 @@ public class ProductMachineActivity extends ProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    columnDataList.add( "delete" );
-                                    roomList.add( info );
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductInfo( info );
 
                                 }

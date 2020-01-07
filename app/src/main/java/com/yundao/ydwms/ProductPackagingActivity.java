@@ -2,49 +2,25 @@ package com.yundao.ydwms;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.device.ScanManager;
-import android.device.scanner.configuration.PropertyID;
-import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Vibrator;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.zxing.WriterException;
 import com.nf.android.common.avoidonresult.AvoidOnResult;
-import com.nf.android.common.base.ImmersiveBaseActivity;
 import com.yundao.ydwms.print.PrintJobMonitorService;
 import com.yundao.ydwms.protocal.ProductInfo;
 import com.yundao.ydwms.protocal.request.PackeResourse;
-import com.yundao.ydwms.protocal.request.ProductionVo;
-import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -57,29 +33,28 @@ import com.yundao.ydwms.util.ToastUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
-import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
-import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
-import sysu.zyb.panellistlibrary.PanelListLayout;
 
+/**
+ * 产品打包Activity
+ */
 public class ProductPackagingActivity extends ProductBaseActivity {
 
-    private PrintManager mgr = null;
-    private WebView wv = null;
-    PrintJob print ;
-    private String printFilePath;
-    private boolean isInit = false ;
+    private boolean isInit = false ; //界面是否初始化
 
-    Dialog printProgress ;
+    private Dialog declareDialog; //显示不同规格不能打包的对话框
+
+    private WebView wv = null; //承载打印内容的webview
+    private PrintManager mgr = null; //打印Manager
+    PrintJob print ; //打印服务，轮询检测打印状态
+    Dialog printProgress ;//打印的等待框
+    private String printFilePath; //外部保存的生成打印内容的html文件
+    private String printBarCode ; //打包生成的1维码。
     private int tempTime = 0 ;//轮循尝试次数
-    private String printBarCode ;
-    private Handler printJobHandler = new Handler(){
+    private Handler printJobHandler = new Handler(){//轮循handler
 
         @Override
         public void dispatchMessage(Message msg) {
@@ -87,20 +62,20 @@ public class ProductPackagingActivity extends ProductBaseActivity {
             if( print != null ){
                 System.out.println( "print_state:" + print.getInfo().getState() );
                 String barcode = (String) msg.obj;
-                if( print.isCancelled() || print.isFailed() ){
+                if( print.isCancelled() || print.isFailed() ){ //取消或者失败，重新打印
                     if( printProgress != null && printProgress.isShowing() ){
                         printProgress.dismiss();
                     }
                     DialogUtil.showDeclareDialog( getActivity(), "用户取消或打印失败\n是否需要重新打印", v -> {
                         printReport( barcode );
                     } ).show();
-                }else if( print.isCompleted() ){
+                }else if( print.isCompleted() ){ //打印完成
                     if( printProgress != null && printProgress.isShowing() ){
                         printProgress.dismiss();
                     }
                     print = null ;
                     DialogUtil.showDeclareDialog( getActivity(), "打印成功", false, null).show();
-                }else{
+                }else{ //其他状态继续轮循
                     if( tempTime ++ < 100 ) {
                         Message message = printJobHandler.obtainMessage();
                         message.obj = msg.obj;
@@ -113,13 +88,14 @@ public class ProductPackagingActivity extends ProductBaseActivity {
         }
     };
 
+
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
         submit.setOnClickListener( v->{
-            if( roomList.size() == 0 ){
+            if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
@@ -129,15 +105,15 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                 } ).show();
             }else {
                 DialogUtil.showDeclareDialog(getActivity(), "确定是否打包", v1 -> {
-
+                    //组装打包接口的数据
                     PackeResourse resourse = new PackeResourse();
                     long timeMillis = System.currentTimeMillis();
-                    resourse.barCode = timeMillis + "2";
-                    resourse.dateline = timeMillis;
+                    resourse.barCode = timeMillis + "2"; //时间戳加上2
+                    resourse.dateline = timeMillis ;
                     int totalLength = 0;
                     BigDecimal totalWeight = null;
-                    for (int i = 0; i < roomList.size(); i++) {
-                        ProductInfo productInfo = roomList.get(i);
+                    for (int i = 0; i < productInfos.size(); i++) {
+                        ProductInfo productInfo = productInfos.get(i);
                         if (TextUtils.isEmpty(resourse.trayNumber) && !TextUtils.isEmpty(productInfo.trayNumber)) {
                             resourse.trayNumber = productInfo.trayNumber;
                         }
@@ -156,9 +132,9 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                         if (TextUtils.isEmpty(resourse.materielName) && !TextUtils.isEmpty(productInfo.materielName)) {
                             resourse.materielName = productInfo.materielName;
                         }
-                        totalLength += productInfo.length;
+                        totalLength += productInfo.length; //米数相加
 
-                        if (productInfo.netWeight != null) {
+                        if (productInfo.netWeight != null) {//重量相加
                             if (totalWeight == null) {
                                 totalWeight = productInfo.netWeight;
                             } else {
@@ -167,9 +143,9 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                         }
                     }
                     resourse.meter = totalLength + "";
-                    resourse.number = roomList.size();
+                    resourse.number = productInfos.size();
                     resourse.netWeight = totalWeight;
-                    resourse.productionLogs = roomList;
+                    resourse.productionLogs = productInfos;
                     baling(getActivity(), true, resourse);
 
                 }).show();
@@ -211,9 +187,8 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         ProductQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
-//                            int totalElements = body.totalElements;
-                            ProductInfo[] content = body.content;
-                            if(/* totalElements == content.length && */content.length > 0 ){
+                            ProductInfo[] content = body.content ;
+                            if(content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductInfo info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
@@ -225,21 +200,23 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
                                         barCode.setText( "" );
                                         continue;
-                                    }else if( roomList.size() > 0 && !roomList.get(0).isSameType( info ) ){//产品类型不同
-                                        DialogUtil.showDeclareDialog(getActivity(), "不是同一个产品规格不可以一起打包", false, "我知道了", null).show();
+                                    }else if( productInfos.size() > 0 && !productInfos.get(0).isSameType( info ) ){//产品类型不同
+                                        declareDialog = DialogUtil.showDeclareDialog(getActivity(), "不是同一个产品规格不可以一起打包", false, "我知道了", null);
+
+                                        declareDialog.show();
                                         barCode.setText( "" );
                                         continue;
                                     }
 
-                                    columnDataList.add( "delete" );
-                                    roomList.add( info );
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductInfo( info );
                                 }
                             }else{

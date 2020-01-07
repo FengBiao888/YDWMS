@@ -3,7 +3,6 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -16,8 +15,6 @@ import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -33,7 +30,7 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
 
     @Override
     public boolean barcodeHasSpecialCondition() {
-        if( foucusEditText == null && roomList.size() > 0 ){
+        if( foucusEditText == null && productInfos.size() > 0 ){
             ToastUtil.showShortToast( "一次只能操作一个仓位变更" );
             return true ;
         }
@@ -45,7 +42,7 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
         super.initView(var1);
 
         submit.setOnClickListener( v->{
-            if( roomList.size() == 0 ){
+            if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
@@ -88,15 +85,15 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    columnDataList.add( "delete" );
-                                    roomList.add( info );
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductInfo( info );
 
                                 }
@@ -135,7 +132,7 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
 
         ProductionVo vo = new ProductionVo();
 //        vo.codes = list ;
-        vo.code = roomList.get( 0 ).barCode ;
+        vo.code = productInfos.get( 0 ).barCode ;
         vo.warehouseCode = wearhouseCode;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
@@ -150,15 +147,10 @@ public class ProductHouseChangingActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
                             ToastUtil.showShortToast( "仓位变更成功" );
-                            roomList.clear();
-                            columnDataList.clear();
-                            barCode.setText( "" );
-                            material.setText( "" );
-                            productName.setText( "" );
-                            specification.setText( "" );
-                            volume.setText( "" );
-                            pack.setText( "" );
-                            remarkValue.setText( "" );
+                            //操作完一条，清除一条信息
+                            productInfos.clear();
+                            deleteOperators.clear();
+                            clearProductInfo();
                             totalCount.setText("");
                             adapter.notifyDataSetChanged();
                         }else if( response.code() == 401 ){

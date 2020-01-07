@@ -5,10 +5,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
-import com.yundao.ydwms.protocal.request.ProductionVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
@@ -17,8 +17,6 @@ import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -41,6 +39,8 @@ public class ProductInventoryActivity extends ProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        //产品盘点不需要确定按钮
+        submit.setVisibility( View.GONE );
 //        submit.setOnClickListener( v->{
 //            DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
 //                changeWarehousePositon( getActivity(), true, remarkValue.getText().toString() );
@@ -48,7 +48,6 @@ public class ProductInventoryActivity extends ProductBaseActivity {
 //        });
 
         remark.setText( "仓位" );
-
         monthIsChecked( getActivity(), true );
     }
 
@@ -83,15 +82,15 @@ public class ProductInventoryActivity extends ProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    columnDataList.add( "delete" );
-                                    roomList.add( info );
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductInfo( info );
                                     if (anEnum.equals(ScanTypeEnum.PRODUCT_INVENTORY)) { //盘点功能。
                                         pdaCheck(activity, true, info);
@@ -188,10 +187,10 @@ public class ProductInventoryActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         if ( response.code() == 400  ){
                             ToastUtil.showShortToast( "盘点失败" );
-                            int index = roomList.indexOf(info);
+                            int index = productInfos.indexOf(info);
                             if( index != -1 ){
-                                roomList.remove( index );
-                                columnDataList.remove( index );
+                                productInfos.remove( index );
+                                deleteOperators.remove( index );
                             }
                         }else{
                             ToastUtil.showShortToast( "盘点成功" );

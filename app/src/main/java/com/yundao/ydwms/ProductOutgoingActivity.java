@@ -3,7 +3,6 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductInfo;
@@ -41,24 +40,24 @@ public class ProductOutgoingActivity extends ProductBaseActivity {
         super.setTitleBar();
         titleBar.setRightText( "分类汇总" )
                 .setRightTitleClickListener( v->{
-                    if( roomList.size() > 0 ) {
+                    if( productInfos.size() > 0 ) {
                         AvoidOnResult onResult = new AvoidOnResult(getActivity());
                         Intent intent = new Intent(getActivity(), ProductCatalogueActivity.class);
-                        intent.putExtra("productInfoList", roomList);
+                        intent.putExtra("productInfoList", productInfos);
                         onResult.startForResult(intent, new AvoidOnResult.Callback() {
                             @Override
                             public void onActivityResult(int requestCode, int resultCode, Intent data) {
                                 if (resultCode == Activity.RESULT_OK) {
                                     List<ProductInfo> productInfoList = (List<ProductInfo>)data.getSerializableExtra("productInfoList");
-                                    roomList.clear();
-                                    columnDataList.clear();
+                                    productInfos.clear();
+                                    deleteOperators.clear();
                                     if( productInfoList.size() > 0 ) {
-                                        roomList.addAll(productInfoList);
-                                        for (int i = 0; i < roomList.size(); i++) {
-                                            columnDataList.add("delete");
+                                        productInfos.addAll(productInfoList);
+                                        for (int i = 0; i < productInfos.size(); i++) {
+                                            deleteOperators.add("delete");
                                         }
                                     }
-                                    totalCount.setText( "合计：" + roomList.size() + "件" );
+                                    totalCount.setText( "合计：" + productInfos.size() + "件" );
                                     adapter.notifyDataSetChanged();
                                 }
                             }
@@ -71,7 +70,7 @@ public class ProductOutgoingActivity extends ProductBaseActivity {
     public void initView(Bundle var1) {
         super.initView(var1);
         submit.setOnClickListener( v->{
-            if( roomList.size() == 0 ){
+            if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
@@ -112,15 +111,15 @@ public class ProductOutgoingActivity extends ProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    columnDataList.add( "delete" );
-                                    roomList.add( info );
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + roomList.size() + "件");
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductInfo( info );
 
                                 }
