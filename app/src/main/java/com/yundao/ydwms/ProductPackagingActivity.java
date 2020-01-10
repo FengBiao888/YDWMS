@@ -138,7 +138,7 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                             if (totalWeight == null) {
                                 totalWeight = productInfo.netWeight;
                             } else {
-                                totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
+                                totalWeight = totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
                             }
                         }
                     }
