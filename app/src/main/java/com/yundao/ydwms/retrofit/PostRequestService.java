@@ -1,30 +1,28 @@
 package com.yundao.ydwms.retrofit;
 
 
-import android.support.design.widget.BaseTransientBottomBar;
-
-import com.yundao.ydwms.protocal.ProductInfo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.URLConstant;
+import com.yundao.ydwms.protocal.request.Baling;
+import com.yundao.ydwms.protocal.request.BalingRequest;
+import com.yundao.ydwms.protocal.request.CheckRequest;
 import com.yundao.ydwms.protocal.request.LoginRequest;
-import com.yundao.ydwms.protocal.request.PackeResourse;
-import com.yundao.ydwms.protocal.request.ProductionVo;
+import com.yundao.ydwms.protocal.request.ProductUpdateRequest;
+import com.yundao.ydwms.protocal.request.WareHouseChangingRequest;
+import com.yundao.ydwms.protocal.request.WarehouseVo;
+import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
+import com.yundao.ydwms.protocal.respone.CheckedMonthRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
+import com.yundao.ydwms.protocal.respone.ProductOutRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.WarehouseQueryRespone;
+import com.yundao.ydwms.protocal.respone.WarehouseRespone;
 
-import java.math.BigDecimal;
-import java.security.Timestamp;
-import java.util.List;
-
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
@@ -46,54 +44,66 @@ public interface PostRequestService {
     @GET(URLConstant.PRODUCTION_LOG)
     Call<ProductQueryRespone> productionLog(@Query("barCode") String barCode);
     /**
+     * 仓位查询接口
+     * @return
+     */
+    @GET(URLConstant.QUERY_WAREHOUSE_LOG)
+    Call<WarehouseQueryRespone> queryWarehouselog(@Query("barCode") String barCode);
+    /**
+     * 产品查询接口
+     * @return
+     */
+    @GET(URLConstant.BALING_PRODUCTION_LOG)
+    Call<BalingQueryRespone> balingProductionLog(@Query("balingBarCode") String barCode);
+    /**
      * 产品进仓接口
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.PRODUCTION_INCOMING)
-    Call<BaseRespone> productionIncoming(@Body ProductionVo requestBody);
+    Call<BaseRespone> productionIncoming(@Body WarehouseVo requestBody);
     /**
      * 产品出仓接口
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.PRODUCTION_OUTGOING)
-    Call<BaseRespone> productionOutgoing(@Body ProductionVo requestBody);
+    Call<BaseRespone> productionOutgoing(@Body WarehouseVo requestBody);
     /**
      * 半成品出仓接口
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.HALF_PRODUCTION_OUTGOING)
-    Call<BaseRespone> halfProductionOutgoing(@Body ProductionVo requestBody);
+    Call<BaseRespone> halfProductionOutgoing(@Body WarehouseVo requestBody);
     /**
      * 半成品修改接口
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.PRODUCTION_LOG)
-    Call<BaseRespone> halfProductionModify(@Body ProductInfo requestBody);
+    Call<BaseRespone> halfProductionModify(@Body ProductionLogDto requestBody);
     /**
      * 产品加工
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.PRODUCTION_MACHINING)
-    Call<BaseRespone> productionMachining(@Body ProductionVo requestBody);
+    Call<BaseRespone> productionMachining(@Body WarehouseVo requestBody);
     /**
      * 改变仓库
      * @return
      */
     @Headers({"Content-Type: application/json"})
     @PUT(URLConstant.CHANGE_WAREHOUSE_POSITION)
-    Call<BaseRespone> changeWarehousePositon(@Body ProductionVo requestBody);
+    Call<BaseRespone> changeWarehousePositon(@Body WareHouseChangingRequest requestBody);
     /**
      * 产品打包码
      * @return
      */
     @Headers({"Content-Type: application/json"})
-    @POST(URLConstant.PRODUCTION_BALING)
-    Call<PackeResourse> baling(@Body PackeResourse resourse);
+    @PUT(URLConstant.PRODUCTION_BALING)
+    Call<Baling> baling(@Body BalingRequest resourse);
     /**
      * 产品出仓码的打包码查询
      * @return
@@ -111,6 +121,42 @@ public interface PostRequestService {
      * @return
      */
     @PUT(URLConstant.PRODUCTION_PDA_CHECK)
-    Call<BaseRespone> pdaCheck(@Body ProductInfo info);
+    Call<BaseRespone> pdaCheck(@Body CheckRequest info);
+    /**
+     * 盘点
+     * @return
+     */
+    @GET(URLConstant.WAREHOUSE)
+    Call<WarehouseRespone> warehouse(@Query("type") String type );
+    /**
+     * 盘点
+     * @return
+     */
+    @PUT(URLConstant.MACHINING_PRODUCTION)
+    Call<BaseRespone> machiningProduction(@Body BalingRequest info);
+    /**
+     * 盘点
+     * @return
+     */
+    @PUT(URLConstant.PRODUCTION_UPDATE)
+    Call<BaseRespone> productionUpdate(@Body ProductUpdateRequest info);
+    /**
+     * 盘点
+     * @return
+     */
+    @GET(URLConstant.PRODUCTION_CHECKED_MONTH)
+    Call<CheckedMonthRespone> productionCheckedMonth(@Query("warehouseName") String warehouseName, @Query("type") int type);
+ /**
+     * 盘点
+     * @return
+     */
+    @PUT(URLConstant.PRODUCTION_RETURN)
+    Call<BaseRespone> productionReturn(@Body WarehouseVo warehouseVo);
+    /**
+     * 盘点
+     * @return
+     */
+    @GET(URLConstant.OUT_BALING)
+    Call<ProductOutRespone> outBaling(@Query("barCode") String barCode);
 
 }

@@ -12,7 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.nf.android.common.base.ImmersiveBaseActivity;
-import com.yundao.ydwms.protocal.ProductInfo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.util.DialogUtil;
 
 import java.util.ArrayList;
@@ -24,14 +24,11 @@ import sysu.zyb.panellistlibrary.PanelListLayout;
 
 public class ProductCatalogueActivity extends ImmersiveBaseActivity {
 
-
-    @BindView(R.id.id_pl_root)
     PanelListLayout pl_root;//产品信息父Layout
-    @BindView(R.id.id_lv_content)
     ListView lv_content;//产品信息列表
 
     AbstractPanelListAdapter adapter;//产品列表adapter
-    ArrayList<ProductInfo> productInfos = new ArrayList<>(); //显示出来的产品列表
+    ArrayList<ProductionLogDto> productInfos = new ArrayList<>(); //显示出来的产品列表
     List<String> deleteOperators = new ArrayList<>();//最右侧删除用的操作栏，与productInfos数目保持一致
 
     private boolean dataChanged  = false ;
@@ -58,7 +55,7 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
     protected void initIntent(Intent intent) {
         super.initIntent(intent);
         //根据传过来的数据初始化
-        List<ProductInfo> lists = (List<ProductInfo>) intent.getSerializableExtra( "productInfoList" );
+        List<ProductionLogDto> lists = (List<ProductionLogDto>) intent.getSerializableExtra( "productInfoList" );
         productInfos.addAll( lists );
         for( int i = 0 ; i < productInfos.size() ; i ++ ){
             deleteOperators.add( "delete" );
@@ -67,6 +64,9 @@ public class ProductCatalogueActivity extends ImmersiveBaseActivity {
 
     @Override
     public void initView(Bundle var1) {
+
+        pl_root = findViewById( R.id.id_pl_root );//产品信息父Layout
+        lv_content = findViewById( R.id.id_lv_content );//产品信息列表
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

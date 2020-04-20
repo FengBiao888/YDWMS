@@ -9,6 +9,7 @@ package com.yundao.ydwms.protocal;
 public class URLConstant {
 
      public static String BASE_URL = "http://121.201.76.121:8086/"; //新外网地址
+//     public static String BASE_URL = "http://192.168.1.101:8000/"; //新外网地址
      public static String BASE_H5_URL = "https://test.southhr.cn"; //新外网地址
     /**
      * 登录
@@ -19,13 +20,21 @@ public class URLConstant {
      */
     public static final String PRODUCTION_LOG = "/api/productionLog";
     /**
+     * 产品查询
+     */
+    public static final String QUERY_WAREHOUSE_LOG = "/api/warehousePosition";
+    /**
+     * 打包的成品查询
+     */
+    public static final String BALING_PRODUCTION_LOG = "/api/productionLog/getBaling";
+    /**
      * 产品进仓
      */
-    public static final String PRODUCTION_INCOMING = "api/goProduction";
+    public static final String PRODUCTION_INCOMING = "api/productionLog/goProduction";
     /**
      * 产品出仓
      */
-    public static final String PRODUCTION_OUTGOING = "api/outProduction";
+    public static final String PRODUCTION_OUTGOING = "api/productionLog/outProduction";
     /**
      * 产品出仓
      */
@@ -33,15 +42,15 @@ public class URLConstant {
     /**
      * 仓位变更
      */
-    public static final String CHANGE_WAREHOUSE_POSITION = "api/changeWarehousePosition";
+    public static final String CHANGE_WAREHOUSE_POSITION = "/api/productionLog/changeWarehousePosition";
     /**
      * 产品加工
      */
     public static final String PRODUCTION_MACHINING = "api/machiningProduction";
     /**
-     * 产品加工
+     * 产品打包
      */
-    public static final String PRODUCTION_BALING = "api/baling";
+    public static final String PRODUCTION_BALING = "/api/productionLog/baling";
     /**
      * 是否该月盘点过
      */
@@ -49,5 +58,29 @@ public class URLConstant {
     /**
      * 盘点
      */
-    public static final String PRODUCTION_PDA_CHECK = "api/PDACheck";
+    public static final String PRODUCTION_PDA_CHECK = "/api/productionLog/check";
+    /**
+     * 仓库
+     */
+    public static final String WAREHOUSE = "/api/warehouse";
+    /**
+     * 产品分切
+     */
+    public static final String MACHINING_PRODUCTION = "/api/productionLog/machiningProduction";
+    /**
+     * 产品
+     */
+    public static final String PRODUCTION_UPDATE = "/api/productionLog/updateProductionLogs";
+    /**
+     * 查月分
+     */
+    public static final String PRODUCTION_CHECKED_MONTH = "/api/checkedMonth";
+    /**
+     * 退仓
+     */
+    public static final String PRODUCTION_RETURN = "/api/productionLog/returnProduction";
+    /**
+     * 产品出库扫码查询
+     */
+    public static final String OUT_BALING = "/api/baling";
 }

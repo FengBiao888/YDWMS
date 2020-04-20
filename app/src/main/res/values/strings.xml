@@ -1,13 +1,22 @@
 <resources>
     <string name="app_name">YDWMS</string>
 
+    <string-array name="warehouse_type">
+        <item>成口仓</item>
+        <item>半成品仓</item>
+        <item>不良品仓 </item>
+    </string-array>
+
     <string-array name="scan_type">
-        <item>产品打包</item>
-        <item>成品进仓</item>
-        <item>成品出仓 </item>
         <item>半成品进仓</item>
         <item>半成品出仓</item>
+        <item>成品打包</item>
+        <item>成品进仓</item>
+        <item>成品出仓 </item>
+        <item>盘点</item>
+        <item>半成品分切</item>
+        <item>退货进仓</item>
         <item>仓位变更</item>
-        <item>产品盘点</item>
+        <item>产品信息变更</item>
     </string-array>
 </resources>

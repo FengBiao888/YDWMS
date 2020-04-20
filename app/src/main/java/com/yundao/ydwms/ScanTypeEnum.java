@@ -4,20 +4,16 @@ import android.text.TextUtils;
 
 public enum ScanTypeEnum {
 
-//     <item>产品打包</item>
-//        <item>成品进仓</item>
-//        <item>成品出仓 </item>
-//        <item>半成品进仓</item>
-//        <item>半成品出仓</item>
-//        <item>仓位变更</item>
-//        <item>产品盘点</item>
-    PRODUCT_PACKAGING( "产品打包", 1),
-    PRODUCT_INCOMING( "产品进仓", 2 ),
-    PRODUCT_OUTGOING( "产品出仓", 3 ),
-    PRODUCT_MACHINING( "半成品加工", 4 ),
-    HALF_PRODUCT_OUTGOING( "半成品出仓", 5 ),
-    WAREHOUSE_CHANGING( "仓位变更",6 ),
-    PRODUCT_INVENTORY( "产品盘点",7 );
+    HALF_PRODUCT_INCOMING( "半成品进仓", 1 ),
+    HALF_PRODUCT_OUTGOING( "半成品出仓", 2 ),
+    PRODUCT_PACKAGING( "成品打包", 3),
+    PRODUCT_INCOMING( "成品进仓", 4 ),
+    PRODUCT_OUTGOING( "成品出仓", 5 ),
+    PRODUCT_INVENTORY( "盘点",6 ),
+    PRODUCT_SLITTING( "半产品分切",7 ),
+    REJECTED_PRODUCT_INCOMING( "退货进仓", 8 ),
+    WAREHOUSE_CHANGING( "仓位变更",9 ),
+    PRODUCT_INFO_CHANGING( "产品信息变更", 10 ) ;
 
 
     /**

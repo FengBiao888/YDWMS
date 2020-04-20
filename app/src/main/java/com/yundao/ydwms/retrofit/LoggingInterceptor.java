@@ -36,7 +36,7 @@ public class LoggingInterceptor implements Interceptor {
         Request.Builder requestBuilder = original.newBuilder();
         String authorization = YDWMSApplication.getInstance().getAuthorization();
         if( ! TextUtils.isEmpty(authorization) ) {
-            requestBuilder.addHeader("Authorization", "Bearer " + authorization);
+            requestBuilder.addHeader("Authorization", authorization);
         }
         if( url.contains(URLConstant.PRODUCTION_OUTGOING) ){//Content-Type: application/json
             requestBuilder.addHeader("Content-Type", "application/json");

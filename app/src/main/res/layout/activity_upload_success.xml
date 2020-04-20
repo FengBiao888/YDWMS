@@ -5,62 +5,31 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <ImageView
+    <com.nf.android.common.titlebar.SimpleToolbar
+        android:id="@+id/titleBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/home_bg"/>
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="140dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:layout_gravity="center"
         >
-
-        <Button
-            android:id="@+id/connect_setting"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设置"
-            android:layout_weight="1"
-            android:layout_marginStart="20dp"
-            android:background="@drawable/selector_white_shadow"
-            android:textColor="@drawable/selector_white_text"
-            />
+            android:background="@drawable/icon_success"/>
 
-        <Button
-            android:id="@+id/login"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="登录"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/selector_white_shadow"
-            android:textColor="@drawable/selector_white_text"
-            />
-
-        <Button
-            android:id="@+id/scan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="扫描"
-            android:layout_weight="1"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/selector_white_shadow"
-            android:textColor="@drawable/selector_white_text"
+            android:text="上传成功"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_18sp"
+            android:layout_marginTop="@dimen/item_gap_l"
             />
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:text="佛山市云道信息科技有限公司"
-        android:layout_marginBottom="@dimen/item_gap_l"
-        android:textColor="@android:color/darker_gray"
-        />
 
 </FrameLayout>

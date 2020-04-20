@@ -1,14 +1,13 @@
 package com.nf.android.common.utils;
 
 
-import com.nf.android.common.BuildConfig;
 
 /**
  * 日志输出
  */
 public class Log {
 
-    public static final boolean isDebug = BuildConfig.DEBUG;
+    public static final boolean isDebug = true;
 
     /**
      * Debug输出Log日志

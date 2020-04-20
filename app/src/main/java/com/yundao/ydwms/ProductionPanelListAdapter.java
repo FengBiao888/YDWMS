@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yundao.ydwms.protocal.ProductInfo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
 
 import java.util.List;
 import java.util.Map;
@@ -35,11 +35,11 @@ import sysu.zyb.panellistlibrary.PanelListLayout;
 public class ProductionPanelListAdapter extends AbstractPanelListAdapter {
 
     private Context context;
-    private List<ProductInfo> roomList;
+    private List<ProductionLogDto> roomList;
     private int resourceId;
 
     public ProductionPanelListAdapter(Context context, PanelListLayout pl_root, ListView lv_content,
-                                List<ProductInfo> roomList, int resourceId) {
+                                List<ProductionLogDto> roomList, int resourceId) {
         super(context, pl_root, lv_content);
         this.context = context;
         this.roomList = roomList;
@@ -54,9 +54,9 @@ public class ProductionPanelListAdapter extends AbstractPanelListAdapter {
     private class ContentAdapter extends ArrayAdapter {
 
         private int itemResourceId;
-        private List<ProductInfo> roomList;
+        private List<ProductionLogDto> roomList;
 
-        public ContentAdapter(@NonNull Context context, @LayoutRes int resource, List<ProductInfo> roomList) {
+        public ContentAdapter(@NonNull Context context, @LayoutRes int resource, List<ProductionLogDto> roomList) {
             super(context, resource);
             this.itemResourceId = resource;
             this.roomList = roomList;
@@ -73,7 +73,7 @@ public class ProductionPanelListAdapter extends AbstractPanelListAdapter {
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             View view;
             ViewHolder viewHolder;
-            ProductInfo info = roomList.get( position );
+            ProductionLogDto info = roomList.get( position );
             if (convertView == null){
                 view = LayoutInflater.from(parent.getContext()).inflate(itemResourceId,parent,false);
                 viewHolder = new ViewHolder(view);
@@ -85,10 +85,10 @@ public class ProductionPanelListAdapter extends AbstractPanelListAdapter {
 
             viewHolder.index.setText( ( position + 1 ) + "" );
             viewHolder.bar_code.setText( info.barCode );
-            viewHolder.product_name.setText( info.materielName );
+            viewHolder.product_name.setText( info.productName );
             viewHolder.splice.setText( info.splice );
             viewHolder.train.setText( info.train );
-            viewHolder.materielModel.setText( info.materielModel );
+            viewHolder.materielModel.setText( info.productModel );
             viewHolder.packing.setText( info.packing );
             viewHolder.machine.setText( info.machine );
             viewHolder.trayNumber.setText( info.trayNumber );

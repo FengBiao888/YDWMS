@@ -16,15 +16,16 @@ import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
+import com.yundao.ydwms.util.ARSAUtils;
 import com.yundao.ydwms.util.ToastUtil;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.nf.android.common.R2.string.year;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANL378k3RiZHWx5AfJqdH9xRNBmD9wGD2iRe41HdTNF8RUhNnHit5NpMNtGL0NPTSSpPjjI1kJfVorRvaQerUgkCAwEAAQ==";
     EditText userName ;
     EditText password ;
     Button confirm ;
@@ -38,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         userName = findViewById( R.id.topEditText );
         userName.setText( "admin" );
         password = findViewById( R.id.bottomEditText );
-        password.setText( "123456789" );
+        password.setText( "123456" );
         confirm = findViewById( R.id.confirm );
         confirm.setOnClickListener( v-> {
             login( this, true );
@@ -56,7 +57,9 @@ public class LoginActivity extends AppCompatActivity {
 
         LoginRequest request = new LoginRequest();
         request.username = userName.getText().toString() ;
-        request.password = password.getText().toString() ;
+
+        String encrypted = ARSAUtils.encryptDataByPublicKey( password.getText().toString().getBytes(), ARSAUtils.keyStrToPublicKey(publicKey) );
+        request.password = encrypted ;
         request.code = "code" ;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()

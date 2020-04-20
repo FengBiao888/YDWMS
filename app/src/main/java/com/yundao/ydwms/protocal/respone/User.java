@@ -2,6 +2,8 @@ package com.yundao.ydwms.protocal.respone;
 
 public class User {
     public String username ;
+    public String nickName ;
+    public String sex ;
     public String avatar ;
     public String email ;
     public String phone ;

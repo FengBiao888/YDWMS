@@ -41,7 +41,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
-        <activity android:name=".ProductHouseChangingActivity"
+        <activity android:name=".ProductWarehouseChangingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
@@ -49,7 +49,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
-        <activity android:name=".ProductMachineActivity"
+        <activity android:name=".ProductProductUpdateActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
@@ -73,6 +73,28 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+        <activity android:name=".RejectProductIncomingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".HalfProductIncomingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductInventoryChooseActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".ProductSlittingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".UploadSuccessActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+
+
 
         <service android:name=".print.PrintJobMonitorService"/>
     </application>

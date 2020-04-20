@@ -92,28 +92,23 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:id="@+id/material"
+                        android:id="@+id/warehouse_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
-                        android:text="料号"
+                        android:text="仓库"
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/material_value"
+                        android:id="@+id/warehouse_name_value"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -126,118 +121,31 @@
                         android:focusableInTouchMode="false"
                         />
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/specification"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_s"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/normal_item_min_height"
-                        android:text="规格"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:id="@+id/specification_value"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_margin="@dimen/dp5"
-                        android:background="@drawable/selector_edit_text"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/tare_weight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_s"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/normal_item_min_height"
-                        android:text="皮重"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:id="@+id/tare_weight_value"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_margin="@dimen/dp5"
-                        android:background="@drawable/selector_edit_text"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        />
-
-                </LinearLayout>
-
 
 
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/product_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_s"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/normal_item_min_height"
-                        android:text="品名"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:id="@+id/product_name_value"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_margin="@dimen/dp5"
-                        android:background="@drawable/selector_edit_text"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        android:enabled="false"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        />
-
-                </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:id="@+id/net_weight"
+                        android:id="@+id/warehouse_position"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/item_gap_s"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/normal_item_min_height"
-                        android:text="净重"
+                        android:text="仓位"
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/net_weight_value"
+                        android:id="@+id/warehouse_position_value"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -249,34 +157,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/gross_weight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/item_gap_s"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/normal_item_min_height"
-                        android:text="毛重"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
 
-                    <EditText
-                        android:id="@+id/gross_weight_value"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_margin="@dimen/dp5"
-                        android:background="@drawable/selector_edit_text"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        />
-
-                </LinearLayout>
-
-            </LinearLayout>
 
         </LinearLayout>
 

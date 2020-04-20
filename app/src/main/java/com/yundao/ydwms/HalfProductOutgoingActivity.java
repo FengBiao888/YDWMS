@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
-import com.yundao.ydwms.protocal.ProductInfo;
-import com.yundao.ydwms.protocal.request.ProductionVo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
+import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
@@ -17,12 +18,20 @@ import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class HalfProductOutgoingActivity extends ProductBaseActivity {
+public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
+
+    public EditText warehouseName ; // 出货仓
+    public EditText orderId ; //订单号
+    public  EditText volumeSume ; //出库总卷数
+    public EditText weightSum ; //出库总量（kg）
+
+    BigDecimal totalWeight = null;
 
     private boolean isInit;
 
@@ -49,7 +58,7 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
                             @Override
                             public void onActivityResult(int requestCode, int resultCode, Intent data) {
                                 if (resultCode == Activity.RESULT_OK) {
-                                    List<ProductInfo> productInfoList = (List<ProductInfo>)data.getSerializableExtra("productInfoList");
+                                    List<ProductionLogDto> productInfoList = (List<ProductionLogDto>)data.getSerializableExtra("productInfoList");
                                     productInfos.clear();
                                     deleteOperators.clear();
                                     if( productInfoList.size() > 0 ) {
@@ -69,36 +78,55 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
 
     @Override
     protected int getLayout() {
-        return R.layout.activity_half_product_outgoing ;
+        return R.layout.activity_product_outgoing ;
     }
 
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+
+        warehouseName = findViewById( R.id.warehouse_name_value ); // 出货仓
+        orderId = findViewById( R.id.orderid_value ); //订单号
+        volumeSume = findViewById( R.id.volume_sum_value ); //出库总卷数
+        weightSum = findViewById( R.id.weight_sum_value ); //出库总量（kg）
+
+        warehouseName.setText( "半成品仓" );
+//        orderId.setText( "XS2020011502" );
         submit.setOnClickListener( v->{
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
-                halfProductionOutgoing(getActivity(), true);
+                productionOutgoing(getActivity(), true);
             }).show();
         });
-        Button modify = findViewById( R.id.modify );
-        modify.setOnClickListener( v -> {
-            if( clickedProductInfo != null ) {
-                clickedProductInfo.barCode = barCode.getText().toString() ;
-                clickedProductInfo.materielCode = material.getText().toString() ;
-                clickedProductInfo.materielName = productName.getText().toString() ;
-                clickedProductInfo.materielModel = specification.getText().toString() ;
-                clickedProductInfo.volume = volume.getText().toString() ;
-                clickedProductInfo.packing = pack.getText().toString() ;
-                clickedProductInfo.remark = remarkValue.getText().toString() ;
-                halfProductionModify(getActivity(), true, clickedProductInfo);
-            }else{
-                ToastUtil.showShortToast( "请选择半成品" );
+
+    }
+
+    @Override
+    protected void setProductionLogDto(ProductionLogDto productInfo) {
+        totalWeight = null ;
+        //这里对所有产品的卷数相加
+        for(int i = 0 ; i < productInfos.size() ; i ++ ){
+            ProductionLogDto info = productInfos.get(i);
+//            info.volume = ;
+            if (info.netWeight != null) {//重量相加
+                if (totalWeight == null) {
+                    totalWeight = info.netWeight;
+                } else {
+                    totalWeight = totalWeight.add(info.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
+                }
             }
-        } );
+        }
+        weightSum.setText( totalWeight.toString() );
+        volumeSume.setText( productInfos.size() + "" );
+    }
+
+    @Override
+    protected void clearProductionLogDto() {
+        //与setProductionLogDto一样
+        setProductionLogDto( null );
     }
 
     /**
@@ -123,13 +151,12 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
                         ProductQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
 //                            int totalElements = body.totalElements;
-                            ProductInfo[] content = body.content;
+                            ProductionLogDto[] content = body.content;
                             if(/* totalElements == content.length && */content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductInfo info = content[i];
+                                    ProductionLogDto info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
                                         continue;
                                     }
                                     deleteOperators.add( "delete" );
@@ -141,7 +168,7 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
                                         adapter.notifyDataSetChanged();
                                     }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductInfo( info );
+                                    setProductionLogDto( info );
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
@@ -169,27 +196,33 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
     }
 
     /**
-     * 半成品出仓
+     * 产品出仓
      * @param activity
      * @param showProgressDialog
      */
-    public void halfProductionOutgoing(Activity activity, boolean showProgressDialog ){
+    public void productionOutgoing(Activity activity, boolean showProgressDialog ){
 
-        ProductionVo vo = new ProductionVo();
-        vo.codes = genCodes() ;
+        WarehouseVo vo = new WarehouseVo();
+        vo.ids = genCodes();
+        vo.warehouseName = "半成品仓" ;
+        vo.ordersCode = orderId.getText().toString() ;
+        vo.amountTotal = new BigDecimal( productInfos.size() ) ;
+        vo.number = new BigDecimal(  weightSum.getText().toString() ) ;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
                 .build(activity);
 
         PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.halfProductionOutgoing( vo )
+        postRequestInterface.productionOutgoing( vo )
                 .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
                     @Override
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "半成品出仓成功" );
+                            ToastUtil.showShortToast( "出仓成功" );
+                            Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);
+                            startActivity( intent );
                         }else if( response.code() == 401 ){
                             ToastUtil.showShortToast( "登录过期，请重新登录" );
                             AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
@@ -209,48 +242,8 @@ public class HalfProductOutgoingActivity extends ProductBaseActivity {
                     }
 
                 });
+
     }
 
-    /**
-     * 半成品信息修改
-     * @param activity
-     * @param showProgressDialog
-     */
-    public void halfProductionModify(Activity activity, boolean showProgressDialog, ProductInfo productInfo ){
 
-        ProductionVo vo = new ProductionVo();
-        vo.codes = genCodes() ;
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.halfProductionModify( productInfo )
-                .enqueue(new BaseCallBack<BaseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 200 || response.code() == 204 ){
-                            ToastUtil.showShortToast( "半成品信息修改成功" );
-                        }else if( response.code() == 401 ){
-                            ToastUtil.showShortToast( "登录过期，请重新登录" );
-                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
-                            Intent intent = new Intent( getActivity(), LoginActivity.class );
-                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
-                                @Override
-                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                                    if( resultCode == Activity.RESULT_OK ){
-                                        User user = YDWMSApplication.getInstance().getUser();
-                                        if( user != null ){
-                                            operator.setText( "操作员：" + user.username );
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-
-                });
-    }
 }

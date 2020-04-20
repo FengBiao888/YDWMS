@@ -15,12 +15,19 @@ import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.zxing.WriterException;
 import com.nf.android.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.print.PrintJobMonitorService;
-import com.yundao.ydwms.protocal.ProductInfo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
+import com.yundao.ydwms.protocal.request.Baling;
+import com.yundao.ydwms.protocal.request.BalingRequest;
 import com.yundao.ydwms.protocal.request.PackeResourse;
+import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
+import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -34,14 +41,29 @@ import com.yundao.ydwms.util.ToastUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
 
 /**
  * 产品打包Activity
  */
-public class ProductPackagingActivity extends ProductBaseActivity {
+public class ProductPackagingActivity extends ScanProductBaseActivity {
+
+    public EditText barCode ; //条码
+    public EditText material ; //料号
+    public  EditText productName ; //品名
+    public EditText specification ; //规格
+    public  EditText weightSume ; //总净重
+    public  EditText volumeSum ; //总卷数
+    public Button printBtn ; //打印
+
+    private BalingRequest resourse ;//打包的数据
+
+    BigDecimal totalWeight = null;
 
     private boolean isInit = false ; //界面是否初始化
 
@@ -81,6 +103,9 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                         message.obj = msg.obj;
                         printJobHandler.sendMessageDelayed(message, 1000);
                     }else{
+                        if( printProgress != null && printProgress.isShowing() ){
+                            printProgress.dismiss();
+                        }
                         print.cancel();
                     }
                 }
@@ -88,10 +113,22 @@ public class ProductPackagingActivity extends ProductBaseActivity {
         }
     };
 
+    @Override
+    protected int getLayout() {
+        return R.layout.activity_product_packaging ;
+    }
 
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        barCode = findViewById( R.id.bar_code_value ); //条码
+        material = findViewById( R.id.material_value ); //料号
+        productName = findViewById( R.id.product_name_value ); //品名
+        specification = findViewById( R.id.specification_value) ; //规格
+        weightSume = findViewById( R.id.weight_sum_value ); //总净重
+        volumeSum = findViewById( R.id.volume_sum_value ); //总卷数
+        printBtn = findViewById( R.id.print ); //打印
+
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
         submit.setOnClickListener( v->{
@@ -99,40 +136,50 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
-            if( !TextUtils.isEmpty( printBarCode ) ){
-                DialogUtil.showDeclareDialog( getActivity(), "产品已打包，是否打印打包数据", v1 -> {
-                    printReport( printBarCode );
-                } ).show();
-            }else {
+
+//            if( !TextUtils.isEmpty( printBarCode ) ){
+//                DialogUtil.showDeclareDialog( getActivity(), "产品已打包，是否打印打包数据", v1 -> {
+//                    printReport( printBarCode );
+//                } ).show();
+//            }else {
                 DialogUtil.showDeclareDialog(getActivity(), "确定是否打包", v1 -> {
                     //组装打包接口的数据
-                    PackeResourse resourse = new PackeResourse();
+                    if( resourse == null ) {
+                        resourse = new BalingRequest();
+                        resourse.baling = new Baling();
+                    }
                     long timeMillis = System.currentTimeMillis();
-                    resourse.barCode = timeMillis + "2"; //时间戳加上2
-                    resourse.dateline = timeMillis ;
-                    int totalLength = 0;
+                    if( TextUtils.isEmpty( barCode.getText().toString() ) ){//没有打包过，才要生成打包码
+                        resourse.baling.barCode = timeMillis + "2"; //时间戳加上2
+                    }
+                    resourse.baling.balingDate = timeMillis ;
                     BigDecimal totalWeight = null;
+                    BigDecimal totalLength = null;
+                    List<Long> ids = new ArrayList<>();
                     for (int i = 0; i < productInfos.size(); i++) {
-                        ProductInfo productInfo = productInfos.get(i);
-                        if (TextUtils.isEmpty(resourse.trayNumber) && !TextUtils.isEmpty(productInfo.trayNumber)) {
-                            resourse.trayNumber = productInfo.trayNumber;
+                        ProductionLogDto productInfo = productInfos.get(i);
+                        if (TextUtils.isEmpty(resourse.baling.trayNumber) && !TextUtils.isEmpty(productInfo.trayNumber)) {
+                            resourse.baling.trayNumber = productInfo.trayNumber;
                         }
-                        if (TextUtils.isEmpty(resourse.customerId) && !TextUtils.isEmpty(productInfo.customerId)) {
-                            resourse.customerId = productInfo.customerId;
+//                        if (TextUtils.isEmpty(resourse.customerId) && !TextUtils.isEmpty(productInfo.customerId)) {
+                        resourse.baling.customerId = productInfo.customerId;
+//                        }
+                        if (TextUtils.isEmpty(resourse.baling.customerAbbreviation) && !TextUtils.isEmpty(productInfo.customerAbbreviation)) {
+                            resourse.baling.customerAbbreviation = productInfo.customerAbbreviation;
                         }
-                        if (TextUtils.isEmpty(resourse.customerName) && !TextUtils.isEmpty(productInfo.customerAbbreviation)) {
-                            resourse.customerName = productInfo.customerAbbreviation;
+                        if (TextUtils.isEmpty(resourse.baling.productModel) && !TextUtils.isEmpty(productInfo.productModel)) {
+                            resourse.baling.productModel = productInfo.productModel;
                         }
-                        if (TextUtils.isEmpty(resourse.materielCode) && !TextUtils.isEmpty(productInfo.materielCode)) {
-                            resourse.materielCode = productInfo.materielCode;
+
+                        resourse.baling.productId = productInfo.productId;
+
+                        if (TextUtils.isEmpty(resourse.baling.productCode) && !TextUtils.isEmpty(productInfo.productCode)) {
+                            resourse.baling.productCode = productInfo.productCode;
                         }
-                        if (TextUtils.isEmpty(resourse.materielModel) && !TextUtils.isEmpty(productInfo.materielModel)) {
-                            resourse.materielModel = productInfo.materielModel;
+
+                        if (TextUtils.isEmpty(resourse.baling.productType) && !TextUtils.isEmpty(productInfo.productType)) {
+                            resourse.baling.productType = productInfo.productType;
                         }
-                        if (TextUtils.isEmpty(resourse.materielName) && !TextUtils.isEmpty(productInfo.materielName)) {
-                            resourse.materielName = productInfo.materielName;
-                        }
-                        totalLength += productInfo.length; //米数相加
 
                         if (productInfo.netWeight != null) {//重量相加
                             if (totalWeight == null) {
@@ -141,23 +188,94 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                                 totalWeight = totalWeight.add(productInfo.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
                             }
                         }
+                        if (productInfo.length != null) {//米数相加
+                            if (totalLength == null) {
+                                totalLength = productInfo.length;
+                            } else {
+                                totalLength = totalLength.add(productInfo.length).setScale(2, BigDecimal.ROUND_HALF_UP);
+                            }
+                        }
+
+                        ids.add( productInfo.id );
                     }
-                    resourse.meter = totalLength + "";
-                    resourse.number = productInfos.size();
-                    resourse.netWeight = totalWeight;
-                    resourse.productionLogs = productInfos;
-                    baling(getActivity(), true, resourse);
+                    resourse.baling.meter = totalLength ;
+                    resourse.baling.amount = new BigDecimal( productInfos.size() );
+                    resourse.baling.netWeight = totalWeight;
+                    resourse.ids = ids;
+
+                    baling(getActivity(), true, resourse.baling);
 
                 }).show();
-            }
+//            }
         } );
 
-        submit.setText( "产品打包" );
+        printBtn.setOnClickListener( v -> {
+            if( TextUtils.isEmpty( barCode.getText().toString() ) ){
+                ToastUtil.showShortToast( "请先上传数据" );
+                return ;
+            }
+            writeHtml( resourse.baling );
+            printReport( resourse.baling.barCode );
+            printBarCode = resourse.baling.barCode ;
+
+        } );
+
+
+    }
+
+    @Override
+    protected void setProductionLogDto(ProductionLogDto productInfo) {
+
+        totalWeight = null ;
+        if( productInfos.size() > 0 ) {
+            ProductionLogDto firstInfo = productInfos.get(0);
+            material.setText(firstInfo.productModel);
+            productName.setText(firstInfo.productName);
+            specification.setText(firstInfo.productModel);
+            volumeSum.setText(productInfos.size() + "");
+
+            for (int i = 0; i < productInfos.size(); i++) {
+                ProductionLogDto info = productInfos.get(i);
+//            firstInfo.volume = ;
+                if (info.netWeight != null) {//重量相加
+                    if (totalWeight == null) {
+                        totalWeight = info.netWeight;
+                    } else {
+                        totalWeight = totalWeight.add(info.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    }
+                }
+            }
+            weightSume.setText(totalWeight.toString());
+        }else{
+            material.setText( "" );
+            productName.setText( "" );
+            specification.setText( "" );
+            volumeSum.setText( "" );
+            weightSume.setText( "" );
+        }
+    }
+
+    @Override
+    protected void clearProductionLogDto() {
+//        barCode.setText( "" );
+//        material.setText( "" );
+//        productName.setText( "" );
+//        specification.setText( "" );
+//        volumeSum.setText( "" );
+//        weightSume.setText( "" );
+        setProductionLogDto( null );
+
     }
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
-        productionLog( getActivity(), true, barcodeStr );
+        if( barcodeStr.endsWith("2") ){
+            productInfos.clear();
+            clearProductionLogDto();
+            balingProductionLog( getActivity(), true, barcodeStr );
+        }else {
+            productionLog(getActivity(), true, barcodeStr);
+        }
     }
 
     @Override
@@ -187,16 +305,16 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         ProductQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
-                            ProductInfo[] content = body.content ;
+                            ProductionLogDto[] content = body.content ;
                             if(content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductInfo info = content[i];
+                                    ProductionLogDto info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    if( "半成口".equals( info.materielType ) ){
+                                    if( "半成口".equals( info.productType ) ){
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
                                         barCode.setText( "" );
                                         continue;
@@ -217,7 +335,7 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                                         adapter.notifyDataSetChanged();
                                     }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductInfo( info );
+                                    setProductionLogDto( info );
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
@@ -245,28 +363,104 @@ public class ProductPackagingActivity extends ProductBaseActivity {
     }
 
     /**
-     * 产品打包接口
+     * 打包的产品信息
      * @param activity
      * @param showProgressDialog
-     * @param vo
+     * @param code
      */
-    public void baling(Activity activity, boolean showProgressDialog, PackeResourse vo){
+    public void balingProductionLog(Activity activity, boolean showProgressDialog, String code){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
                 .build(activity);
 
         PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.baling( vo )
-                .enqueue(new BaseCallBack<PackeResourse>(activity, manager) {
+        Call<BalingQueryRespone> productQueryResponeCall = postRequestInterface.balingProductionLog(code);
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<BalingQueryRespone>(activity, manager) {
                     @Override
-                    public void onResponse(Call<PackeResourse> call, Response<PackeResourse> response) {
+                    public void onResponse(Call<BalingQueryRespone> call, Response<BalingQueryRespone> response) {
                         super.onResponse(call, response);
-                        if( response.code() == 201 ){
+                        BalingQueryRespone body = response.body();
+                        if( body != null && response.code() == 200 ){
+                            ProductionLogDto[] content = body.productionLogs ;
+
+                            resourse = new BalingRequest();
+                            resourse.baling = new Baling();
+                            resourse.baling = body.baling ;
+
+                            barCode.setText( body.baling.barCode );
+                            if(content.length > 0 ){
+                                for( int i = 0 ; i < content.length ; i ++ ){
+                                    ProductionLogDto info = content[i];
+                                    if( info.state == 1 ){ //产品打包，如果是已打包
+                                        ToastUtil.showShortToast( "该产品已打包");
+                                        barCode.setText( "" );
+                                        continue;
+                                    }
+
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    } else {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
+                                    setProductionLogDto( info );
+
+                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
+                            }
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }else{
+                            ToastUtil.showShortToast( "错误码:" + response.code()+ ",不能识别该产品" );
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 产品打包接口
+     * @param activity
+     * @param showProgressDialog
+     * @param vo
+     */
+    public void baling(Activity activity, boolean showProgressDialog, Baling vo){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        postRequestInterface.baling( resourse )
+                .enqueue(new BaseCallBack<Baling>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<Baling> call, Response<Baling> response) {
+                        super.onResponse(call, response);
+                        if( response.code() == 201 || response.code() == 204 ){
                             ToastUtil.showShortToast( "打包成功" );
-                            writeHtml( vo );
-                            printReport( vo.barCode );
+                            barCode.setText( vo.barCode );
                             printBarCode = vo.barCode ;
+                            if( response.body() != null ) {
+                                resourse.baling = response.body();
+                            }
                         }else if( response.code() == 401 ){
                             ToastUtil.showShortToast( "登录过期，请重新登录" );
                             AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
@@ -293,7 +487,7 @@ public class ProductPackagingActivity extends ProductBaseActivity {
         print.loadUrl("file://" + printFilePath);
     }
 
-    private void writeHtml(PackeResourse vo){
+    private void writeHtml(Baling vo){
 
         File dataFile = new File(Environment.getExternalStorageDirectory(), "print.html");
         try {
@@ -309,7 +503,7 @@ public class ProductPackagingActivity extends ProductBaseActivity {
         }
     }
 
-    public String htmltext(PackeResourse vo){
+    public String htmltext(Baling vo){
         StringBuffer buffer = new StringBuffer( );
         buffer.append("<style type=\"text/css\">\n" +
                 "    table{ border-collapse: collapse; }\n" +
@@ -326,10 +520,10 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                 "\t</script>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "<h1>客户名：").append( vo.customerName ).append("</h1>\n" +
+                "<h1>客户名：").append( vo.customerAbbreviation ).append("</h1>\n" +
                 "<div id=\"middle\">\n" +
                 "    <div class=\"left\"><text style=\"font-size:20px\">托盘号：").append( vo.trayNumber ).append("</text> </div>\n" +
-                "    <div class=\"right\"><text style=\"font-size:20px\">日 期：").append(DateFormatUtils.long2Str( vo.dateline, false ) ).append("</text></div>\n" +
+                "    <div class=\"right\"><text style=\"font-size:20px\">日 期：").append(DateFormatUtils.long2Str( vo.balingDate, false ) ).append("</text></div>\n" +
                 "</div>\n" +
                 "<table width=\"100%\" border=\"1\">\n" +
                 "    <tr>\n" +
@@ -338,18 +532,18 @@ public class ProductPackagingActivity extends ProductBaseActivity {
                 "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">重量</text></th>\n" +
                 "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">米数</text></th>\n" +
                 "    </tr>\n");
-                for( int i = 0 ; i < vo.productionLogs.size() ; i ++ ){
-                    ProductInfo productInfo = vo.productionLogs.get(i);
+                for( int i = 0 ; i < productInfos.size() ; i ++ ){
+                    ProductionLogDto productInfo = productInfos.get(i);
                     buffer.append( "    <tr>\n" )
-                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.materielModel ).append("</text></th>\n" )
-                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.materielCode ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.productModel ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.masterBarCode ).append("</text></th>\n" )
                           .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.netWeight == null ? "" : productInfo.netWeight.toString() ).append("</text></th>\n" )
                           .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.length ).append("</text></th>\n" ) ;
                     buffer.append("    </tr>\n");
                 }
                 buffer.append( "    <tr>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">合计</text></th>\n" )
-                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.productionLogs.size() ).append("件").append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfos.size() ).append("件").append("</text></th>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.netWeight == null ? "" : vo.netWeight.toString() ).append("KG").append("</text></th>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.meter ).append("M").append("</text></th>\n" )
                       .append( "    </tr>\n");

@@ -6,15 +6,20 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.yundao.ydwms.R;
@@ -78,6 +83,8 @@ public class DialogUtil {
         return getProgressDialog(context, context.getString(titleResId),
                 context.getString(msgResId));
     }
+
+
 
     /**
      * @param context
@@ -231,6 +238,55 @@ public class DialogUtil {
             }
 
         }
+    }
+
+    /**
+     * 类型单选择对话框
+     */
+    public static void showTypeDialog(final Context context, final String title, int arrayResid, final OnItemSelectListener listener) {
+        final String[] types = context.getResources().getStringArray(arrayResid);
+        showTypeDialog(context, title, types, listener );
+    }
+
+    /**
+     * 类型单选择对话框
+     */
+    public static void showTypeDialog(final Context context, final String title, String[] arrays, final OnItemSelectListener listener) {
+
+        final Dialog dialog = new Dialog(context, R.style.more_option_dialot);
+        dialog.setContentView(R.layout.leave_type_dialog);
+        dialog.setCanceledOnTouchOutside(true);
+
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        dialogWindow.setWindowAnimations(R.style.ActionSheetDialogAnimation);
+        /*
+         * 将对话框的大小按屏幕大小的百分比设置
+         */
+        WindowManager m = ((Activity) context).getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = dialogWindow.getAttributes(); // 获取对话框当前的参数值
+        //p.height = (int) (d.getHeight() * 0.35); // 高度设置为屏幕的0.35
+        p.width = (int) (d.getWidth() * 0.95);
+        dialogWindow.setAttributes(p);
+
+        ((TextView) dialog.findViewById(R.id.type_dialog_title)).setText(title);
+
+        ListView listView = dialog.findViewById(R.id.leave_type_list);
+        listView.setAdapter(new ArrayAdapter<String>(context, R.layout.leave_type_pick_item, arrays));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    final int position, long id) {
+
+                listener.onItemSelect(dialog, arrays[position], position);
+
+
+            }
+        });
+
+        dialog.show();
     }
 
     public static Dialog showDeclareDialog(Activity context, String tips, View.OnClickListener rightClickListener ){

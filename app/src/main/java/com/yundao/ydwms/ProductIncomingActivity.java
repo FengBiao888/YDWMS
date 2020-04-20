@@ -3,10 +3,11 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
-import com.yundao.ydwms.protocal.ProductInfo;
-import com.yundao.ydwms.protocal.request.ProductionVo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
+import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
@@ -18,12 +19,24 @@ import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.List;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class ProductIncomingActivity extends ProductBaseActivity {
+public class ProductIncomingActivity extends ScanProductBaseActivity {
+
+    public EditText barCode ; //条码
+    public EditText material ; //料号
+    public  EditText productName ; //品名
+    public EditText warehouseName ; //仓库名
+    public  EditText warehousePositon ; //仓位
 
     private boolean isInit;
+
+    @Override
+    protected int getLayout() {
+        return R.layout.activity_product_incoming ;
+    }
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
@@ -43,7 +56,7 @@ public class ProductIncomingActivity extends ProductBaseActivity {
                             @Override
                             public void onActivityResult(int requestCode, int resultCode, Intent data) {
                                 if (resultCode == Activity.RESULT_OK) {
-                                    List<ProductInfo> productInfoList = (List<ProductInfo>)data.getSerializableExtra("productInfoList");
+                                    List<ProductionLogDto> productInfoList = (List<ProductionLogDto>)data.getSerializableExtra("productInfoList");
                                     productInfos.clear();
                                     deleteOperators.clear();
                                     if( productInfoList.size() > 0 ) {
@@ -69,6 +82,13 @@ public class ProductIncomingActivity extends ProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        barCode = findViewById( R.id.bar_code_value ); //条码
+        material = findViewById( R.id.material_value ); //料号
+         productName = findViewById( R.id.product_name_value ); //品名
+        warehouseName = findViewById( R.id.warehouse_name_value ); //仓库名
+         warehousePositon = findViewById( R.id.warehouse_position_value ) ; //仓位
+
+        warehouseName.setText( "成品仓" );
         submit.setOnClickListener( v->{
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
@@ -78,6 +98,23 @@ public class ProductIncomingActivity extends ProductBaseActivity {
                 productionIncoming(getActivity(), true);
             }).show();
         });
+
+//        dealwithBarcode("15844258895641" );
+    }
+
+    @Override
+    protected void setProductionLogDto(ProductionLogDto productInfo) {
+        barCode.setText( productInfo.barCode );
+        material.setText( productInfo.productModel );
+        productName.setText( productInfo.productName );
+
+    }
+
+    @Override
+    protected void clearProductionLogDto() {
+        barCode.setText( "" );
+        material.setText( "" );
+        productName.setText( "" );
     }
 
     /**
@@ -102,10 +139,10 @@ public class ProductIncomingActivity extends ProductBaseActivity {
                         ProductQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
 //                            int totalElements = body.totalElements;
-                            ProductInfo[] content = body.content;
+                            ProductionLogDto[] content = body.content;
                             if(/* totalElements == content.length && */content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductInfo info = content[i];
+                                    ProductionLogDto info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
                                         barCode.setText( "" );
@@ -120,7 +157,7 @@ public class ProductIncomingActivity extends ProductBaseActivity {
                                         adapter.notifyDataSetChanged();
                                     }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductInfo( info );
+                                    setProductionLogDto( info );
 
                                 }
                             }else{
@@ -155,8 +192,10 @@ public class ProductIncomingActivity extends ProductBaseActivity {
      */
     public void productionIncoming(Activity activity, boolean showProgressDialog ){
 
-        ProductionVo vo = new ProductionVo();
-        vo.codes = genCodes();
+        WarehouseVo vo = new WarehouseVo();
+        vo.ids = genCodes();
+        vo.warehouseName = warehouseName.getText().toString() ;
+        vo.warehousePositionCode = warehousePositon.getText().toString() ;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -170,6 +209,8 @@ public class ProductIncomingActivity extends ProductBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
                             ToastUtil.showShortToast( "进仓成功" );
+                            Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);
+                            startActivity( intent );
                         }else if( response.code() == 401 ){
                             ToastUtil.showShortToast( "登录过期，请重新登录" );
                             AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );

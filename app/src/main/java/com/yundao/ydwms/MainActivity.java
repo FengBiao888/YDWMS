@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.widget.Button;
 
 import com.nf.android.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.LoginRequest;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
@@ -15,6 +17,10 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.ToastUtil;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -57,11 +63,12 @@ public class MainActivity extends AppCompatActivity {
         scan.setOnClickListener( v -> {
             if( YDWMSApplication.getInstance().getUser() == null ){
                 ToastUtil.showShortToast( "请先登录" );
-                return ;
+//                return ;
             }
             Intent intent = new Intent( this, ScanListActivity.class );
             startActivity( intent );
         });
+
 
 
     }

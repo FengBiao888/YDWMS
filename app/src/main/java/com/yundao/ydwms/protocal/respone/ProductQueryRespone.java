@@ -1,9 +1,9 @@
 package com.yundao.ydwms.protocal.respone;
 
-import com.yundao.ydwms.protocal.ProductInfo;
+import com.yundao.ydwms.protocal.ProductionLogDto;
 
 public class ProductQueryRespone extends BaseRespone {
 
-    public ProductInfo[] content ;
+    public ProductionLogDto[] content ;
     public int totalElements ;
 }
