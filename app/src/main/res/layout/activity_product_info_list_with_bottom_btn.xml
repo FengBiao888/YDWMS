@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource"
+    android:background="@color/white"
+    >
+
+    <com.nf.android.common.titlebar.SimpleToolbar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include android:id="@+id/topPanel" layout="@layout/layout_top_operator_state"
+        android:layout_below="@+id/titleBar" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="@dimen/item_gap_s"
+        android:layout_marginBottom="@dimen/item_gap_s"
+        ></include>
+
+    <LinearLayout
+        android:id="@+id/btns_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:paddingTop="@dimen/item_gap_s"
+        android:paddingBottom="@dimen/item_gap_s"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="上传"
+            android:layout_weight="1"
+            android:background="@drawable/selector_blue_solid"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_20sp"
+            android:layout_marginStart="@dimen/item_gap_s"
+            />
+
+    </LinearLayout>
+
+
+    <sysu.zyb.panellistlibrary.PanelListLayout
+        android:id="@+id/id_pl_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topPanel"
+        android:layout_above="@+id/btns_parent"
+        >
+
+        <ListView
+            android:id="@+id/id_lv_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:divider="#EDEDED"
+            android:dividerHeight="1px"
+            />
+
+    </sysu.zyb.panellistlibrary.PanelListLayout>
+
+</RelativeLayout>
