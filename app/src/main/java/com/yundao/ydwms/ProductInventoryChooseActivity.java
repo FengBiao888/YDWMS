@@ -11,14 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 
-import com.nf.android.common.avoidonresult.AvoidOnResult;
-import com.nf.android.common.base.BaseAbsListItemActivity;
-import com.nf.android.common.datapicker.CustomDatePicker;
-import com.nf.android.common.datapicker.DateFormatUtils;
-import com.nf.android.common.listmodule.listitems.AbsEditItem;
-import com.nf.android.common.listmodule.listitems.AbsListItem;
-import com.nf.android.common.listmodule.listitems.BlankItem;
-import com.nf.android.common.listmodule.listitems.EditItemPick;
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.common.base.BaseAbsListItemActivity;
+import com.yundao.ydwms.common.datapicker.CustomDatePicker;
+import com.yundao.ydwms.common.datapicker.DateFormatUtils;
+import com.yundao.ydwms.common.listmodule.listitems.AbsEditItem;
+import com.yundao.ydwms.common.listmodule.listitems.AbsListItem;
+import com.yundao.ydwms.common.listmodule.listitems.BlankItem;
+import com.yundao.ydwms.common.listmodule.listitems.EditItemPick;
 import com.yundao.ydwms.protocal.respone.CheckedMonthRespone;
 import com.yundao.ydwms.protocal.respone.WarehouseRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -57,7 +57,7 @@ public class ProductInventoryChooseActivity extends BaseAbsListItemActivity {
         listView = findViewById( R.id.list_view );
         listView.setOnItemClickListener(this);
         listView.setAdapter(simpleListAdapter);
-        listView.setBackgroundColor(getResources().getColor(com.nf.android.common.R.color.login_bg));
+        listView.setBackgroundColor(getResources().getColor(com.yundao.ydwms.common.R.color.login_bg));
     }
 
     @Override

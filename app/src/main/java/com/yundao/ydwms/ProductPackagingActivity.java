@@ -17,17 +17,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.zxing.WriterException;
-import com.nf.android.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.print.PrintJobMonitorService;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.Baling;
 import com.yundao.ydwms.protocal.request.BalingRequest;
-import com.yundao.ydwms.protocal.request.PackeResourse;
 import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
-import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -44,7 +41,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
 

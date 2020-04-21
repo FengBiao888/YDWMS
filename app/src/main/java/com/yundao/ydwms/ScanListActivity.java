@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 
-import com.nf.android.common.base.BaseAbsListItemActivity;
-import com.nf.android.common.listmodule.listitems.AbsListItem;
-import com.nf.android.common.listmodule.listitems.BlankItem;
-import com.nf.android.common.listmodule.listitems.EditItemSubmitButton;
-import com.nf.android.common.listmodule.listitems.ItemCheckbox;
-import com.nf.android.common.listmodule.listitems.ItemOneTextView;
+import com.yundao.ydwms.common.base.BaseAbsListItemActivity;
+import com.yundao.ydwms.common.listmodule.listitems.AbsListItem;
+import com.yundao.ydwms.common.listmodule.listitems.BlankItem;
+import com.yundao.ydwms.common.listmodule.listitems.EditItemSubmitButton;
+import com.yundao.ydwms.common.listmodule.listitems.ItemCheckbox;
+import com.yundao.ydwms.common.listmodule.listitems.ItemOneTextView;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.util.ToastUtil;
 

@@ -8,11 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.nf.android.common.utils.StringUtil;
 import com.yundao.ydwms.protocal.request.LoginRequest;
-import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
-import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;

@@ -6,36 +6,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
 import android.device.scanner.configuration.PropertyID;
-import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.nf.android.common.base.ImmersiveBaseActivity;
 import com.yundao.ydwms.protocal.ProductionLogDto;
-import com.yundao.ydwms.protocal.ProductionLogDto;
-import com.yundao.ydwms.protocal.respone.User;
-import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
-import sysu.zyb.panellistlibrary.PanelListLayout;
-
 public abstract class ScanProductBaseActivity extends ProductBaseActivity {
+
+    boolean isHandsetTest = false ; //当前是不手持设备
 
     private Vibrator mVibrator; //打扫成功后的震动器
     private ScanManager mScanManager; //扫码manager
@@ -122,7 +106,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
      * 扫一维码功能的初始化
      */
     private void initScan() {
-        // TODO Auto-generated method stub
+
         mScanManager = new ScanManager();
         mScanManager.openScanner();
 
@@ -136,27 +120,31 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
         // TODO Auto-generated method stub
         super.onResume();
         //扫一维码功能的初始化
-        initScan();
-        IntentFilter filter = new IntentFilter();
-        int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME, PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
-        String[] value_buf = mScanManager.getParameterString(idbuf);
-        if(value_buf != null && value_buf[0] != null && !value_buf[0].equals("")) {
-            filter.addAction(value_buf[0]);
-        } else {
-            filter.addAction(SCAN_ACTION);
+        if( isHandsetTest ) {
+            initScan();
+            IntentFilter filter = new IntentFilter();
+            int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME, PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
+            String[] value_buf = mScanManager.getParameterString(idbuf);
+            if (value_buf != null && value_buf[0] != null && !value_buf[0].equals("")) {
+                filter.addAction(value_buf[0]);
+            } else {
+                filter.addAction(SCAN_ACTION);
+            }
+            //注册接收广播
+            registerReceiver(mScanReceiver, filter);
         }
-        //注册接收广播
-        registerReceiver(mScanReceiver, filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //反注册广播
-        if(mScanManager != null) {
-            mScanManager.stopDecode();
+        if( isHandsetTest ) {
+            //反注册广播
+            if (mScanManager != null) {
+                mScanManager.stopDecode();
+            }
+            unregisterReceiver(mScanReceiver);
         }
-        unregisterReceiver(mScanReceiver);
     }
 
     /**

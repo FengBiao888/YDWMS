@@ -5,17 +5,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.nf.android.common.avoidonresult.AvoidOnResult;
-import com.nf.android.common.listmodule.listitems.EditItemPick;
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.common.listmodule.listitems.EditItemPick;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
-import com.yundao.ydwms.protocal.respone.WarehouseQueryRespone;
 import com.yundao.ydwms.protocal.respone.WarehouseRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -26,7 +24,6 @@ import com.yundao.ydwms.util.ToastUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
 

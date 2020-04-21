@@ -1,10 +1,9 @@
 package com.yundao.ydwms;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.nf.android.common.base.ImmersiveBaseActivity;
+import com.yundao.ydwms.common.base.ImmersiveBaseActivity;
 
 public class UploadSuccessActivity extends ImmersiveBaseActivity {
 

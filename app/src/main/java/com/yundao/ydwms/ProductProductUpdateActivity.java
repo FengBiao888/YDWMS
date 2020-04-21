@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
-import com.nf.android.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.ProductUpdateRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
@@ -23,7 +23,6 @@ import com.yundao.ydwms.util.ToastUtil;
 
 import java.math.BigDecimal;
 
-import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Response;
 

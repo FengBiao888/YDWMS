@@ -1,36 +1,26 @@
 package com.yundao.ydwms;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.device.ScanManager;
-import android.device.scanner.configuration.PropertyID;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nf.android.common.base.ImmersiveBaseActivity;
+import com.yundao.ydwms.common.base.ImmersiveBaseActivity;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.util.DialogUtil;
-import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
 import sysu.zyb.panellistlibrary.PanelListLayout;
 
@@ -199,7 +189,6 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             view.setOnClickListener( v->{
                 DialogUtil.showDeclareDialog( getActivity(), "确认要删除该条数据吗?", v1 -> {
                     //产品栏删除对应条目录
-                    System.out.println( "kdkdkdk aaabbbcc： " + productInfos.size() + " , " + position );
                     productInfos.remove( position );
                     deleteOperators.remove( position );
                     clearProductionLogDto();

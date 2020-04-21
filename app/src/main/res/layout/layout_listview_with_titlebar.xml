@@ -6,7 +6,7 @@
     android:baselineAligned="false"
     >
 
-    <com.nf.android.common.titlebar.SimpleToolbar
+    <com.yundao.ydwms.common.titlebar.SimpleToolbar
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

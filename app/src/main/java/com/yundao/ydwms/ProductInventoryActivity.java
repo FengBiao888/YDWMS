@@ -1,13 +1,10 @@
 package com.yundao.ydwms;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-import com.nf.android.common.avoidonresult.AvoidOnResult;
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.CheckRequest;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
@@ -54,11 +51,13 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
     public void initView(Bundle var1) {
         super.initView(var1);
         //产品盘点不需要确定按钮
-        submit.setOnClickListener( v->{
-            DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
+        if( submit != null ) {
+            submit.setOnClickListener(v -> {
+                DialogUtil.showDeclareDialog(getActivity(), "确定是否上传记录", v1 -> {
 
-            }).show();
-        });
+                }).show();
+            });
+        }
 
 //        monthIsChecked( getActivity(), true );
     }

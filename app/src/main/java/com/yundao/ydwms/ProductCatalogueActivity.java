@@ -1,7 +1,6 @@
 package com.yundao.ydwms;
 
 import android.content.Intent;
-import android.device.ScanManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -11,14 +10,13 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.nf.android.common.base.ImmersiveBaseActivity;
+import com.yundao.ydwms.common.base.ImmersiveBaseActivity;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.util.DialogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import sysu.zyb.panellistlibrary.AbstractPanelListAdapter;
 import sysu.zyb.panellistlibrary.PanelListLayout;
 
