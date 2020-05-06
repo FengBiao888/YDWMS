@@ -1,9 +1,18 @@
 package com.yundao.ydwms;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
@@ -18,6 +27,7 @@ import com.yundao.ydwms.util.DialogUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -25,13 +35,13 @@ import retrofit2.Response;
 
 public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
 
+    private ArrayAdapter<String> ordersAdapter ;
     public EditText warehouseName ; // 出货仓
     public EditText orderId ; //订单号
-    public  EditText volumeSume ; //出库总卷数
+    public EditText volumeSume ; //出库总卷数
     public EditText weightSum ; //出库总量（kg）
 
     BigDecimal totalWeight = null;
-
     private boolean isInit;
 
     @Override
@@ -99,6 +109,23 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
                 productionOutgoing(getActivity(), true);
             }).show();
+        });
+
+        orderId.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent( getActivity(), OrdersSearchActivity.class );
+                AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                    @Override
+                    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                        if( resultCode == Activity.RESULT_OK ){
+                            String searchResult = data.getStringExtra("searchResult");
+                            orderId.setText( searchResult );
+                        }
+                    }
+                });
+            }
         });
 
     }
@@ -195,7 +222,7 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
     }
 
     /**
-     * 产品出仓
+     * 半成品品出仓
      * @param activity
      * @param showProgressDialog
      */
@@ -243,6 +270,4 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
                 });
 
     }
-
-
 }

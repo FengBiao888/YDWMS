@@ -36,7 +36,7 @@ public class URLConstant {
      */
     public static final String PRODUCTION_OUTGOING = "api/productionLog/outProduction";
     /**
-     * 产品出仓
+     * 半产品出仓
      */
     public static final String HALF_PRODUCTION_OUTGOING = "api/outHalfProduction";
     /**
@@ -83,4 +83,8 @@ public class URLConstant {
      * 产品出库扫码查询
      */
     public static final String OUT_BALING = "/api/baling";
+    /**
+     * 订单号搜索
+     */
+    public static final String ORDERS_QUERY = "api/orders/findCode";
 }

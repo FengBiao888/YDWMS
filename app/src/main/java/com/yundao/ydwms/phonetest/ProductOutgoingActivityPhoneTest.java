@@ -1,13 +1,10 @@
-package com.yundao.ydwms;
+package com.yundao.ydwms.phonetest;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.yundao.ydwms.LoginActivity;
 import com.yundao.ydwms.OrdersSearchActivity;
@@ -36,7 +33,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class ProductOutgoingActivity extends ScanProductBaseActivity {
+public class ProductOutgoingActivityPhoneTest extends ScanProductBaseActivity {
+
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15887325704482" };
 
     public EditText warehouseName ; // 出货仓
     public EditText orderId ; //订单号
@@ -107,17 +107,17 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
         warehouseName.setText("成品仓");
         submit.setOnClickListener( v->{
+            if( index < codes.length ){
+                dealwithBarcode( codes[index] );
+
+                index ++ ;
+                return ;
+            }
 
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
             }
-
-            if( TextUtils.isEmpty( orderId.getText().toString() ) ){
-                ToastUtil.showLongToast( "请输入订单号" );
-                return ;
-            }
-
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
                 productionOutgoing(getActivity(), true);
             }).show();

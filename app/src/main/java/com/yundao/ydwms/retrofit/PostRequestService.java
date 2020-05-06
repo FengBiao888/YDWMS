@@ -14,6 +14,7 @@ import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.CheckedMonthRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
+import com.yundao.ydwms.protocal.respone.OrderQueryRespone;
 import com.yundao.ydwms.protocal.respone.ProductOutRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.WarehouseQueryRespone;
@@ -158,5 +159,11 @@ public interface PostRequestService {
      */
     @GET(URLConstant.OUT_BALING)
     Call<ProductOutRespone> outBaling(@Query("barCode") String barCode);
+    /**
+     * 盘点
+     * @return
+     */
+    @GET(URLConstant.ORDERS_QUERY)
+    Call<OrderQueryRespone.OrdersInfo[]> ordersQuery(@Query("code") String code);
 
 }

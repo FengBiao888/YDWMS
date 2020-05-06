@@ -36,9 +36,9 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
 
     protected Enum anEnum ; //传输过来的扫码类型
 
-    AbstractPanelListAdapter adapter ;//产品列表adapter
-    ArrayList<ProductionLogDto> productInfos = new ArrayList<>(); //显示出来的产品列表
-    List<String> deleteOperators = new ArrayList<>();//最右侧删除用的操作栏，与productInfos数目保持一致
+    public AbstractPanelListAdapter adapter ;//产品列表adapter
+    public ArrayList<ProductionLogDto> productInfos = new ArrayList<>(); //显示出来的产品列表
+    public List<String> deleteOperators = new ArrayList<>();//最右侧删除用的操作栏，与productInfos数目保持一致
 
 
     public ProductionLogDto clickedProductionLogDto ;//点击选中的产品信息

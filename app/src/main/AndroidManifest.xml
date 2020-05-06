@@ -37,6 +37,10 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+        <activity android:name=".phonetest.ProductIncomingActivityPhoneTest"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
         <activity android:name=".HalfProductOutgoingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
@@ -57,7 +61,15 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
+        <activity android:name=".phonetest.ProductOutgoingActivityPhoneTest"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
         <activity android:name=".ProductPackagingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".phonetest.ProductPackagingActivityPhoneTest"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
@@ -86,6 +98,10 @@
 
         </activity>
         <activity android:name=".ProductSlittingActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        </activity>
+        <activity android:name=".OrdersSearchActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>

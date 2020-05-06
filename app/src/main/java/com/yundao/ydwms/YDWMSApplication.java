@@ -10,6 +10,7 @@ public class YDWMSApplication extends Application {
 
     private String authorization ;
     private User user;
+    private boolean isPhoneTest = true ;
 
     public synchronized static YDWMSApplication getInstance() {
         if (null == instance) {
@@ -39,5 +40,9 @@ public class YDWMSApplication extends Application {
 
     public User getUser() {
         return user;
+    }
+
+    public boolean isPhoneTest() {
+        return isPhoneTest;
     }
 }

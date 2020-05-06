@@ -19,8 +19,6 @@ import java.util.List;
 
 public abstract class ScanProductBaseActivity extends ProductBaseActivity {
 
-    boolean isHandsetTest = false ; //当前是不手持设备
-
     private Vibrator mVibrator; //打扫成功后的震动器
     private ScanManager mScanManager; //扫码manager
     private SoundPool soundpool = null;//打包成功后bee一声
@@ -120,7 +118,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
         // TODO Auto-generated method stub
         super.onResume();
         //扫一维码功能的初始化
-        if( isHandsetTest ) {
+        if( ! YDWMSApplication.getInstance().isPhoneTest() ) {
             initScan();
             IntentFilter filter = new IntentFilter();
             int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME, PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
@@ -138,7 +136,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if( isHandsetTest ) {
+        if( ! YDWMSApplication.getInstance().isPhoneTest() ) {
             //反注册广播
             if (mScanManager != null) {
                 mScanManager.stopDecode();

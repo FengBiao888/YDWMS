@@ -67,7 +67,6 @@
 -keep public class roboguice.** {*;}
 -keep class android.support.** {*; }
 -keep class vi.com.gdi.bgl.android.java.EnvDrawText
--keep class com.nf.android.eoa.db.** {*;}
 -keep public class i.p.** {*;}
 
 
@@ -79,7 +78,7 @@
 -keep class com.google.android.maps.**{*;}
 -keep class com.nostra13.** {*;}
 -keep class org.google.gson.** {*;}
--keep class com.nf.android.eoa.protocol.response.**{*;}
+-keep class com.yundao.ydwms.protocol.response.**{*;}
 
 
 -keepattributes *Annotation*
@@ -203,20 +202,12 @@
 }
 
 
--keep public class com.nf.android.eoa.R$*{
+-keep public class com.yundao.ydwms.R$*{
 	public static final int *;
 }
 
 -keep public class com.umeng.fb.ui.ThreadView {
 }
-
-##---------------keep class & field name which use reflect ----------
--keepclasseswithmembernames class * extends com.nf.android.eoa.ui.business.elsewheretrans.PersonInfoDataBean { *; }
--keepclasseswithmembernames class com.nf.android.eoa.ui.business.elsewheretrans.ElseTransBasicBean { *; }
--keepclasseswithmembernames class com.nf.android.eoa.ui.business.elsewheretrans.SpouseBean { *; }
--keepclasseswithmembernames class com.nf.android.eoa.ui.business.graduate.GraduateBasicBean { *; }
--keepclasseswithmembernames class com.nf.android.eoa.ui.business.graduate.GraduateSpouseBean { *; }
--keepclasseswithmembernames class com.nf.android.eoa.ui.business.repobutioninsurance.RepobutionInsuranceBean { *; }
 
 ##---------------keep wechat pay sdk----------------------------------------------------
 -keep class com.tencent.mm.opensdk.** { *;}
@@ -291,4 +282,3 @@ public static java.lang.String TABLENAME;
 #    <init>(java.lang.Throwable);
 #}
 #event bus 3.0 end
--keep class com.nf.android.eoa.dsbridge.** { *; }
