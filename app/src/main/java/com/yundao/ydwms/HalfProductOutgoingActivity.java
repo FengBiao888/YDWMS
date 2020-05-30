@@ -145,7 +145,9 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
                 }
             }
         }
-        weightSum.setText( totalWeight.toString() );
+        if( totalWeight != null ) {
+            weightSum.setText(totalWeight.toString());
+        }
         volumeSume.setText( productInfos.size() + "" );
     }
 

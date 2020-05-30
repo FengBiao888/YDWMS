@@ -212,8 +212,12 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     } else {
                                         adapter.notifyDataSetChanged();
                                     }
-                                    volumeSume.setText( baling.amount.toString() );
-                                    weightSum.setText( baling.netWeight.toString() );
+                                    if( baling.amount != null ) {
+                                        volumeSume.setText(baling.amount.toString());
+                                    }
+                                    if( baling.netWeight != null ) {
+                                        weightSum.setText(baling.netWeight.toString());
+                                    }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductionLogDto( info );
 

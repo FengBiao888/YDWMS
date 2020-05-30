@@ -54,7 +54,7 @@ import retrofit2.Response;
 public class ProductPackagingActivityPhoneTest extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "1587799147522", "1587794668512", "15877873822501" };
+    private String[] codes = new String[]{ "15894622973371" };
 
     public EditText barCode ; //条码
     public EditText material ; //料号
@@ -135,7 +135,7 @@ public class ProductPackagingActivityPhoneTest extends ScanProductBaseActivity {
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
         submit.setOnClickListener( v->{
-            if( index <= codes.length ){
+            if( index < codes.length ){
                 dealwithBarcode( codes[index] );
 
                 index ++ ;
@@ -255,7 +255,9 @@ public class ProductPackagingActivityPhoneTest extends ScanProductBaseActivity {
                     }
                 }
             }
-            weightSume.setText(totalWeight.toString());
+            if( totalWeight != null ) {
+                weightSume.setText(totalWeight.toString());
+            }
         }else{
             material.setText( "" );
             productName.setText( "" );

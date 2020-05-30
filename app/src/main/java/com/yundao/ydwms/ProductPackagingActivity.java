@@ -241,7 +241,9 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                     }
                 }
             }
-            weightSume.setText(totalWeight.toString());
+            if( totalWeight != null ) {
+                weightSume.setText(totalWeight.toString());
+            }
         }else{
             material.setText( "" );
             productName.setText( "" );

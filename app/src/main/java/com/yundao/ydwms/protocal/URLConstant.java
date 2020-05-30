@@ -8,7 +8,7 @@ package com.yundao.ydwms.protocal;
  */
 public class URLConstant {
 
-     public static String BASE_URL = "http://121.201.76.121:8086/"; //新外网地址
+     public static String BASE_URL = "http://api.dg.yuelongfilm.com"; //新外网地址
 //     public static String BASE_URL = "http://192.168.1.101:8000/"; //新外网地址
      public static String BASE_H5_URL = "https://test.southhr.cn"; //新外网地址
     /**
