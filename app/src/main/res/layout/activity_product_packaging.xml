@@ -102,9 +102,6 @@
                         android:background="@drawable/selector_edit_text"
                         android:singleLine="true"
                         android:textColor="@color/black"
-                        android:enabled="false"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
                         />
 
                 </LinearLayout>

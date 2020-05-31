@@ -115,6 +115,11 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         clickListener = new ScanTypeClickListener( productInfoChanging );
         productInfoChanging.setClickListener( clickListener ) ;
 
+        ItemCheckbox substandardProductIncoming = new ItemCheckbox( getActivity(), ScanTypeEnum.SUBSTANDARD_PRODUCT_INCOMING.getCodeName() );
+        substandardProductIncoming.setExtraObj(ScanTypeEnum.SUBSTANDARD_PRODUCT_INCOMING);
+        clickListener = new ScanTypeClickListener( substandardProductIncoming );
+        substandardProductIncoming.setClickListener( clickListener ) ;
+
 
 //        HALF_PRODUCT_INCOMING( "半成品进仓", 1 ),
 //                HALF_PRODUCT_OUTGOING( "半成品出仓", 2 ),
@@ -136,6 +141,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         list.add( rejectProductIncoming );
         list.add( warehouseChanging );
         list.add( productInfoChanging );
+        list.add( substandardProductIncoming );
 
         checkboxes.add( halfProductionIncoming );
         checkboxes.add( halfProductionOutgoing );
@@ -147,6 +153,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         checkboxes.add( rejectProductIncoming );
         checkboxes.add( warehouseChanging );
         checkboxes.add( productInfoChanging );
+        checkboxes.add( substandardProductIncoming );
 
         list.add( new BlankItem( getActivity(), 30, false) );
         confirm = new EditItemSubmitButton(getActivity(), "确定");
@@ -200,6 +207,9 @@ public class ScanListActivity extends BaseAbsListItemActivity {
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.PRODUCT_SLITTING.equals( checkboxSelected.getExtraObj() ) ){
                 intent = new Intent(getActivity(), ProductSlittingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.SUBSTANDARD_PRODUCT_INCOMING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), SubstandardProductIncomingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }
             startActivity( intent );

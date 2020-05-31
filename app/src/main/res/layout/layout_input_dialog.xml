@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp20"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:background="@drawable/white_border_corner_small">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="提示"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/dp10"
+            android:layout_marginBottom="@dimen/dp10"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/dp10">
+
+            <EditText
+                android:id="@+id/txt_left_title"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="@dimen/dp10"
+                android:paddingLeft="@dimen/dp10"
+                android:layout_weight="1"
+                android:drawablePadding="@dimen/dp10"
+                android:background="@drawable/bg_white_sold_gray_border"
+                android:layout_gravity="center"
+                android:singleLine="true"
+                android:hint="请输入条码"
+                android:inputType="text"
+                android:textColorHint="@color/input_hint_color"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/txt_right_title"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/selector_blue_solid"
+                android:gravity="center"
+                android:text="确定"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</FrameLayout>

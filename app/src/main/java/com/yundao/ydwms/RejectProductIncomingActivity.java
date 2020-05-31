@@ -103,6 +103,10 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
         } );
         warehousePositionView.setOnClickListener( v->{
             WarehouseRespone.WarehouseInfo[] warehouseInfos = (WarehouseRespone.WarehouseInfo[]) warehouse.getExtraObj();
+            if ( warehouseInfos == null ){
+                ToastUtil.showShortToast( "请先选择仓库" );
+                return ;
+            }
             for( int i = 0 ; i < warehouseInfos.length; i ++ ){
                 WarehouseRespone.WarehouseInfo warehouseInfo = warehouseInfos[i];
                 if( warehouseInfo.name == warehouse.getInputMessage() ){

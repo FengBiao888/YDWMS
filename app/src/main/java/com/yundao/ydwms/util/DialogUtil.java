@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -285,6 +286,43 @@ public class DialogUtil {
 
             }
         });
+
+        dialog.show();
+    }
+
+    /**
+     * 类型单选择对话框
+     */
+    public static void showInputDialog(final Context context, String text, final OnItemSelectListener listener) {
+
+        final Dialog dialog = new Dialog(context, R.style.more_option_dialot);
+        dialog.setContentView(R.layout.layout_input_dialog);
+        dialog.setCanceledOnTouchOutside(true);
+
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setGravity(Gravity.CENTER);
+        dialogWindow.setWindowAnimations(R.style.ActionSheetDialogAnimation);
+        /*
+         * 将对话框的大小按屏幕大小的百分比设置
+         */
+        WindowManager m = ((Activity) context).getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = dialogWindow.getAttributes(); // 获取对话框当前的参数值
+        //p.height = (int) (d.getHeight() * 0.35); // 高度设置为屏幕的0.35
+        p.width = (int) (d.getWidth() * 0.95);
+        dialogWindow.setAttributes(p);
+
+        EditText left = dialog.findViewById( R.id.txt_left_title );
+        if( ! TextUtils.isEmpty( text ) ){
+            left.setText( text );
+        }
+
+        TextView right = dialog.findViewById( R.id.txt_right_title );
+        right.setOnClickListener( v -> {
+            if( listener != null ){
+                listener.onItemSelect( dialog, left.getText().toString(), 0 );
+            }
+        } );
 
         dialog.show();
     }

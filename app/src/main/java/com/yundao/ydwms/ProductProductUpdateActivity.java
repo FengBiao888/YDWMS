@@ -121,6 +121,11 @@ public class ProductProductUpdateActivity extends ScanProductBaseActivity {
                 halfProductionModify(getActivity(), true );
             }).show();
         });
+
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dialog.dismiss();
+        }));
     }
 
     @Override

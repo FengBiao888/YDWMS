@@ -1,8 +1,10 @@
 package com.yundao.ydwms;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
@@ -98,6 +100,10 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
             }).show();
         });
 
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dialog.dismiss();
+        }));
 //        dealwithBarcode("15844258895641" );
     }
 

@@ -10,7 +10,7 @@ public class YDWMSApplication extends Application {
 
     private String authorization ;
     private User user;
-    private boolean isPhoneTest = false ;
+    private boolean isPhoneTest = true ;
 
     public synchronized static YDWMSApplication getInstance() {
         if (null == instance) {
