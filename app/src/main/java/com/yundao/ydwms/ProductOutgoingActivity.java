@@ -38,6 +38,10 @@ import retrofit2.Response;
 
 public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+
+    public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
     public EditText orderId ; //订单号
     public  EditText volumeSume ; //出库总卷数
@@ -56,6 +60,14 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
+        ProductionLogDto ProductionLogDto = new ProductionLogDto();
+        ProductionLogDto.barCode = barcodeStr ;
+
+        if( productInfos.contains( ProductionLogDto ) ){
+            ToastUtil.showShortToast( "该产品已在列表中" );
+            return ;
+        }
+
         productionLog( getActivity(), true, barcodeStr );
     }
 
@@ -100,6 +112,8 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        SHARE_PREFERENCE_KEY = "PRODUCT_OUTGOING_KEY" ;
+        barCode = findViewById( R.id.bar_code_value ); //条码
         warehouseName = findViewById( R.id.warehouse_name_value ); // 出货仓
         orderId = findViewById( R.id.orderid_value ); //订单号
         volumeSume = findViewById( R.id.volume_sum_value ); //出库总卷数
@@ -107,6 +121,14 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
         warehouseName.setText("成品仓");
         submit.setOnClickListener( v->{
+
+            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+                if (index < codes.length) {
+                    dealwithBarcode(codes[index]);
+                    index++;
+                    return;
+                }
+            }
 
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
@@ -139,6 +161,14 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                 });
             }
         });
+
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dealwithBarcode( type );
+            dialog.dismiss();
+        }));
+
+        loadFromCache();
     }
 
     @Override

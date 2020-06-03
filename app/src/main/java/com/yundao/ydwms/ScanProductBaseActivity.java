@@ -1,5 +1,6 @@
 package com.yundao.ydwms;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,19 +11,38 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.text.TextUtils;
 
+import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
+import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
+import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.User;
+import com.yundao.ydwms.retrofit.BaseCallBack;
+import com.yundao.ydwms.retrofit.HttpConnectManager;
+import com.yundao.ydwms.retrofit.PostRequestService;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Response;
+
 public abstract class ScanProductBaseActivity extends ProductBaseActivity {
+
+    public String SHARE_PREFERENCE_KEY ;//缓存的key
 
     private Vibrator mVibrator; //打扫成功后的震动器
     private ScanManager mScanManager; //扫码manager
     private SoundPool soundpool = null;//打包成功后bee一声
     private int soundid; //声音文件id
+
+    private boolean isInit;
+
+    ProductQueryListener listener ;
 
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() { //扫码结果广播监听
 
@@ -100,6 +120,16 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
+    protected void loadFromCache() {
+        Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
+        if( object instanceof ArrayList){
+            ArrayList<String> codesArray = (ArrayList<String>) object;
+//            cachedBarcodes.addAll( codesArray );
+//            String[] codes = codesArray.toArray(new String[codesArray.size()]);
+            productionLog( getActivity(), true, codesArray );
+        }
+    }
+
     /**
      * 扫一维码功能的初始化
      */
@@ -146,6 +176,149 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
     }
 
     /**
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
+     */
+    public void productionLog(Activity activity, boolean showProgressDialog, String code){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog(code);
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
+                        super.onResponse(call, response);
+                        ProductQueryRespone body = response.body();
+                        if( body != null && response.code() == 200 ){
+//                            int totalElements = body.totalElements;
+                            ProductionLogDto[] content = body.content;
+                            if(/* totalElements == content.length && */content.length > 0 ){
+                                for( int i = 0 ; i < content.length ; i ++ ){
+                                    ProductionLogDto info = content[i];
+//                                    info.state = 1 ;
+                                    if( info.state == 1 ){ //产品打包，如果是已打包
+                                        ToastUtil.showShortToast( "该产品已打包");
+                                        continue;
+                                    }
+                                    deleteOperators.add( "delete" );
+//                                    cachedBarcodes.add( code );
+                                    productInfos.add( info );
+                                    if( listener != null ){
+                                        listener.onSuccessed( info );
+                                    }
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    }
+                                    adapter.notifyDataSetChanged();
+
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
+                                    setProductionLogDto( info );
+
+                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
+                            }
+                        }else if( response.code() == 400 ){
+                            ToastUtil.showShortToast( "不能识别该产品" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
+     */
+    public void productionLog(Activity activity, boolean showProgressDialog, ArrayList<String> code){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        ProductArrayLogRequest request = new ProductArrayLogRequest();
+        request.barcodes = code ;
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        Call<ProductionLogDto[]> productQueryResponeCall = postRequestInterface.productionLog( request );
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<ProductionLogDto[]>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<ProductionLogDto[]> call, Response<ProductionLogDto[]> response) {
+                        super.onResponse(call, response);
+                        ProductionLogDto[] body = response.body();
+                        if( body != null && response.code() == 200 ){
+//                            int totalElements = body.totalElements;
+                            ProductionLogDto[] content = body;
+                            if(/* totalElements == content.length && */content.length > 0 ){
+                                for( int i = 0 ; i < content.length ; i ++ ){
+                                    ProductionLogDto info = content[i];
+//                                    info.state = 1 ;
+                                    if( info.state == 1 ){ //产品打包，如果是已打包
+                                        ToastUtil.showShortToast( "该产品已打包");
+                                        continue;
+                                    }
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    } else {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
+                                    setProductionLogDto( info );
+
+                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
+                            }
+                        }else if( response.code() == 400 ){
+                            ToastUtil.showShortToast( "不能识别该产品" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+
+    /**
      * 根据产品列表，获取一维码集合
      * @return
      */
@@ -155,6 +328,49 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
             list.add( productInfos.get(i).id );
         }
         return list ;
+    }
+
+    /**
+     * 根据产品列表，获取条码集合
+     * @return
+     */
+    public List<String> genBarCodes(){
+        List<String> list = new ArrayList<>();
+        for(int i = 0; i < productInfos.size() ; i ++ ){
+            list.add( productInfos.get(i).barCode );
+        }
+        return list ;
+    }
+
+
+    public void setListener(ProductQueryListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    protected void onDestroy() {
+
+//        List<String> codesArray = new ArrayList<>();
+//        codesArray.addAll(Arrays.asList(codes));
+//        System.out.println( "kdkdkdk " + cachedBarcodes);
+        if( !TextUtils.isEmpty( SHARE_PREFERENCE_KEY ) ) {
+            List<String> barcodes = genBarCodes();
+            System.out.println( "kdkdkdk " + " SHARE_PREFERENCE_KEY: " + SHARE_PREFERENCE_KEY + barcodes);
+            if( barcodes.size() > 0 ) {
+                SharedPreferenceUtil.putObject(SHARE_PREFERENCE_KEY, barcodes );
+            }else{
+                SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
+            }
+        }
+        super.onDestroy();
+    }
+
+    public interface ProductQueryListener{
+
+
+        void onQueryFailed() ;
+
+        void onSuccessed( ProductionLogDto productionLogDto );
     }
 
 }

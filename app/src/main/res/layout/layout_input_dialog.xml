@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:text="提示"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:gravity="center"
             android:layout_marginTop="@dimen/dp10"
             android:layout_marginBottom="@dimen/dp10"

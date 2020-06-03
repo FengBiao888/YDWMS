@@ -3,6 +3,7 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
@@ -24,6 +25,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
     private boolean isInit;
     private long checkMonthId ;
     private ProductionLogDto checkInfo;
+    public EditText barCode ; //条码
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
@@ -32,7 +34,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
 
     @Override
     protected int getLayout() {
-        return R.layout.activity_product_info_list ;
+        return R.layout.activity_product_bar_code_only ;
     }
 
     @Override
@@ -58,7 +60,12 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
                 }).show();
             });
         }
-
+        barCode = findViewById( R.id.bar_code_value ); //条码
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dealwithBarcode( type );
+            dialog.dismiss();
+        }));
 //        monthIsChecked( getActivity(), true );
     }
 
@@ -78,6 +85,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
+    @Override
     public void productionLog(Activity activity, boolean showProgressDialog, String code){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()

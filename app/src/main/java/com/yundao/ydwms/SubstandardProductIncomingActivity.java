@@ -6,6 +6,12 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.yundao.ydwms.LoginActivity;
+import com.yundao.ydwms.ProductCatalogueActivity;
+import com.yundao.ydwms.R;
+import com.yundao.ydwms.ScanProductBaseActivity;
+import com.yundao.ydwms.UploadSuccessActivity;
+import com.yundao.ydwms.YDWMSApplication;
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
@@ -26,6 +32,10 @@ import retrofit2.Response;
 
 public class SubstandardProductIncomingActivity extends ScanProductBaseActivity {
 
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+
+    public String[] warehouseNameStrs = new String[]{ "不良品仓(次品)", "不良品仓(待处理)" } ;
     public EditText barCode ; //条码
     public EditText material ; //料号
     public EditText productName ; //品名
@@ -36,7 +46,7 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
 
     @Override
     protected int getLayout() {
-        return R.layout.activity_product_incoming;
+        return R.layout.activity_substandard_product_incoming;
     }
 
     @Override
@@ -83,19 +93,36 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        SHARE_PREFERENCE_KEY = "SUBSTANDARD_PRODUCT_INCOMING_KEY";
         barCode = findViewById( R.id.bar_code_value ); //条码
         material = findViewById( R.id.material_value ); //料号
         productName = findViewById( R.id.product_name_value ); //品名
         warehouseName = findViewById( R.id.warehouse_name_value ); //仓库名
         warehousePositon = findViewById( R.id.warehouse_position_value ); //仓位
 
-//        warehouseName.setText( "半成品仓" );
+
         warehouseName.setOnClickListener( v -> {
-            warehouse( getActivity(), true );
+            DialogUtil.showTypeDialog(getActivity(), "请选择仓库", warehouseNameStrs, (dialog, type, position) -> {
+                warehouseName.setText( type );
+                dialog.cancel();
+            });
         } );
         submit.setOnClickListener( v->{
+
+            if( index < codes.length ){
+                dealwithBarcode( codes[index] );
+
+                index ++ ;
+                return ;
+            }
+
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
+                return ;
+            }
+
+            if( "".equals( warehouseName.getText() ) ){
+                ToastUtil.showShortToast( "请选择仓库" );
                 return ;
             }
             DialogUtil.showDeclareDialog( getActivity(),  "确定是否上传记录", v1 -> {
@@ -108,6 +135,7 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
             dialog.dismiss();
         }));
 //        dealwithBarcode("15844258895641" );
+        loadFromCache();
     }
 
     @Override
@@ -126,121 +154,6 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
     }
 
     /**
-     * 产品信息
-     * @param activity
-     * @param showProgressDialog
-     * @param code
-     */
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog(code);
-        productQueryResponeCall
-                .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
-                        super.onResponse(call, response);
-                        ProductQueryRespone body = response.body();
-                        if( body != null && response.code() == 200 ){
-//                            int totalElements = body.totalElements;
-                            ProductionLogDto[] content = body.content;
-                            if(/* totalElements == content.length && */content.length > 0 ){
-                                for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductionLogDto info = content[i];
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
-                                        continue;
-                                    }
-                                    deleteOperators.add( "delete" );
-                                    productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    }
-                                        adapter.notifyDataSetChanged();
-
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
-                                }
-                            }else{
-                                ToastUtil.showShortToast( "不能识别该产品" );
-                            }
-                        }else if( response.code() == 400 ){
-                            ToastUtil.showShortToast( "不能识别该产品" );
-                        }else if( response.code() == 401 ){
-                            ToastUtil.showShortToast( "登录过期，请重新登录" );
-                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
-                            Intent intent = new Intent( getActivity(), LoginActivity.class );
-                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
-                                @Override
-                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                                    if( resultCode == Activity.RESULT_OK ){
-                                        User user = YDWMSApplication.getInstance().getUser();
-                                        if( user != null ){
-                                            operator.setText( "操作员：" + user.username );
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-    }
-
-    public void warehouse(Activity activity, boolean showProgressDialog){
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        postRequestInterface.warehouse( "产品")
-                .enqueue(new BaseCallBack<WarehouseRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<WarehouseRespone> call, Response<WarehouseRespone> response) {
-                        super.onResponse(call, response);
-                        if( response.code() == 400 ){//未盘点
-
-                        }else if( response.code() == 401 ){
-                            ToastUtil.showShortToast( "登录过期，请重新登录" );
-                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
-                            Intent intent = new Intent( getActivity(), LoginActivity.class );
-                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
-                                @Override
-                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                                    if( resultCode == Activity.RESULT_OK ){
-
-                                    }
-                                }
-                            });
-                        }else if( response.body() != null ){
-                            WarehouseRespone.WarehouseInfo[] warehouseInfos = response.body().content;
-                            if( warehouseInfos.length != 0 ) {
-                                String[] warehouses = new String[warehouseInfos.length];
-                                for (int i = 0; i < warehouseInfos.length; i++) {
-                                    warehouses[i] = warehouseInfos[i].name;
-                                }
-                                DialogUtil.showTypeDialog(getActivity(), "请选择仓库类型", warehouses, (dialog, type, position1) -> {
-//                                    warehouse.setInputMessage(type);type
-//                                    warehouse.postInvalidate();
-//                                    warehouse.setExtraObj( warehouseInfos );
-                                    warehouseName.setText( type );
-                                    dialog.dismiss();
-                                });
-                            }
-                        }
-                    }
-                });
-
-    }
-
-    /**
      * 产品进仓
      * @param activity
      * @param showProgressDialog
@@ -250,7 +163,6 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
         WarehouseVo vo = new WarehouseVo();
         vo.ids = genCodes();
         vo.warehouseName = warehouseName.getText().toString() ;
-        vo.warehouseId = 0l ;
         vo.warehousePositionCode = warehousePositon.getText().toString() ;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()

@@ -37,10 +37,6 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
-        <activity android:name=".phonetest.ProductIncomingActivityPhoneTest"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-        </activity>
         <activity android:name=".HalfProductOutgoingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
@@ -61,15 +57,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
-        <activity android:name=".phonetest.ProductOutgoingActivityPhoneTest"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-        </activity>
         <activity android:name=".ProductPackagingActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-        </activity>
-        <activity android:name=".phonetest.ProductPackagingActivityPhoneTest"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
@@ -114,7 +102,6 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
         </activity>
-
 
 
         <service android:name=".print.PrintJobMonitorService"/>

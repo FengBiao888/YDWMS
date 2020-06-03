@@ -27,6 +27,10 @@ import retrofit2.Response;
 
 public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
 
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+
+
     public EditText barCode ; //条码
     public TextView warehouseName ; //仓库名
     public EditText warehouseNameValue ; //仓库名
@@ -45,6 +49,14 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
         if( barcodeStr.endsWith( "3") ){//3结尾是仓库的码
             queryWarehouseLog( getActivity(), true, barcodeStr );
         }else {
+            ProductionLogDto ProductionLogDto = new ProductionLogDto();
+            ProductionLogDto.barCode = barcodeStr ;
+
+            if( productInfos.contains( ProductionLogDto ) ){
+                ToastUtil.showShortToast( "该产品已在列表中" );
+                return ;
+            }
+
             productionLog(getActivity(), true, barcodeStr);
         }
     }
@@ -61,6 +73,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        SHARE_PREFERENCE_KEY = "PRODUCT_WAREHOUSE_CHANGING_KEY" ;
         barCode = findViewById( R.id.bar_code_value ) ; //条码
         warehouseName = findViewById( R.id.warehouse_name ); //仓库名
         warehouseNameValue = findViewById( R.id.warehouse_name_value ) ; //仓库名
@@ -72,6 +85,14 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
         warehousePositon.setText( "新仓位" );
         warehousePositon.setEnabled( true );
         submit.setOnClickListener( v->{
+            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+                if (index < codes.length) {
+                    dealwithBarcode(codes[index]);
+                    index++;
+                    return;
+                }
+            }
+
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
@@ -80,7 +101,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                 changeWarehousePositon( getActivity(), true, String.valueOf( warehousePositonValue.getTag() ) );
             }).show();
         });
-
+        loadFromCache();
     }
 
     @Override
@@ -95,73 +116,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
         warehouseNameValue.setText( "" );
     }
 
-    /**
-     * 产品信息
-     * @param activity
-     * @param showProgressDialog
-     * @param code
-     */
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
 
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog( code );
-        productQueryResponeCall
-                .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
-                        super.onResponse(call, response);
-                        ProductQueryRespone body = response.body();
-                        if( body != null && response.code() == 200 ){
-//                            int totalElements = body.totalElements;
-                            ProductionLogDto[] content = body.content;
-                            if(/* totalElements == content.length && */content.length > 0 ){
-                                for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductionLogDto info = content[i];
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
-                                        continue;
-                                    }
-                                    deleteOperators.add( "delete" );
-                                    productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    } else {
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
-                                }
-                            }else{
-                                ToastUtil.showShortToast( "不能识别该产品" );
-                            }
-                        }else if( response.code() == 400 ){
-                            ToastUtil.showShortToast( "不能识别该产品" );
-                        }else if( response.code() == 401 ){
-                            ToastUtil.showShortToast( "登录过期，请重新登录" );
-                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
-                            Intent intent = new Intent( getActivity(), LoginActivity.class );
-                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
-                                @Override
-                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                                    if( resultCode == Activity.RESULT_OK ){
-                                        User user = YDWMSApplication.getInstance().getUser();
-                                        if( user != null ){
-                                            operator.setText( "操作员：" + user.username );
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-    }
     /**
      * 查仓位号信息
      * @param activity
@@ -226,11 +181,11 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
 
         WareHouseChangingRequest vo = new WareHouseChangingRequest();
 //        vo.codes = list ;
-        List<Long> longList = new ArrayList<>();
-        for( int i = 0 ; i < productInfos.size() ; i ++ ){
-            longList.add( productInfos.get(i).id );
-        }
-        vo.ids = longList ;
+//        List<Long> longList = new ArrayList<>();
+//        for( int i = 0 ; i < productInfos.size() ; i ++ ){
+//            longList.add( productInfos.get(i).id );
+//        }
+        vo.ids = genCodes() ;
         vo.warehousePositionCode = wearhouseCode;
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()

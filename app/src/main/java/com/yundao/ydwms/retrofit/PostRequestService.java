@@ -7,6 +7,7 @@ import com.yundao.ydwms.protocal.request.Baling;
 import com.yundao.ydwms.protocal.request.BalingRequest;
 import com.yundao.ydwms.protocal.request.CheckRequest;
 import com.yundao.ydwms.protocal.request.LoginRequest;
+import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
 import com.yundao.ydwms.protocal.request.ProductUpdateRequest;
 import com.yundao.ydwms.protocal.request.WareHouseChangingRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
@@ -19,6 +20,8 @@ import com.yundao.ydwms.protocal.respone.ProductOutRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.WarehouseQueryRespone;
 import com.yundao.ydwms.protocal.respone.WarehouseRespone;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -44,6 +47,12 @@ public interface PostRequestService {
      */
     @GET(URLConstant.PRODUCTION_LOG)
     Call<ProductQueryRespone> productionLog(@Query("barCode") String barCode);
+    /**
+     * 产品查询接口，多个
+     * @return
+     */
+    @POST(URLConstant.PRODUCTION_ARRAY_LOG)
+    Call<ProductionLogDto[]> productionLog(@Body ProductArrayLogRequest request);
     /**
      * 仓位查询接口
      * @return

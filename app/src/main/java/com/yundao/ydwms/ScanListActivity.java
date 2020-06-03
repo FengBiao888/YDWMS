@@ -12,9 +12,6 @@ import com.yundao.ydwms.common.listmodule.listitems.BlankItem;
 import com.yundao.ydwms.common.listmodule.listitems.EditItemSubmitButton;
 import com.yundao.ydwms.common.listmodule.listitems.ItemCheckbox;
 import com.yundao.ydwms.common.listmodule.listitems.ItemOneTextView;
-import com.yundao.ydwms.phonetest.ProductIncomingActivityPhoneTest;
-import com.yundao.ydwms.phonetest.ProductOutgoingActivityPhoneTest;
-import com.yundao.ydwms.phonetest.ProductPackagingActivityPhoneTest;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.util.ToastUtil;
 
@@ -166,22 +163,13 @@ public class ScanListActivity extends BaseAbsListItemActivity {
             }
             Intent intent = null;
             if( ScanTypeEnum.PRODUCT_INCOMING.equals( checkboxSelected.getExtraObj() ) ){
-                if( YDWMSApplication.getInstance().isPhoneTest() ){
-                    intent = new Intent(getActivity(), ProductIncomingActivityPhoneTest.class);
-                }else {
                     intent = new Intent(getActivity(), ProductIncomingActivity.class);
-                }
-//                intent = new Intent(getActivity(), ProductIncomingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.REJECTED_PRODUCT_INCOMING.equals( checkboxSelected.getExtraObj() ) ){
                 intent = new Intent(getActivity(), RejectProductIncomingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.PRODUCT_OUTGOING.equals( checkboxSelected.getExtraObj() ) ){
-                if( YDWMSApplication.getInstance().isPhoneTest() ){
-                    intent = new Intent(getActivity(), ProductOutgoingActivityPhoneTest.class);
-                }else {
-                    intent = new Intent(getActivity(), ProductOutgoingActivity.class);
-                }
+                intent = new Intent(getActivity(), ProductOutgoingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.PRODUCT_INVENTORY.equals( checkboxSelected.getExtraObj() ) ){
                 intent = new Intent(getActivity(), ProductInventoryChooseActivity.class);
@@ -199,11 +187,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
                 intent = new Intent(getActivity(), ProductWarehouseChangingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.PRODUCT_PACKAGING.equals( checkboxSelected.getExtraObj() ) ){
-                if( YDWMSApplication.getInstance().isPhoneTest() ){
-                    intent = new Intent(getActivity(), ProductPackagingActivityPhoneTest.class);
-                }else {
-                    intent = new Intent(getActivity(), ProductPackagingActivity.class);
-                }
+                intent = new Intent(getActivity(), ProductPackagingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.PRODUCT_SLITTING.equals( checkboxSelected.getExtraObj() ) ){
                 intent = new Intent(getActivity(), ProductSlittingActivity.class);

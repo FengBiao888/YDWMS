@@ -9,6 +9,7 @@ import android.widget.EditText;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
+import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
@@ -17,8 +18,10 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -26,13 +29,15 @@ import retrofit2.Response;
 
 public class HalfProductIncomingActivity extends ScanProductBaseActivity {
 
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+
+
     public EditText barCode ; //条码
     public EditText material ; //料号
     public EditText productName ; //品名
     public EditText warehouseName ; //仓库名
     public EditText warehousePositon ; //仓位
-
-    private boolean isInit;
 
     @Override
     protected int getLayout() {
@@ -41,6 +46,14 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
+        ProductionLogDto ProductionLogDto = new ProductionLogDto();
+        ProductionLogDto.barCode = barcodeStr ;
+
+        if( productInfos.contains( ProductionLogDto ) ){
+            ToastUtil.showShortToast( "该产品已在列表中" );
+            return ;
+        }
+
         productionLog( getActivity(), true, barcodeStr );
     }
 
@@ -83,6 +96,8 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        SHARE_PREFERENCE_KEY = "HALF_PRODUCT_INCOMING_KEY" ;
+
         barCode = findViewById( R.id.bar_code_value ); //条码
         material = findViewById( R.id.material_value ); //料号
         productName = findViewById( R.id.product_name_value ); //品名
@@ -91,6 +106,15 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
 
         warehouseName.setText( "半成品仓" );
         submit.setOnClickListener( v->{
+
+            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+                if (index < codes.length) {
+                    dealwithBarcode(codes[index]);
+                    index++;
+                    return;
+                }
+            }
+
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
@@ -102,10 +126,13 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
 
         barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
             barCode.setText( type );
+            dealwithBarcode( type );
             dialog.dismiss();
         }));
-//        dealwithBarcode("15844258895641" );
+
+        loadFromCache();
     }
+
 
     @Override
     protected void setProductionLogDto(ProductionLogDto ProductionLogDto) {
@@ -120,74 +147,6 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
         barCode.setText( "" );
         material.setText( "" );
         productName.setText( "" );
-    }
-
-    /**
-     * 产品信息
-     * @param activity
-     * @param showProgressDialog
-     * @param code
-     */
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
-
-        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
-                .setShowProgress(showProgressDialog)
-                .build(activity);
-
-        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
-        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog(code);
-        productQueryResponeCall
-                .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
-                    @Override
-                    public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
-                        super.onResponse(call, response);
-                        ProductQueryRespone body = response.body();
-                        if( body != null && response.code() == 200 ){
-//                            int totalElements = body.totalElements;
-                            ProductionLogDto[] content = body.content;
-                            if(/* totalElements == content.length && */content.length > 0 ){
-                                for( int i = 0 ; i < content.length ; i ++ ){
-                                    ProductionLogDto info = content[i];
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
-                                        continue;
-                                    }
-                                    deleteOperators.add( "delete" );
-                                    productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    }
-                                        adapter.notifyDataSetChanged();
-
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
-                                }
-                            }else{
-                                ToastUtil.showShortToast( "不能识别该产品" );
-                            }
-                        }else if( response.code() == 400 ){
-                            ToastUtil.showShortToast( "不能识别该产品" );
-                        }else if( response.code() == 401 ){
-                            ToastUtil.showShortToast( "登录过期，请重新登录" );
-                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
-                            Intent intent = new Intent( getActivity(), LoginActivity.class );
-                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
-                                @Override
-                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                                    if( resultCode == Activity.RESULT_OK ){
-                                        User user = YDWMSApplication.getInstance().getUser();
-                                        if( user != null ){
-                                            operator.setText( "操作员：" + user.username );
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
     }
 
     /**
@@ -237,4 +196,5 @@ public class HalfProductIncomingActivity extends ScanProductBaseActivity {
                 });
 
     }
+
 }

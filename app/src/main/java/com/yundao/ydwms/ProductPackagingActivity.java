@@ -218,6 +218,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 
         barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
             barCode.setText( type );
+            dealwithBarcode( type );
             dialog.dismiss();
         }));
 
@@ -271,11 +272,22 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
+
+
         if( barcodeStr.endsWith("2") ){
             productInfos.clear();
             clearProductionLogDto();
             balingProductionLog( getActivity(), true, barcodeStr );
         }else {
+
+            ProductionLogDto ProductionLogDto = new ProductionLogDto();
+            ProductionLogDto.barCode = barcodeStr ;
+
+            if( productInfos.contains( ProductionLogDto ) ){
+                ToastUtil.showShortToast( "该产品已在列表中" );
+                return ;
+            }
+
             productionLog(getActivity(), true, barcodeStr);
         }
     }
@@ -291,6 +303,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
+    @Override
     public void productionLog(Activity activity, boolean showProgressDialog, String code){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
@@ -316,7 +329,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
-                                    if( "半成口".equals( info.productType ) ){
+                                    if( "半成品".equals( info.productType ) ){
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
                                         barCode.setText( "" );
                                         continue;
@@ -538,7 +551,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                     ProductionLogDto productInfo = productInfos.get(i);
                     buffer.append( "    <tr>\n" )
                           .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.productModel ).append("</text></th>\n" )
-                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.masterBarCode ).append("</text></th>\n" )
+                          .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.volume ).append("</text></th>\n" )
                           .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.netWeight == null ? "" : productInfo.netWeight.toString() ).append("</text></th>\n" )
                           .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.length ).append("</text></th>\n" ) ;
                     buffer.append("    </tr>\n");

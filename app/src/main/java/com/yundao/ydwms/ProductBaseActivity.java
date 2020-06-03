@@ -40,7 +40,7 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
     public ArrayList<ProductionLogDto> productInfos = new ArrayList<>(); //显示出来的产品列表
     public List<String> deleteOperators = new ArrayList<>();//最右侧删除用的操作栏，与productInfos数目保持一致
 
-
+//    protected List<String> cachedBarcodes = new ArrayList(); //缓存的barcode
     public ProductionLogDto clickedProductionLogDto ;//点击选中的产品信息
     public int clickedPosition ;//选中的position
     /**
@@ -191,6 +191,7 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
                     //产品栏删除对应条目录
                     productInfos.remove( position );
                     deleteOperators.remove( position );
+//                    cachedBarcodes.remove( position );
                     clearProductionLogDto();
                     totalCount.setText( "合计：" + productInfos.size() + "件" );
                     adapter.notifyDataSetChanged();

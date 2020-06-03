@@ -138,18 +138,18 @@
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/warehouse_name_value"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:layout_margin="@dimen/dp5"
-                        android:background="@drawable/edittext_gray_border_gray_solid"
+                        android:background="@drawable/selector_edit_text"
                         android:singleLine="true"
                         android:textColor="@color/black"
-                        android:drawableRight="@drawable/arrow_normal"
-                        android:text="请选择仓库"
-                        android:gravity="center"
+                        android:enabled="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
                         />
 
 
