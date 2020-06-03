@@ -39,7 +39,7 @@ import retrofit2.Response;
 public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "XS2020052102", "15908482382951", "15908380552481" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -173,6 +173,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     @Override
     protected void setProductionLogDto(ProductionLogDto productInfo) {
+
         totalWeight = null ;
         //这里对所有产品的卷数相加
         for(int i = 0 ; i < productInfos.size() ; i ++ ){
@@ -185,6 +186,21 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                     totalWeight = totalWeight.add(info.netWeight).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
             }
+        }
+        if( totalWeight != null ){
+            weightSum.setText(totalWeight.toString() );
+        }else{
+            weightSum.setText( "" );
+        }
+        if( productInfos.size() > 0 ){
+            volumeSume.setText( productInfos.size() + "" );
+        }else{
+            volumeSume.setText( "" );
+        }
+        if( productInfo != null ){
+            orderId.setText( productInfo.ordersCode + "" );
+        }else{
+            orderId.setText( "" );
         }
     }
 
@@ -222,6 +238,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     Baling baling = content[i];
                                     ProductionLogDto info = new ProductionLogDto();
                                     info.id = baling.id ;
+                                    info.ordersCode = baling.ordersCode ;
                                     info.trayNumber = baling.trayNumber;
                                     info.length = baling.meter ;
                                     info.productModel = baling.productModel ;

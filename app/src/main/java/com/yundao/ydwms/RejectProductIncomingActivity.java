@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
@@ -34,7 +35,7 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
 
     LinearLayout productInfoParent ;
 
-    private boolean isInit;
+    public EditText barCode ; //条码
     private EditItemPick warehouse;
     private EditItemPick warehousePosition;
 
@@ -99,6 +100,7 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
         SHARE_PREFERENCE_KEY = "REJECT_PRODUCT_INCOMING_KEY" ;
         productInfoParent = findViewById( R.id.product_info_parent ) ;
 
+        barCode = findViewById( R.id.bar_code_value ); //条码
 //        warehouseName.setEnabled( true );
         warehouse = new EditItemPick( getActivity(), "仓库", true, "请选择");
         warehouse.setAlignRight( true );
@@ -155,6 +157,12 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
                 productionIncoming(getActivity(), true);
             }).show();
         });
+
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dealwithBarcode( type );
+            dialog.dismiss();
+        }));
 
         loadFromCache();
     }

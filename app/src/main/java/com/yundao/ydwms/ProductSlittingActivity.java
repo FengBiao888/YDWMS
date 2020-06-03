@@ -3,6 +3,7 @@ package com.yundao.ydwms;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
@@ -27,9 +28,11 @@ public class ProductSlittingActivity extends ScanProductBaseActivity {
     private int index = 0 ;
     private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
 
+    public EditText barCode ; //条码
+
     @Override
     protected int getLayout() {
-        return R.layout.activity_product_info_list_with_bottom_btn ;
+        return R.layout.activity_product_bar_code_with_bottom_btn ;
     }
 
     @Override
@@ -54,6 +57,7 @@ public class ProductSlittingActivity extends ScanProductBaseActivity {
     public void initView(Bundle var1) {
         super.initView(var1);
         SHARE_PREFERENCE_KEY = "PRODUCT_SLITTING_KEY" ;
+        barCode = findViewById( R.id.bar_code_value ); //条码
         //产品盘点不需要确定按钮
         submit.setOnClickListener( v->{
 
@@ -74,6 +78,12 @@ public class ProductSlittingActivity extends ScanProductBaseActivity {
                 productionMachining(getActivity(), true,  genCodes() );
             }).show();
         });
+
+        barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
+            barCode.setText( type );
+            dealwithBarcode( type );
+            dialog.dismiss();
+        }));
 
         loadFromCache();
     }

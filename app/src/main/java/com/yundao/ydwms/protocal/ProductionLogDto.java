@@ -23,6 +23,8 @@ public class ProductionLogDto implements Serializable {
     /** 产品编号 */
     public String productCode;
 
+    public String balingId ;
+
     /** 产品名称 */
     public String productName;
 
@@ -35,6 +37,9 @@ public class ProductionLogDto implements Serializable {
     /** 销售订单id */
     public long ordersId;
 
+    public long cuttingTime ;
+
+    public String ordersCode ;
     /** 卷号 */
     public String volume;
 

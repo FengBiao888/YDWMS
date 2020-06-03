@@ -16,6 +16,8 @@ public class Baling implements Serializable {
     /** 销售订单id */
     public long ordersId;
 
+    public String ordersCode ;
+
     public long customerId;
 
     /** 客户 */

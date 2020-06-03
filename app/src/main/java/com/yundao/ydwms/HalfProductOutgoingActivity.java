@@ -36,7 +36,7 @@ import retrofit2.Response;
 public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "XS2020053005", "15908482382951", "15908380552481" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -170,10 +170,22 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
                 }
             }
         }
-        if( totalWeight != null ) {
-            weightSum.setText(totalWeight.toString());
+        if( totalWeight != null ){
+            weightSum.setText(totalWeight.toString() );
+        }else{
+            weightSum.setText( "" );
         }
-        volumeSume.setText( productInfos.size() + "" );
+        if( productInfos.size() > 0 ){
+            volumeSume.setText( productInfos.size() + "" );
+        }else{
+            volumeSume.setText( "" );
+        }
+
+        if( productInfo != null ){
+            orderId.setText( productInfo.ordersCode + "" );
+        }else{
+            orderId.setText( "" );
+        }
     }
 
     @Override
