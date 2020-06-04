@@ -127,7 +127,7 @@ public interface PostRequestService {
     @GET(URLConstant.PRODUCTION_IS_CHECKED)
     Call<BaseRespone> monthIsChecked( );
     /**
-     * 产品进仓接口
+     * 盘点
      * @return
      */
     @PUT(URLConstant.PRODUCTION_PDA_CHECK)
@@ -163,7 +163,7 @@ public interface PostRequestService {
     @PUT(URLConstant.PRODUCTION_RETURN)
     Call<BaseRespone> productionReturn(@Body WarehouseVo warehouseVo);
     /**
-     * 盘点
+     * 成品出仓产品信息查询
      * @return
      */
     @GET(URLConstant.OUT_BALING)

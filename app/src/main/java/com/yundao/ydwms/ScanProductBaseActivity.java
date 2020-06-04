@@ -40,7 +40,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
     private SoundPool soundpool = null;//打包成功后bee一声
     private int soundid; //声音文件id
 
-    private boolean isInit;
+    protected boolean isInit;
 
     ProductQueryListener listener ;
 

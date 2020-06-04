@@ -111,7 +111,7 @@ public class ProductIncomingActivity extends ScanProductBaseActivity {
         warehouseName.setText( "成品仓" );
         submit.setOnClickListener( v->{
 
-            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+            if( YDWMSApplication.getInstance().isUseLocalData() ) {
                 if (index <= codes.length) {
                     dealwithBarcode(codes[index]);
                     index++;
@@ -176,6 +176,8 @@ public class ProductIncomingActivity extends ScanProductBaseActivity {
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
+                            productInfos.clear();
+                            adapter.notifyDataSetChanged();
                             SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                             ToastUtil.showShortToast( "进仓成功" );
                             Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);

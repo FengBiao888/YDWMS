@@ -15,6 +15,7 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class ProductSlittingActivity extends ScanProductBaseActivity {
         //产品盘点不需要确定按钮
         submit.setOnClickListener( v->{
 
-            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+            if( YDWMSApplication.getInstance().isUseLocalData() ) {
                 if (index < codes.length) {
                     dealwithBarcode(codes[index]);
                     index++;
@@ -120,6 +121,9 @@ public class ProductSlittingActivity extends ScanProductBaseActivity {
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
+                            productInfos.clear();
+                            adapter.notifyDataSetChanged();
+                            SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                             ToastUtil.showShortToast( "分切成功" );
                             Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);
                             startActivity( intent );

@@ -33,6 +33,7 @@ import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.BitmapUtil;
 import com.yundao.ydwms.util.DateFormatUtils;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.io.File;
@@ -49,6 +50,10 @@ import retrofit2.Response;
  */
 public class ProductPackagingActivity extends ScanProductBaseActivity {
 
+    private int index = 0 ;
+    private String[] codes = new String[]{ "15912561869802", "15912549282711", "15912548924371", "15912548908281" };
+
+
     public EditText barCode ; //条码
     public EditText material ; //料号
     public  EditText productName ; //品名
@@ -60,8 +65,6 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
     private BalingRequest resourse ;//打包的数据
 
     BigDecimal totalWeight = null;
-
-    private boolean isInit = false ; //界面是否初始化
 
     private Dialog declareDialog; //显示不同规格不能打包的对话框
 
@@ -93,6 +96,9 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                     }
                     print = null ;
                     DialogUtil.showDeclareDialog( getActivity(), "打印成功", false, null).show();
+                    productInfos.clear();
+                    adapter.notifyDataSetChanged();
+                    SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                 }else{ //其他状态继续轮循
                     if( tempTime ++ < 100 ) {
                         Message message = printJobHandler.obtainMessage();
@@ -117,6 +123,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
     @Override
     public void initView(Bundle var1) {
         super.initView(var1);
+        SHARE_PREFERENCE_KEY = "PRODUCT_PACKAGING_KEY" ;
         barCode = findViewById( R.id.bar_code_value ); //条码
         material = findViewById( R.id.material_value ); //料号
         productName = findViewById( R.id.product_name_value ); //品名
@@ -128,6 +135,16 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
         printFilePath = Environment.getExternalStorageDirectory() + "/print.html";
         mgr = (PrintManager) getSystemService(PRINT_SERVICE);
         submit.setOnClickListener( v->{
+
+            if( YDWMSApplication.getInstance().isUseLocalData() ) {
+                if (index < codes.length) {
+                    dealwithBarcode(codes[index]);
+                    index++;
+                    return;
+                }
+            }
+
+
             if( productInfos.size() == 0 ){
                 ToastUtil.showShortToast( "请先扫条形码" );
                 return ;
@@ -210,9 +227,24 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                 ToastUtil.showShortToast( "请先上传数据" );
                 return ;
             }
-            writeHtml( resourse.baling );
-            printReport( resourse.baling.barCode );
-            printBarCode = resourse.baling.barCode ;
+            String[] array = new String[]{"明细", "汇总"};
+            DialogUtil.showTypeDialog(getActivity(), "请选择", array, new DialogUtil.OnItemSelectListener() {
+                @Override
+                public void onItemSelect(Dialog dialog, String type, int position) {
+                    dialog.cancel();
+                    boolean sum = false ;
+                    if( position == 0 ){
+                        sum = false ;
+                    }else if( position == 1 ){
+                        sum = true ;
+                    }
+
+                    writeHtml( resourse.baling, sum );
+                    printReport( resourse.baling.barCode );
+                    printBarCode = resourse.baling.barCode ;
+                }
+            });
+
 
         } );
 
@@ -222,17 +254,20 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
             dialog.dismiss();
         }));
 
+        loadFromCache();
     }
 
     @Override
     protected void setProductionLogDto(ProductionLogDto productInfo) {
 
         totalWeight = null ;
+        if( productInfo != null ) {
+            barCode.setText(productInfo.barCode);
+            material.setText(productInfo.productModel);
+            productName.setText(productInfo.productName);
+            specification.setText(productInfo.productModel);
+        }
         if( productInfos.size() > 0 ) {
-            ProductionLogDto firstInfo = productInfos.get(0);
-            material.setText(firstInfo.productModel);
-            productName.setText(firstInfo.productName);
-            specification.setText(firstInfo.productModel);
             volumeSum.setText(productInfos.size() + "");
 
             for (int i = 0; i < productInfos.size(); i++) {
@@ -250,6 +285,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                 weightSume.setText(totalWeight.toString());
             }
         }else{
+            barCode.setText( "" );
             material.setText( "" );
             productName.setText( "" );
             specification.setText( "" );
@@ -273,10 +309,9 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
     @Override
     public void dealwithBarcode(String barcodeStr) {
 
-
         if( barcodeStr.endsWith("2") ){
-            productInfos.clear();
-            clearProductionLogDto();
+//            productInfos.clear();
+//            clearProductionLogDto();
             balingProductionLog( getActivity(), true, barcodeStr );
         }else {
 
@@ -343,15 +378,16 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 
                                     deleteOperators.add( "delete" );
                                     productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    } else {
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductionLogDto( info );
                                 }
+                                System.out.println( "kdkdkd productionLog - > " + isInit );
+                                if (!isInit) {
+                                    pl_root.setAdapter(adapter);
+                                    isInit = true;
+                                } else {
+                                    adapter.notifyDataSetChanged();
+                                }
+                                totalCount.setText("合计：" + productInfos.size() + "件");
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
                             }
@@ -413,19 +449,22 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                         barCode.setText( "" );
                                         continue;
                                     }
+                                    if( !productInfos.contains( info ) ){
+                                        deleteOperators.add( "delete" );
+                                        productInfos.add( info );
+                                        setProductionLogDto( info );
+                                    }else{
 
-                                    deleteOperators.add( "delete" );
-                                    productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    } else {
-                                        adapter.notifyDataSetChanged();
                                     }
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
                                 }
+                                System.out.println( "kdkdkd balingProductionLog- > " + isInit );
+                                if (!isInit) {
+                                    pl_root.setAdapter(adapter);
+                                    isInit = true;
+                                } else {
+                                    adapter.notifyDataSetChanged();
+                                }
+                                totalCount.setText("合计：" + productInfos.size() + "件");
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
                             }
@@ -502,7 +541,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
         print.loadUrl("file://" + printFilePath);
     }
 
-    private void writeHtml(Baling vo){
+    private void writeHtml(Baling vo, boolean sum){
 
         File dataFile = new File(Environment.getExternalStorageDirectory(), "print.html");
         try {
@@ -510,7 +549,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                 dataFile.createNewFile();
             }
             FileOutputStream fos = new FileOutputStream(dataFile);
-            fos.write( htmltext( vo ).getBytes( "utf-8") );
+            fos.write( ( sum ? htmltextSum(vo) : htmltext( vo ) ).getBytes( "utf-8") );
             fos.flush();
             fos.close();
         }catch (Exception e) {
@@ -559,6 +598,56 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                 buffer.append( "    <tr>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">合计</text></th>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfos.size() ).append("件").append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.netWeight == null ? "" : vo.netWeight.toString() ).append("KG").append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.meter ).append("M").append("</text></th>\n" )
+                      .append( "    </tr>\n");
+                buffer.append("</table>\n" +
+                "<div style=\"margin-top:5px\" align=\"center\" ><img id=\"test\" src=\"\" onclick=\"\"/></div>\n" +
+                "<div style=\"margin-top:5px\" align=\"center\">").append( vo.barCode ).append("</div>\n" +
+                "</body>\n" +
+                "</html>").append("\n");
+        return buffer.toString() ;
+    }
+
+    public String htmltextSum(Baling vo){
+        StringBuffer buffer = new StringBuffer( );
+        buffer.append("<style type=\"text/css\">\n" +
+                "    table{ border-collapse: collapse; }\n" +
+                "    table,table tr td { border:1px solid #000; }\n" +
+                "    table tr td{ padding: 5px 10px; }\n" +
+                "    .left { width: 50%; height: 40px; float: left; text-align:left; }\n" +
+                "    .right { width: 50%; height: 40px; float: right; text-align:right; }\n" +
+                "    .center { margin: auto; }\n" +
+                "</style>\n" +
+                "<head>\n" +
+                "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
+                "    <script type=\"text/javascript\">\n" +
+                "\t\tfunction onSaveCallback(src){ document.getElementById(\"test\").src = src; }\n" +
+                "\t</script>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1>客户名：").append( vo.customerAbbreviation ).append("</h1>\n" +
+                "<div id=\"middle\">\n" +
+                "    <div class=\"left\"><text style=\"font-size:20px\">托盘号：").append( vo.trayNumber ).append("</text> </div>\n" +
+                "    <div class=\"right\"><text style=\"font-size:20px\">日 期：").append(DateFormatUtils.long2Str( vo.balingDate, false ) ).append("</text></div>\n" +
+                "</div>\n" +
+                "<table width=\"100%\" border=\"1\">\n" +
+                "    <tr>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">规格</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">件数</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">重量</text></th>\n" +
+                "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">米数</text></th>\n" +
+                "    </tr>\n");
+                ProductionLogDto productInfo = productInfos.get(0);
+                buffer.append( "    <tr>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( productInfo.productModel ).append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.amount.setScale( 0, BigDecimal.ROUND_DOWN) ).append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.netWeight == null ? "" : vo.netWeight.toString() ).append("</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.meter ).append("</text></th>\n" ) ;
+                buffer.append("    </tr>\n");
+                buffer.append( "    <tr>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">合计</text></th>\n" )
+                      .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.amount.setScale( 0, BigDecimal.ROUND_DOWN) ).append("件").append("</text></th>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.netWeight == null ? "" : vo.netWeight.toString() ).append("KG").append("</text></th>\n" )
                       .append( "        <td width=\"25%\" style=\"text-align:center\"><text style=\"font-size:20px\">").append( vo.meter ).append("M").append("</text></th>\n" )
                       .append( "    </tr>\n");

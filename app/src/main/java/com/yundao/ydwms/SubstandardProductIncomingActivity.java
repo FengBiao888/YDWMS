@@ -23,6 +23,7 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.List;
@@ -33,7 +34,7 @@ import retrofit2.Response;
 public class SubstandardProductIncomingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "15909214791831", "15908468698451", "15908482382951", "15908380552481" };
 
     public String[] warehouseNameStrs = new String[]{ "不良品仓(次品)", "不良品仓(待处理)" } ;
     public EditText barCode ; //条码
@@ -132,6 +133,7 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
 
         barCode.setOnClickListener(v -> DialogUtil.showInputDialog(getActivity(), barCode.getText().toString(), (dialog, type, position) -> {
             barCode.setText( type );
+            dealwithBarcode( type );
             dialog.dismiss();
         }));
 //        dealwithBarcode("15844258895641" );
@@ -176,6 +178,9 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
+                            productInfos.clear();
+                            adapter.notifyDataSetChanged();
+                            SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                             ToastUtil.showShortToast( "进仓成功" );
                             Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);
                             startActivity( intent );

@@ -11,6 +11,7 @@ public class YDWMSApplication extends Application {
     private String authorization ;
     private User user;
     private boolean isPhoneTest = true ;
+    private boolean useLocalData = false ;
 
     public synchronized static YDWMSApplication getInstance() {
         if (null == instance) {
@@ -44,5 +45,9 @@ public class YDWMSApplication extends Application {
 
     public boolean isPhoneTest() {
         return isPhoneTest;
+    }
+
+    public boolean isUseLocalData() {
+        return useLocalData;
     }
 }

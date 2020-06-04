@@ -17,6 +17,7 @@ import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
 import com.yundao.ydwms.retrofit.PostRequestService;
 import com.yundao.ydwms.util.DialogUtil;
+import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
         warehousePositon.setText( "新仓位" );
         warehousePositon.setEnabled( true );
         submit.setOnClickListener( v->{
-            if( YDWMSApplication.getInstance().isPhoneTest() ) {
+            if( YDWMSApplication.getInstance().isUseLocalData() ) {
                 if (index < codes.length) {
                     dealwithBarcode(codes[index]);
                     index++;
@@ -200,6 +201,9 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
                             ToastUtil.showShortToast( "仓位变更成功" );
+                            productInfos.clear();
+                            adapter.notifyDataSetChanged();
+                            SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
 //                            productInfos.clear();
 //                            deleteOperators.clear();
 //                            clearProductionLogDto();
