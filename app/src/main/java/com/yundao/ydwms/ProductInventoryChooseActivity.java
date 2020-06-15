@@ -205,6 +205,12 @@ public class ProductInventoryChooseActivity extends BaseAbsListItemActivity {
                                     monthIsChecked( getActivity(), true );
                                 });
                             }
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

@@ -45,6 +45,8 @@ public class LoginActivity extends AppCompatActivity {
         close.setOnClickListener( v ->{
             finish();
         } );
+
+
     }
 
     public void login(Activity activity, boolean showProgressDialog ){

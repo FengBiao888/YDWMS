@@ -167,6 +167,12 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -226,6 +232,12 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 

@@ -25,6 +25,7 @@ import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.Baling;
 import com.yundao.ydwms.protocal.request.BalingRequest;
 import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
+import com.yundao.ydwms.protocal.respone.BalingTotalQueryRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -51,7 +52,7 @@ import retrofit2.Response;
 public class ProductPackagingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15912561869802", "15912549282711", "15912548924371", "15912548908281" };
+    private String[] codes = new String[]{ "15918391510573" };
 
 
     public EditText barCode ; //条码
@@ -162,7 +163,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                         resourse.baling = new Baling();
                     }
                     long timeMillis = System.currentTimeMillis();
-                    if( TextUtils.isEmpty( barCode.getText().toString() ) ){//没有打包过，才要生成打包码
+                    if( TextUtils.isEmpty( resourse.baling.barCode ) ){//没有打包过，才要生成打包码
                         resourse.baling.barCode = timeMillis + "2"; //时间戳加上2
                     }
                     resourse.baling.balingDate = timeMillis ;
@@ -313,7 +314,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 //            productInfos.clear();
 //            clearProductionLogDto();
             balingProductionLog( getActivity(), true, barcodeStr );
-        }else {
+        } else {
 
             ProductionLogDto ProductionLogDto = new ProductionLogDto();
             ProductionLogDto.barCode = barcodeStr ;
@@ -361,18 +362,15 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                     ProductionLogDto info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
                                         continue;
                                     }
                                     if( "半成品".equals( info.productType ) ){
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
-                                        barCode.setText( "" );
                                         continue;
                                     }else if( productInfos.size() > 0 && !productInfos.get(0).isSameType( info ) ){//产品类型不同
                                         declareDialog = DialogUtil.showDeclareDialog(getActivity(), "不是同一个产品规格不可以一起打包", false, "我知道了", null);
 
                                         declareDialog.show();
-                                        barCode.setText( "" );
                                         continue;
                                     }
 
@@ -380,7 +378,6 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                     productInfos.add( info );
                                     setProductionLogDto( info );
                                 }
-                                System.out.println( "kdkdkd productionLog - > " + isInit );
                                 if (!isInit) {
                                     pl_root.setAdapter(adapter);
                                     isInit = true;
@@ -408,10 +405,18 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
     }
+
+
 
     /**
      * 打包的产品信息
@@ -440,13 +445,12 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                             resourse.baling = new Baling();
                             resourse.baling = body.baling ;
 
-                            barCode.setText( body.baling.barCode );
+//                            barCode.setText( body.baling.barCode );
                             if(content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
-                                        barCode.setText( "" );
                                         continue;
                                     }
                                     if( !productInfos.contains( info ) ){
@@ -457,7 +461,6 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 
                                     }
                                 }
-                                System.out.println( "kdkdkd balingProductionLog- > " + isInit );
                                 if (!isInit) {
                                     pl_root.setAdapter(adapter);
                                     isInit = true;
@@ -483,6 +486,12 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else if( response.code() == 400 ){
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }else{
                             ToastUtil.showShortToast( "错误码:" + response.code()+ ",不能识别该产品" );
                         }
@@ -510,7 +519,8 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                         super.onResponse(call, response);
                         if( response.code() == 201 || response.code() == 204 ){
                             ToastUtil.showShortToast( "打包成功" );
-                            barCode.setText( vo.barCode );
+//                            barCode.setText( vo.barCode );
+                            SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                             printBarCode = vo.barCode ;
                             if( response.body() != null ) {
                                 resourse.baling = response.body();
@@ -530,6 +540,12 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

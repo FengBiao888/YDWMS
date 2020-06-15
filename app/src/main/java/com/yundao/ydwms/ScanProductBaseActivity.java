@@ -242,6 +242,12 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -277,7 +283,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
 //                                    info.state = 1 ;
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
+                                    if( info != null && info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
                                         continue;
                                     }
@@ -313,6 +319,12 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

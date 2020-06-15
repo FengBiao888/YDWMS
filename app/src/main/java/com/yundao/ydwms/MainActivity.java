@@ -53,7 +53,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity( intent );
         });
 
+        if( YDWMSApplication.getInstance().isPhoneTest() ){
+            login.setBackgroundResource( R.color.color_777 );
+            scan.setBackgroundResource( R.color.color_777 );
+            connectSetting.setBackgroundResource( R.color.color_777 );
 
+        }
 
     }
 

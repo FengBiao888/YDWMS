@@ -19,7 +19,9 @@ import com.yundao.ydwms.YDWMSApplication;
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.Baling;
+import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
+import com.yundao.ydwms.protocal.respone.BalingTotalQueryRespone;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductOutRespone;
 import com.yundao.ydwms.protocal.respone.User;
@@ -32,6 +34,7 @@ import com.yundao.ydwms.util.ToastUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -40,7 +43,7 @@ import retrofit2.Response;
 public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "XS2020052102", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "15918391510573" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -51,8 +54,8 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     BigDecimal totalWeight = null;
 
     private boolean isInit;
-
-
+    private List<String> cacheBarcodes = new ArrayList<>();
+    private List<Long> uploadIds = new ArrayList<>();
 
     @Override
     protected int getLayout() {
@@ -61,20 +64,25 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
-        ProductionLogDto ProductionLogDto = new ProductionLogDto();
-        ProductionLogDto.barCode = barcodeStr ;
 
-        if( productInfos.contains( ProductionLogDto ) ){
-            ToastUtil.showShortToast( "该产品已在列表中" );
-            return ;
+        if( barcodeStr.endsWith( "3" ) ){
+            balingTotal( getActivity(), true , barcodeStr );
+        }else{
+            if( cacheBarcodes.contains( barcodeStr ) ){
+                ToastUtil.showShortToast( "该产品已在列表中" );
+                return ;
+            }
+
+            productionBalingLog( getActivity(), true, barcodeStr );
         }
 
-        productionLog( getActivity(), true, barcodeStr );
+
     }
 
     @Override
     public boolean barcodeHasSpecialCondition() {
-        return false;
+
+        return true ;
     }
 
     @Override
@@ -173,12 +181,24 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     }
 
     @Override
+    protected void loadFromCache() {
+            Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
+            if( object instanceof ArrayList){
+                ArrayList<String> codesArray = (ArrayList<String>) object;
+//            cachedBarcodes.addAll( codesArray );
+//            String[] codes = codesArray.toArray(new String[codesArray.size()]);
+                productionBalingArrayLog( getActivity(), true, codesArray );
+            }
+    }
+
+    @Override
     protected void setProductionLogDto(ProductionLogDto productInfo) {
 
         totalWeight = null ;
         //这里对所有产品的卷数相加
         for(int i = 0 ; i < productInfos.size() ; i ++ ){
             ProductionLogDto info = productInfos.get(i);
+            if( info == null ) continue;
 //            info.volume = ;
             if (info.netWeight != null) {//重量相加
                 if (totalWeight == null) {
@@ -188,8 +208,9 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                 }
             }
         }
+//        barCode.setText( productInfo.barCode );
         if( totalWeight != null ){
-            weightSum.setText(totalWeight.toString() );
+            weightSum.setText( totalWeight.toString() );
         }else{
             weightSum.setText( "" );
         }
@@ -198,11 +219,16 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
         }else{
             volumeSume.setText( "" );
         }
-        if( productInfo != null ){
-            orderId.setText( productInfo.ordersCode + "" );
-        }else{
-            orderId.setText( "" );
-        }
+    }
+
+    protected void setBalingInfo(Baling baling) {
+
+        if( baling.list == null || baling.list.size() == 0 ) return ;
+
+
+
+        orderId.setText( baling.list.get(0).ordersCode + "" );
+        barCode.setText( baling.barCode );
     }
 
     @Override
@@ -217,7 +243,60 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
+    public void balingTotal(Activity activity, boolean showProgressDialog, String code){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        Call<BalingTotalQueryRespone> productQueryResponeCall = postRequestInterface.balingTotal(code);
+
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<BalingTotalQueryRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<BalingTotalQueryRespone> call, Response<BalingTotalQueryRespone> response) {
+                        super.onResponse(call, response);
+                        BalingTotalQueryRespone body = response.body();
+                        if( body != null && response.code() == 200 ){
+                            if( body.barCodes != null && body.barCodes.size() > 0 ){
+                                productionBalingArrayLog( getActivity(), true, body.barCodes );
+                            }else{
+                                ToastUtil.showShortToast( "产品码数组为空" );
+                            }
+                        }if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
+     */
+    public void productionBalingLog(Activity activity, boolean showProgressDialog, String code){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -232,43 +311,43 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                         super.onResponse(call, response);
                         ProductOutRespone body = response.body();
                         if( body != null && response.code() == 200 ){
+                            cacheBarcodes.add( code );
 //                            int totalElements = body.totalElements;
                             Baling[] content = body.content;
                             if(/* totalElements == content.length && */content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     Baling baling = content[i];
-                                    ProductionLogDto info = new ProductionLogDto();
-                                    info.id = baling.id ;
-                                    info.ordersCode = baling.ordersCode ;
-                                    info.trayNumber = baling.trayNumber;
-                                    info.length = baling.meter ;
-                                    info.productModel = baling.productModel ;
-                                    info.productType = baling.productType ;
-                                    info.productName = baling.productName;
-                                    info.productCode = baling.productCode ;
-                                    info.barCode = baling.barCode ;
-                                    info.netWeight = baling.netWeight ;
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
-                                        continue;
-                                    }
-                                    deleteOperators.add( "delete" );
-                                    productInfos.add( info );
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
-                                    } else {
-                                        adapter.notifyDataSetChanged();
-                                    }
+                                    uploadIds.add( baling.id );
+                                    setBalingInfo( baling );
                                     if( baling.amount != null ) {
                                         volumeSume.setText(baling.amount.toString());
                                     }
                                     if( baling.netWeight != null ) {
                                         weightSum.setText(baling.netWeight.toString());
                                     }
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
 
+                                    for( int j = 0 ; j < baling.list.size() ; j ++ ) {
+                                        ProductionLogDto info = baling.list.get( j );
+
+                                        if (info.state == 1) { //产品打包，如果是已打包
+                                            ToastUtil.showShortToast("该产品已打包");
+                                            continue;
+                                        }
+                                        deleteOperators.add("delete");
+                                        productInfos.add(info);
+                                    }
+
+                                }
+
+                                if( productInfos.size() > 0 ) {
+
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    } else {
+                                        adapter.notifyDataSetChanged();
+                                     }
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
@@ -290,6 +369,121 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        List<String> barcodes = cacheBarcodes ;
+        if( barcodes.size() > 0 ) {
+            SharedPreferenceUtil.putObject(SHARE_PREFERENCE_KEY, barcodes );
+        }else{
+            SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
+        }
+    }
+
+    /**
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
+     */
+    public void productionBalingArrayLog(Activity activity, boolean showProgressDialog, List<String> code){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        cacheBarcodes.addAll( code );
+        ProductArrayLogRequest request = new ProductArrayLogRequest();
+        request.barcodes = code ;
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        Call<Baling[]> productQueryResponeCall = postRequestInterface.outBalingArray( request );
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<Baling[]>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<Baling[]> call, Response<Baling[]> response) {
+                        super.onResponse(call, response);
+                        Baling[] body = response.body();
+                        if( body != null && response.code() == 200 ){
+//                            int totalElements = body.totalElements;
+                            Baling[] content = body;
+                            if(/* totalElements == content.length && */content.length > 0 ){
+                                for( int i = 0 ; i < content.length ; i ++ ){
+                                    Baling baling = content[i];
+                                    if( uploadIds.contains( baling ) ) continue ;
+                                    uploadIds.add( baling.id );
+                                    setBalingInfo( baling );
+                                    if( baling.amount != null ) {
+                                        volumeSume.setText(baling.amount.toString());
+                                    }
+                                    if( baling.netWeight != null ) {
+                                        weightSum.setText(baling.netWeight.toString());
+                                    }
+
+                                    if( baling.list != null ) {
+                                        for (int j = 0; j < baling.list.size(); j++) {
+                                            ProductionLogDto info = baling.list.get(j);
+
+                                            if( productInfos.contains( info ) ) continue;
+
+                                            if (info.state == 1) { //产品打包，如果是已打包
+                                                ToastUtil.showShortToast("该产品已打包");
+                                                continue;
+                                            }
+                                            deleteOperators.add("delete");
+                                            productInfos.add(info);
+                                        }
+                                    }
+                                }
+
+                                if( productInfos.size() > 0 ) {
+
+                                    if (!isInit) {
+                                        pl_root.setAdapter(adapter);
+                                        isInit = true;
+                                    } else {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    totalCount.setText("合计：" + productInfos.size() + "件");
+                                    setProductionLogDto(productInfos.get(productInfos.size() - 1));
+                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
+                            }
+                        }else if( response.code() == 400 ){
+                            ToastUtil.showShortToast( "不能识别该产品" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -303,7 +497,8 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     public void productionOutgoing(Activity activity, boolean showProgressDialog ){
 
         WarehouseVo vo = new WarehouseVo();
-        vo.ids = genCodes();
+        vo.ids = uploadIds ;
+
         vo.warehouseName = "成品仓" ;
         vo.ordersCode = orderId.getText().toString() ;
         vo.amountTotal = new BigDecimal( volumeSume.getText().toString() ) ;
@@ -320,8 +515,8 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                     public void onResponse(Call<BaseRespone> call, Response<BaseRespone> response) {
                         super.onResponse(call, response);
                         if( response.code() == 200 || response.code() == 204 ){
-                            productInfos.clear();
-                            adapter.notifyDataSetChanged();
+                            cacheBarcodes.clear();
+
                             SharedPreferenceUtil.remove( SHARE_PREFERENCE_KEY );
                             ToastUtil.showShortToast( "出仓成功" );
                             Intent intent = new Intent(getActivity(), UploadSuccessActivity.class);
@@ -341,7 +536,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
-                        }else if( response.code() == 400 ){
+                        }else{
                             try {
                                 ToastUtil.showShortToast( response.errorBody().string() );
                             } catch (Exception e) {

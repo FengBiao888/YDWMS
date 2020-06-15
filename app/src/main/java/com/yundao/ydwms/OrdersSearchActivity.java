@@ -162,6 +162,12 @@ public class OrdersSearchActivity extends ImmersiveBaseActivity implements Adapt
 
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 

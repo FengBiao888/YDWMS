@@ -128,6 +128,12 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

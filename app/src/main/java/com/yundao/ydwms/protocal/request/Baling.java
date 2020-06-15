@@ -1,5 +1,7 @@
 package com.yundao.ydwms.protocal.request;
 
+import com.yundao.ydwms.protocal.ProductionLogDto;
+
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.List;
@@ -15,8 +17,6 @@ public class Baling implements Serializable {
     
     /** 销售订单id */
     public long ordersId;
-
-    public String ordersCode ;
 
     public long customerId;
 
@@ -58,5 +58,7 @@ public class Baling implements Serializable {
 
     /** 产品类型 */
     public String productType;
+
+    public List<ProductionLogDto> list ;
 
 }

@@ -12,6 +12,7 @@ import com.yundao.ydwms.protocal.request.ProductUpdateRequest;
 import com.yundao.ydwms.protocal.request.WareHouseChangingRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
+import com.yundao.ydwms.protocal.respone.BalingTotalQueryRespone;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.CheckedMonthRespone;
 import com.yundao.ydwms.protocal.respone.LoginRespone;
@@ -48,6 +49,12 @@ public interface PostRequestService {
     @GET(URLConstant.PRODUCTION_LOG)
     Call<ProductQueryRespone> productionLog(@Query("barCode") String barCode);
     /**
+     * 返回打包码
+     * @return
+     */
+    @GET(URLConstant.BALING_TOTAL)
+    Call<BalingTotalQueryRespone> balingTotal(@Query("collectCode") String collectCode);
+    /**
      * 产品查询接口，多个
      * @return
      */
@@ -65,6 +72,12 @@ public interface PostRequestService {
      */
     @GET(URLConstant.BALING_PRODUCTION_LOG)
     Call<BalingQueryRespone> balingProductionLog(@Query("balingBarCode") String barCode);
+ /**
+     * 产品查询接口
+     * @return
+     */
+    @POST(URLConstant.BALING_PRODUCTION_LOG)
+    Call<BalingQueryRespone[]> balingProductionLog(@Body ProductArrayLogRequest request);
     /**
      * 产品进仓接口
      * @return
@@ -168,6 +181,12 @@ public interface PostRequestService {
      */
     @GET(URLConstant.OUT_BALING)
     Call<ProductOutRespone> outBaling(@Query("barCode") String barCode);
+    /**
+     * 成品出仓产品信息查询
+     * @return
+     */
+    @POST(URLConstant.OUT_BALING_ARRAY)
+    Call<Baling[]> outBalingArray(@Body ProductArrayLogRequest requeste);
     /**
      * 盘点
      * @return

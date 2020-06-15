@@ -223,6 +223,12 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
                                     dialog.dismiss();
                                 });
                             }
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -281,6 +287,12 @@ public class RejectProductIncomingActivity extends ScanProductBaseActivity {
                                     }
                                 }
                             });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 

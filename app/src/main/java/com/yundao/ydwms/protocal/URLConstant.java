@@ -8,8 +8,8 @@ package com.yundao.ydwms.protocal;
  */
 public class URLConstant {
 
-//     public static String BASE_URL = "http://api.dg.yuelongfilm.com"; //新外网地址
-     public static String BASE_URL = "http://121.201.76.116:8000/"; //新外网地址
+     public static String BASE_URL = "http://api.dg.yuelongfilm.com"; //新外网地址
+//     public static String BASE_URL = "http://121.201.76.116:8000/"; //新外网地址
      public static String BASE_H5_URL = "https://test.southhr.cn"; //新外网地址
     /**
      * 登录
@@ -43,6 +43,7 @@ public class URLConstant {
      * 半产品出仓
      */
     public static final String HALF_PRODUCTION_OUTGOING = "api/outHalfProduction";
+
     /**
      * 仓位变更
      */
@@ -88,7 +89,16 @@ public class URLConstant {
      */
     public static final String OUT_BALING = "/api/baling";
     /**
+     * 产品出库扫码查询，数组
+     */
+    public static final String OUT_BALING_ARRAY = "/api/baling/barcodes";
+
+    /**
      * 订单号搜索
      */
     public static final String ORDERS_QUERY = "api/orders/findCode";
+    /**
+     * 以3结尾的条码搜索
+     */
+    public static final String BALING_TOTAL = "api/baling/total";
 }
