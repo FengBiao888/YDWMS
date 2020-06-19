@@ -17,6 +17,7 @@ import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -35,7 +36,7 @@ import retrofit2.Response;
 public class ProductIncomingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15908468698451", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "15919426100811", "15919423955931", "15919421580631" };
 
     public EditText barCode ; //条码
     public EditText material ; //料号
@@ -58,7 +59,7 @@ public class ProductIncomingActivity extends ScanProductBaseActivity {
             return ;
         }
 
-        productionLog( getActivity(), true, barcodeStr );
+        productionLog( getActivity(), true, barcodeStr, ProductStateEnums.INCOMING );
     }
 
     @Override
@@ -112,7 +113,7 @@ public class ProductIncomingActivity extends ScanProductBaseActivity {
         submit.setOnClickListener( v->{
 
             if( YDWMSApplication.getInstance().isUseLocalData() ) {
-                if (index <= codes.length) {
+                if (index < codes.length) {
                     dealwithBarcode(codes[index]);
                     index++;
                     return;
@@ -135,7 +136,7 @@ public class ProductIncomingActivity extends ScanProductBaseActivity {
         }));
 //        dealwithBarcode("15844258895641" );
 
-        loadFromCache();
+        loadFromCache(ProductStateEnums.INCOMING);
     }
 
     @Override

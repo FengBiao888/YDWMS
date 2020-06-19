@@ -24,6 +24,7 @@ import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BalingTotalQueryRespone;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductOutRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -43,7 +44,7 @@ import retrofit2.Response;
 public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15918391510573" };
+    private String[] codes = new String[]{ "15913225105012", "15918477647002" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -66,14 +67,14 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     public void dealwithBarcode(String barcodeStr) {
 
         if( barcodeStr.endsWith( "3" ) ){
-            balingTotal( getActivity(), true , barcodeStr );
+            balingTotal( getActivity(), true , barcodeStr, ProductStateEnums.OUTGOING );
         }else{
             if( cacheBarcodes.contains( barcodeStr ) ){
                 ToastUtil.showShortToast( "该产品已在列表中" );
                 return ;
             }
 
-            productionBalingLog( getActivity(), true, barcodeStr );
+            productionBalingLog( getActivity(), true, barcodeStr, ProductStateEnums.OUTGOING );
         }
 
 
@@ -82,7 +83,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     @Override
     public boolean barcodeHasSpecialCondition() {
 
-        return true ;
+        return false ;
     }
 
     @Override
@@ -177,17 +178,18 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
             dialog.dismiss();
         }));
 
-        loadFromCache();
+        loadFromCache( ProductStateEnums.OUTGOING );
+
     }
 
     @Override
-    protected void loadFromCache() {
+    protected void loadFromCache(ProductStateEnums state) {
             Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
             if( object instanceof ArrayList){
                 ArrayList<String> codesArray = (ArrayList<String>) object;
 //            cachedBarcodes.addAll( codesArray );
 //            String[] codes = codesArray.toArray(new String[codesArray.size()]);
-                productionBalingArrayLog( getActivity(), true, codesArray );
+                productionBalingArrayLog( getActivity(), true, codesArray, state );
             }
     }
 
@@ -243,7 +245,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void balingTotal(Activity activity, boolean showProgressDialog, String code){
+    public void balingTotal(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -260,7 +262,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                         BalingTotalQueryRespone body = response.body();
                         if( body != null && response.code() == 200 ){
                             if( body.barCodes != null && body.barCodes.size() > 0 ){
-                                productionBalingArrayLog( getActivity(), true, body.barCodes );
+                                productionBalingArrayLog( getActivity(), true, body.barCodes, state );
                             }else{
                                 ToastUtil.showShortToast( "产品码数组为空" );
                             }
@@ -296,7 +298,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionBalingLog(Activity activity, boolean showProgressDialog, String code){
+    public void productionBalingLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -328,9 +330,12 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
                                     for( int j = 0 ; j < baling.list.size() ; j ++ ) {
                                         ProductionLogDto info = baling.list.get( j );
-
-                                        if (info.state == 1) { //产品打包，如果是已打包
-                                            ToastUtil.showShortToast("该产品已打包");
+                                        if( info == null ) continue;
+                                        if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
+                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                            continue;
+                                        }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
                                             continue;
                                         }
                                         deleteOperators.add("delete");
@@ -397,7 +402,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionBalingArrayLog(Activity activity, boolean showProgressDialog, List<String> code){
+    public void productionBalingArrayLog(Activity activity, boolean showProgressDialog, List<String> code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -437,8 +442,11 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
                                             if( productInfos.contains( info ) ) continue;
 
-                                            if (info.state == 1) { //产品打包，如果是已打包
-                                                ToastUtil.showShortToast("该产品已打包");
+                                            if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
+                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                                continue;
+                                            }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
                                                 continue;
                                             }
                                             deleteOperators.add("delete");
@@ -460,9 +468,11 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
+                                cacheBarcodes.clear();
                             }
                         }else if( response.code() == 400 ){
                             ToastUtil.showShortToast( "不能识别该产品" );
+                            cacheBarcodes.clear();
                         }else if( response.code() == 401 ){
                             ToastUtil.showShortToast( "登录过期，请重新登录" );
                             AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );

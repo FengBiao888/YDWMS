@@ -17,6 +17,7 @@ import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.ProductArrayLogRequest;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -120,13 +121,13 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    protected void loadFromCache() {
+    protected void loadFromCache(ProductStateEnums state) {
         Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
         if( object instanceof ArrayList){
             ArrayList<String> codesArray = (ArrayList<String>) object;
 //            cachedBarcodes.addAll( codesArray );
 //            String[] codes = codesArray.toArray(new String[codesArray.size()]);
-            productionLog( getActivity(), true, codesArray );
+            productionLog( getActivity(), true, codesArray, state);
         }
     }
 
@@ -181,7 +182,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -202,8 +203,12 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
 //                                    info.state = 1 ;
-                                    if( info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
+                                    if( info == null ) continue;
+                                    if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                        continue;
+                                    }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
                                         continue;
                                     }
                                     deleteOperators.add( "delete" );
@@ -259,7 +264,7 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionLog(Activity activity, boolean showProgressDialog, ArrayList<String> code){
+    public void productionLog(Activity activity, boolean showProgressDialog, ArrayList<String> code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -283,8 +288,16 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
 //                                    info.state = 1 ;
-                                    if( info != null && info.state == 1 ){ //产品打包，如果是已打包
-                                        ToastUtil.showShortToast( "该产品已打包");
+//                                    if( info != null && info.state == 1 ){ //产品打包，如果是已打包
+//                                        ToastUtil.showShortToast( "该产品已打包");
+//                                        continue;
+//                                    }
+                                    if( info == null ) continue;
+                                    if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                        continue;
+                                    }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
                                         continue;
                                     }
                                     deleteOperators.add( "delete" );

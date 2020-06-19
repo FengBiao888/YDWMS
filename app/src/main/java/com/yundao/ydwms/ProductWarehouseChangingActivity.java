@@ -11,6 +11,7 @@ import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.WareHouseChangingRequest;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.protocal.respone.WarehouseQueryRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -58,7 +59,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                 return ;
             }
 
-            productionLog(getActivity(), true, barcodeStr);
+            productionLog(getActivity(), true, barcodeStr, ProductStateEnums.NONE);
         }
     }
 
@@ -102,7 +103,7 @@ public class ProductWarehouseChangingActivity extends ScanProductBaseActivity {
                 changeWarehousePositon( getActivity(), true, String.valueOf( warehousePositonValue.getTag() ) );
             }).show();
         });
-        loadFromCache();
+        loadFromCache(ProductStateEnums.NONE);
     }
 
     @Override

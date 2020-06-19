@@ -1,6 +1,8 @@
 package com.yundao.ydwms;
 
 import android.app.Application;
+import android.os.Debug;
+
 import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.protocal.respone.User;
 
@@ -10,8 +12,8 @@ public class YDWMSApplication extends Application {
 
     private String authorization ;
     private User user;
-    private boolean isPhoneTest = false ;
-    private boolean useLocalData = false ;
+    private boolean isPhoneTest = true;
+    private boolean useLocalData = true ;
 
     public synchronized static YDWMSApplication getInstance() {
         if (null == instance) {

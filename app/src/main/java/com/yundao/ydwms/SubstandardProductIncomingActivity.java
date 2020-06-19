@@ -17,6 +17,7 @@ import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.protocal.respone.WarehouseRespone;
 import com.yundao.ydwms.retrofit.BaseCallBack;
@@ -52,7 +53,7 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
-        productionLog( getActivity(), true, barcodeStr );
+        productionLog( getActivity(), true, barcodeStr, ProductStateEnums.INCOMING );
     }
 
     @Override
@@ -137,7 +138,7 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
             dialog.dismiss();
         }));
 //        dealwithBarcode("15844258895641" );
-        loadFromCache();
+        loadFromCache(ProductStateEnums.INCOMING);
     }
 
     @Override

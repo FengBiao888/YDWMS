@@ -10,6 +10,7 @@ import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.CheckRequest;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -29,7 +30,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
-        productionLog( getActivity(), true, barcodeStr );
+        productionLog( getActivity(), true, barcodeStr, null );
     }
 
     @Override
@@ -86,7 +87,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
      * @param code
      */
     @Override
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)

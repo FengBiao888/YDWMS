@@ -19,6 +19,7 @@ import com.yundao.ydwms.protocal.ProductionLogDto;
 import com.yundao.ydwms.protocal.request.WarehouseVo;
 import com.yundao.ydwms.protocal.respone.BaseRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -37,7 +38,7 @@ import retrofit2.Response;
 public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "XS2020053005", "15908482382951", "15908380552481" };
+    private String[] codes = new String[]{ "15909653672381", "15909103829031" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -57,7 +58,8 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
             return ;
         }
 
-        productionLog( getActivity(), true, barcodeStr );
+        productionLog( getActivity(), true, barcodeStr, ProductStateEnums.OUTGOING );
+
     }
 
     @Override
@@ -152,7 +154,7 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
             dialog.dismiss();
         }));
 
-        loadFromCache();
+        loadFromCache(ProductStateEnums.OUTGOING);
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.yundao.ydwms.protocal.request.BalingRequest;
 import com.yundao.ydwms.protocal.respone.BalingQueryRespone;
 import com.yundao.ydwms.protocal.respone.BalingTotalQueryRespone;
 import com.yundao.ydwms.protocal.respone.ProductQueryRespone;
+import com.yundao.ydwms.protocal.respone.ProductStateEnums;
 import com.yundao.ydwms.protocal.respone.User;
 import com.yundao.ydwms.retrofit.BaseCallBack;
 import com.yundao.ydwms.retrofit.HttpConnectManager;
@@ -255,7 +256,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
             dialog.dismiss();
         }));
 
-        loadFromCache();
+        loadFromCache(ProductStateEnums.NONE);
     }
 
     @Override
@@ -313,7 +314,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
         if( barcodeStr.endsWith("2") ){
 //            productInfos.clear();
 //            clearProductionLogDto();
-            balingProductionLog( getActivity(), true, barcodeStr );
+            balingProductionLog( getActivity(), true, barcodeStr, ProductStateEnums.OUTGOING );
         } else {
 
             ProductionLogDto ProductionLogDto = new ProductionLogDto();
@@ -324,7 +325,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                 return ;
             }
 
-            productionLog(getActivity(), true, barcodeStr);
+            productionLog(getActivity(), true, barcodeStr, ProductStateEnums.OUTGOING );
         }
     }
 
@@ -340,7 +341,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
      * @param code
      */
     @Override
-    public void productionLog(Activity activity, boolean showProgressDialog, String code){
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -360,8 +361,13 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                             if(content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
+                                    if( info == null ) continue;
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
+                                        continue;
+                                    }
+                                    if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
                                         continue;
                                     }
                                     if( "半成品".equals( info.productType ) ){
@@ -424,7 +430,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void balingProductionLog(Activity activity, boolean showProgressDialog, String code){
+    public void balingProductionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -445,21 +451,22 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                             resourse.baling = new Baling();
                             resourse.baling = body.baling ;
 
-//                            barCode.setText( body.baling.barCode );
                             if(content.length > 0 ){
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
+                                    if( info == null ) continue;
                                     if( info.state == 1 ){ //产品打包，如果是已打包
                                         ToastUtil.showShortToast( "该产品已打包");
                                         continue;
                                     }
-                                    if( !productInfos.contains( info ) ){
-                                        deleteOperators.add( "delete" );
-                                        productInfos.add( info );
-                                        setProductionLogDto( info );
-                                    }else{
-
+                                    if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                        continue;
                                     }
+
+                                    deleteOperators.add( "delete" );
+                                    productInfos.add( info );
+                                    setProductionLogDto( info );
                                 }
                                 if (!isInit) {
                                     pl_root.setAdapter(adapter);
