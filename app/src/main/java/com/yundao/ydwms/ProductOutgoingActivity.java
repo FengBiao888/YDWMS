@@ -44,7 +44,7 @@ import retrofit2.Response;
 public class ProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15913225105012", "15918477647002" };
+    private String[] codes = new String[]{ "15929675730912" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -185,11 +185,15 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     @Override
     protected void loadFromCache(ProductStateEnums state) {
             Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
-            if( object instanceof ArrayList){
-                ArrayList<String> codesArray = (ArrayList<String>) object;
+            if( object != null ) {
+                if (object instanceof ArrayList) {
+                    ArrayList<String> codesArray = (ArrayList<String>) object;
 //            cachedBarcodes.addAll( codesArray );
 //            String[] codes = codesArray.toArray(new String[codesArray.size()]);
-                productionBalingArrayLog( getActivity(), true, codesArray, state );
+                    if( codesArray != null && codesArray.size() > 0 ) {
+                        productionBalingArrayLog(getActivity(), true, codesArray, state);
+                    }
+                }
             }
     }
 
@@ -226,8 +230,6 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     protected void setBalingInfo(Baling baling) {
 
         if( baling.list == null || baling.list.size() == 0 ) return ;
-
-
 
         orderId.setText( baling.list.get(0).ordersCode + "" );
         barCode.setText( baling.barCode );
@@ -313,10 +315,13 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                         super.onResponse(call, response);
                         ProductOutRespone body = response.body();
                         if( body != null && response.code() == 200 ){
-                            cacheBarcodes.add( code );
+
 //                            int totalElements = body.totalElements;
                             Baling[] content = body.content;
                             if(/* totalElements == content.length && */content.length > 0 ){
+                                boolean containOutgoing = false ;
+                                boolean containInComing = false ;
+
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     Baling baling = content[i];
                                     uploadIds.add( baling.id );
@@ -332,20 +337,24 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                         ProductionLogDto info = baling.list.get( j );
                                         if( info == null ) continue;
                                         if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
-                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+//                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                            containInComing = true ;
                                             continue;
                                         }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
-                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+//                                            ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                            containOutgoing = true ;
                                             continue;
+                                        }
+
+                                        if( ! cacheBarcodes.contains( code ) ) {
+                                            cacheBarcodes.add(code);
                                         }
                                         deleteOperators.add("delete");
                                         productInfos.add(info);
                                     }
-
                                 }
 
                                 if( productInfos.size() > 0 ) {
-
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
@@ -354,6 +363,15 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                      }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
                                 }
+
+                                if( containOutgoing && containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓和已出仓的产品" );
+                                }else if( containOutgoing ){
+                                    ToastUtil.showShortToast( "包含已出仓的产品" );
+                                }else if( containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓的产品" );
+                                }
+
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
                             }
@@ -408,7 +426,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                 .setShowProgress(showProgressDialog)
                 .build(activity);
 
-        cacheBarcodes.addAll( code );
+
         ProductArrayLogRequest request = new ProductArrayLogRequest();
         request.barcodes = code ;
 
@@ -424,6 +442,8 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
 //                            int totalElements = body.totalElements;
                             Baling[] content = body;
                             if(/* totalElements == content.length && */content.length > 0 ){
+                                boolean containOutgoing = false ;
+                                boolean containInComing = false ;
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     Baling baling = content[i];
                                     if( uploadIds.contains( baling ) ) continue ;
@@ -443,12 +463,15 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                             if( productInfos.contains( info ) ) continue;
 
                                             if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
-                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+//                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                                containInComing = true ;
                                                 continue;
                                             }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
-                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+//                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                                containOutgoing = true ;
                                                 continue;
                                             }
+                                            cacheBarcodes.add( info.barCode );
                                             deleteOperators.add("delete");
                                             productInfos.add(info);
                                         }
@@ -456,7 +479,6 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                 }
 
                                 if( productInfos.size() > 0 ) {
-
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
@@ -465,6 +487,14 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
                                     setProductionLogDto(productInfos.get(productInfos.size() - 1));
+                                }
+
+                                if( containOutgoing && containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓和已出仓的产品" );
+                                }else if( containOutgoing ){
+                                    ToastUtil.showShortToast( "包含已出仓的产品" );
+                                }else if( containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓的产品" );
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );

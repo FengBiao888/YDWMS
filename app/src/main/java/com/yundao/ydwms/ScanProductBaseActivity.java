@@ -123,11 +123,15 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
 
     protected void loadFromCache(ProductStateEnums state) {
         Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
-        if( object instanceof ArrayList){
-            ArrayList<String> codesArray = (ArrayList<String>) object;
+        if( object != null ) {
+            if (object instanceof ArrayList) {
+                ArrayList<String> codesArray = (ArrayList<String>) object;
 //            cachedBarcodes.addAll( codesArray );
 //            String[] codes = codesArray.toArray(new String[codesArray.size()]);
-            productionLog( getActivity(), true, codesArray, state);
+                if( codesArray != null && codesArray.size() > 0 ) {
+                    productionLog(getActivity(), true, codesArray, state);
+                }
+            }
         }
     }
 
@@ -135,11 +139,12 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
      * 扫一维码功能的初始化
      */
     private void initScan() {
-
-        mScanManager = new ScanManager();
+        if( mScanManager == null ) {
+            mScanManager = new ScanManager();
+        }
         mScanManager.openScanner();
 
-        mScanManager.switchOutputMode( 0);
+        mScanManager.switchOutputMode( 0 );
         soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
         soundid = soundpool.load("/etc/Scan_new.ogg", 1);
     }
@@ -200,15 +205,20 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
 //                            int totalElements = body.totalElements;
                             ProductionLogDto[] content = body.content;
                             if(/* totalElements == content.length && */content.length > 0 ){
+                                boolean containOutgoing = false ;
+                                boolean containInComing = false ;
+
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
 //                                    info.state = 1 ;
                                     if( info == null ) continue;
                                     if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
-                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                        containInComing = true ;
                                         continue;
                                     }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
-                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                        containOutgoing = true ;
                                         continue;
                                     }
                                     deleteOperators.add( "delete" );
@@ -217,15 +227,23 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                     if( listener != null ){
                                         listener.onSuccessed( info );
                                     }
-                                    if (!isInit) {
-                                        pl_root.setAdapter(adapter);
-                                        isInit = true;
+                                    if( productInfos.size() > 0 ) {
+                                        if (!isInit) {
+                                            pl_root.setAdapter(adapter);
+                                            isInit = true;
+                                        }
+                                        adapter.notifyDataSetChanged();
+
+                                        totalCount.setText("合计：" + productInfos.size() + "件");
+                                        setProductionLogDto(info);
                                     }
-                                    adapter.notifyDataSetChanged();
-
-                                    totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
+                                }
+                                if( containOutgoing && containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓和已出仓的产品" );
+                                }else if( containOutgoing ){
+                                    ToastUtil.showShortToast( "包含已出仓的产品" );
+                                }else if( containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓的产品" );
                                 }
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
@@ -285,6 +303,8 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
 //                            int totalElements = body.totalElements;
                             ProductionLogDto[] content = body;
                             if(/* totalElements == content.length && */content.length > 0 ){
+                                boolean containOutgoing = false ;
+                                boolean containInComing = false ;
                                 for( int i = 0 ; i < content.length ; i ++ ){
                                     ProductionLogDto info = content[i];
 //                                    info.state = 1 ;
@@ -294,14 +314,19 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
 //                                    }
                                     if( info == null ) continue;
                                     if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
-                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                        containInComing = true ;
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
                                         continue;
                                     }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
-                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                        containOutgoing = true ;
                                         continue;
                                     }
                                     deleteOperators.add( "delete" );
                                     productInfos.add( info );
+                                    setProductionLogDto( info );
+                                }
+                                if( productInfos.size() > 0 ) {
                                     if (!isInit) {
                                         pl_root.setAdapter(adapter);
                                         isInit = true;
@@ -309,9 +334,15 @@ public abstract class ScanProductBaseActivity extends ProductBaseActivity {
                                         adapter.notifyDataSetChanged();
                                     }
                                     totalCount.setText("合计：" + productInfos.size() + "件");
-                                    setProductionLogDto( info );
-
                                 }
+                                if( containOutgoing && containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓和已出仓的产品" );
+                                }else if( containOutgoing ){
+                                    ToastUtil.showShortToast( "包含已出仓的产品" );
+                                }else if( containInComing ){
+                                    ToastUtil.showShortToast( "包含已进仓的产品" );
+                                }
+
                             }else{
                                 ToastUtil.showShortToast( "不能识别该产品" );
                             }

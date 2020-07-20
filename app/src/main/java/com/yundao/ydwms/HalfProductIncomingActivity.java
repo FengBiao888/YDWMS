@@ -31,8 +31,7 @@ import retrofit2.Response;
 public class HalfProductIncomingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15909669950671", "15909103829031" };
-
+    private String[] codes = new String[]{ "15927936989721","15927926036211"/*,"15927919513571"*/ };
 
     public EditText barCode ; //条码
     public EditText material ; //料号

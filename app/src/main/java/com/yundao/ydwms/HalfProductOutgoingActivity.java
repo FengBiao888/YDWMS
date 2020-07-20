@@ -38,7 +38,7 @@ import retrofit2.Response;
 public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
-    private String[] codes = new String[]{ "15909653672381", "15909103829031" };
+    private String[] codes = new String[]{ "15927936989721","15927926036211","15927919513571" };
 
     public EditText barCode ; //条码
     public EditText warehouseName ; // 出货仓
@@ -194,6 +194,102 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
     protected void clearProductionLogDto() {
         //与setProductionLogDto一样
         setProductionLogDto( null );
+    }
+
+    /**
+     * 产品信息
+     * @param activity
+     * @param showProgressDialog
+     * @param code
+     */
+    @Override
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
+
+        HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
+                .setShowProgress(showProgressDialog)
+                .build(activity);
+
+        PostRequestService postRequestInterface = manager.createServiceClass(PostRequestService.class);
+        Call<ProductQueryRespone> productQueryResponeCall = postRequestInterface.productionLog(code);
+        productQueryResponeCall
+                .enqueue(new BaseCallBack<ProductQueryRespone>(activity, manager) {
+                    @Override
+                    public void onResponse(Call<ProductQueryRespone> call, Response<ProductQueryRespone> response) {
+                        super.onResponse(call, response);
+                        ProductQueryRespone body = response.body();
+                        if( body != null && response.code() == 200 ){
+//                            int totalElements = body.totalElements;
+                            ProductionLogDto[] content = body.content;
+                            if(/* totalElements == content.length && */content.length > 0 ){
+                                boolean containOutgoing = false ;
+                                boolean containInComing = false ;
+
+                                for( int i = 0 ; i < content.length ; i ++ ){
+                                    ProductionLogDto info = content[i];
+//                                    info.state = 1 ;
+                                    if( info == null ) continue;
+                                    if( state == ProductStateEnums.OUTGOING && info.productionState != 1 ){ //产品进仓
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                        containInComing = true ;
+                                        continue;
+                                    }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                        containOutgoing = true ;
+                                        continue;
+                                    }
+                                    deleteOperators.add( "delete" );
+//                                    cachedBarcodes.add( code );
+                                    productInfos.add( info );
+                                    if( listener != null ){
+                                        listener.onSuccessed( info );
+                                    }
+                                    if( productInfos.size() > 0 ) {
+                                        if (!isInit) {
+                                            pl_root.setAdapter(adapter);
+                                            isInit = true;
+                                        }
+                                        adapter.notifyDataSetChanged();
+
+                                        totalCount.setText("合计：" + productInfos.size() + "件");
+                                        setProductionLogDto(info);
+                                    }
+                                }
+                                if( containOutgoing && containInComing ){
+                                    ToastUtil.showShortToast( "包含未进仓和已出仓的产品" );
+                                }else if( containOutgoing ){
+                                    ToastUtil.showShortToast( "包含已出仓的产品" );
+                                }else if( containInComing ){
+                                    ToastUtil.showShortToast( "包含未进仓的产品" );
+                                }
+                            }else{
+                                ToastUtil.showShortToast( "不能识别该产品" );
+                            }
+                        }else if( response.code() == 400 ){
+                            ToastUtil.showShortToast( "不能识别该产品" );
+                        }else if( response.code() == 401 ){
+                            ToastUtil.showShortToast( "登录过期，请重新登录" );
+                            AvoidOnResult avoidOnResult = new AvoidOnResult( getActivity() );
+                            Intent intent = new Intent( getActivity(), LoginActivity.class );
+                            avoidOnResult.startForResult(intent, new AvoidOnResult.Callback() {
+                                @Override
+                                public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                                    if( resultCode == Activity.RESULT_OK ){
+                                        User user = YDWMSApplication.getInstance().getUser();
+                                        if( user != null ){
+                                            operator.setText( "操作员：" + user.username );
+                                        }
+                                    }
+                                }
+                            });
+                        }else{
+                            try {
+                                ToastUtil.showShortToast( response.errorBody().string() );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
     }
 
     /**

@@ -61,4 +61,25 @@ public class Baling implements Serializable {
 
     public List<ProductionLogDto> list ;
 
+    public List<Model> modelList ;
+
+    public static class Model {
+        /** 产品规格 */
+        public String productModel;
+
+//        public int number ;
+//
+//        public float netWeight ;
+//
+//        public int length ;
+
+        /** 数量 */
+        public int number;
+
+        /** 总净重 */
+        public BigDecimal netWeight;
+
+        /** 总米数 */
+        public BigDecimal length;
+    }
 }

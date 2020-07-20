@@ -23,7 +23,7 @@ public class ProductionLogDto implements Serializable {
     /** 产品编号 */
     public String productCode;
 
-    public String balingId ;
+    public long balingId ;
 
     /** 产品名称 */
     public String productName;
@@ -146,6 +146,15 @@ public class ProductionLogDto implements Serializable {
     public boolean isSameType( ProductionLogDto info ){
         System.out.println( "aabbcc: " + productName + "," + info.productName + "," + productModel + "," + info.productModel);
         if( productName.equals( info.productName ) && productModel.equals( info.productModel )){
+            return true ;
+        }else{
+            return false ;
+        }
+    }
+
+    public boolean isSameOrderId( ProductionLogDto info ){
+        System.out.println( "aabbcc: " + productName + "," + info.productName + "," + productModel + "," + info.productModel);
+        if( ordersId == info.ordersId ){
             return true ;
         }else{
             return false ;

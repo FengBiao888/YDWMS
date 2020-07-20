@@ -189,12 +189,16 @@ public abstract class ProductBaseActivity extends ImmersiveBaseActivity {
             view.setOnClickListener( v->{
                 DialogUtil.showDeclareDialog( getActivity(), "确认要删除该条数据吗?", v1 -> {
                     //产品栏删除对应条目录
-                    productInfos.remove( position );
-                    deleteOperators.remove( position );
+                    try {
+                        productInfos.remove(position);
+                        deleteOperators.remove(position);
 //                    cachedBarcodes.remove( position );
-                    clearProductionLogDto();
-                    totalCount.setText( "合计：" + productInfos.size() + "件" );
-                    adapter.notifyDataSetChanged();
+                        clearProductionLogDto();
+                        totalCount.setText("合计：" + productInfos.size() + "件");
+                        adapter.notifyDataSetChanged();
+                    }catch (IndexOutOfBoundsException ex ){
+                        ex.printStackTrace();
+                    }
                 }).show();
             } );
             return view;

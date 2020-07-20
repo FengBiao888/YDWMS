@@ -17,8 +17,8 @@ android {
         applicationId "com.yundao.ydwms"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 130
-        versionName "1.3"
+        versionCode 132
+        versionName "1.3.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
