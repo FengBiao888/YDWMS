@@ -215,7 +215,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
                         ids.add( productInfo.id );
                     }
                     resourse.baling.meter = totalLength ;
-                    resourse.baling.amount = new BigDecimal( productInfos.size() );
+                    resourse.baling.amount = productInfos.size()  ;
                     resourse.baling.netWeight = totalWeight;
                     resourse.ids = ids;
 
@@ -342,7 +342,7 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
      * @param code
      */
     @Override
-    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums... state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -370,11 +370,17 @@ public class ProductPackagingActivity extends ScanProductBaseActivity {
 //                                        ToastUtil.showShortToast( "该产品已打包");
                                         continue;
                                     }
-                                    if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
+                                    for( int j = 0 ; j < state.length ; j ++ ) {
+                                        if (state[j] == ProductStateEnums.OUTGOING && info.productionState == 2) {
 //                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
-                                        containOutgoing = true ;
+                                            containOutgoing = true;
+                                        }
+                                    }
+                                    if( containOutgoing ){
                                         continue;
-                                    }else if( "半成品".equals( info.productType ) ){
+                                    }
+
+                                    if( "半成品".equals( info.productType ) ){
                                         DialogUtil.showDeclareDialog(getActivity(), "半成品不能打包", false, "我知道了", null).show();
                                         continue;
                                     }else if( productInfos.size() > 0 && !productInfos.get(0).isSameOrderId( info ) ){//产品类型不同

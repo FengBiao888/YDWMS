@@ -111,11 +111,12 @@ public class SubstandardProductIncomingActivity extends ScanProductBaseActivity 
         } );
         submit.setOnClickListener( v->{
 
-            if( index < codes.length ){
-                dealwithBarcode( codes[index] );
-
-                index ++ ;
-                return ;
+            if( YDWMSApplication.getInstance().isUseLocalData() ) {
+                if (index < codes.length) {
+                    dealwithBarcode(codes[index]);
+                    index++;
+                    return;
+                }
             }
 
             if( productInfos.size() == 0 ){

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sysu.zyb.panellistlibrary.CheckableLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/index"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="50dp"
+        tools:text="序号"/>
+
+    <TextView
+        android:id="@+id/bar_code"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="50dp"
+        tools:text="条码"/>
+
+    <TextView
+        android:id="@+id/product_name"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="100dp"
+        tools:text="品名"/>
+    <TextView
+        android:id="@+id/weight_sum"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="50dp"
+        tools:text="总净重"/>
+    <TextView
+        android:id="@+id/length_sum"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingStart="@dimen/item_gap_m"
+        android:paddingEnd="@dimen/item_gap_m"
+        android:textColor="@color/black"
+        android:minWidth="50dp"
+        tools:text="总米数"/>
+
+
+
+</sysu.zyb.panellistlibrary.CheckableLinearLayout>

@@ -33,7 +33,7 @@ public class Baling implements Serializable {
     public String trayNumber;
 
     /** 数量 */
-    public BigDecimal amount;
+    public int amount;
 
     /** 总净重 */
     public BigDecimal netWeight;

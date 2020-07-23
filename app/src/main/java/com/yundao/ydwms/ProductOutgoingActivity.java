@@ -183,7 +183,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
     }
 
     @Override
-    protected void loadFromCache(ProductStateEnums state) {
+    protected void loadFromCache(ProductStateEnums... state) {
             Object object = SharedPreferenceUtil.getObject( SHARE_PREFERENCE_KEY );
             if( object != null ) {
                 if (object instanceof ArrayList) {
@@ -326,9 +326,9 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     Baling baling = content[i];
                                     uploadIds.add( baling.id );
                                     setBalingInfo( baling );
-                                    if( baling.amount != null ) {
-                                        volumeSume.setText(baling.amount.toString());
-                                    }
+//                                    if( baling.amount != null ) {
+                                        volumeSume.setText(baling.amount + "");
+//                                    }
                                     if( baling.netWeight != null ) {
                                         weightSum.setText(baling.netWeight.toString());
                                     }
@@ -420,7 +420,7 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
      * @param showProgressDialog
      * @param code
      */
-    public void productionBalingArrayLog(Activity activity, boolean showProgressDialog, List<String> code, ProductStateEnums state){
+    public void productionBalingArrayLog(Activity activity, boolean showProgressDialog, List<String> code, ProductStateEnums... state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
@@ -449,9 +449,9 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                     if( uploadIds.contains( baling ) ) continue ;
                                     uploadIds.add( baling.id );
                                     setBalingInfo( baling );
-                                    if( baling.amount != null ) {
-                                        volumeSume.setText(baling.amount.toString());
-                                    }
+//                                    if( baling.amount != null ) {
+                                        volumeSume.setText(baling.amount + "");
+//                                    }
                                     if( baling.netWeight != null ) {
                                         weightSum.setText(baling.netWeight.toString());
                                     }
@@ -461,14 +461,16 @@ public class ProductOutgoingActivity extends ScanProductBaseActivity {
                                             ProductionLogDto info = baling.list.get(j);
 
                                             if( productInfos.contains( info ) ) continue;
-
-                                            if( state == ProductStateEnums.INCOMING && info.productionState == 1 ){ //产品进仓
-//                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
-                                                containInComing = true ;
-                                                continue;
-                                            }else if(state == ProductStateEnums.OUTGOING && info.productionState == 2 ){
-//                                                ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
-                                                containOutgoing = true ;
+                                            for( int k = 0 ; k < state.length ; k ++ ) {
+                                                if (state[k] == ProductStateEnums.INCOMING && info.productionState == 1) { //产品进仓
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已进仓");
+                                                    containInComing = true;
+                                                } else if (state[k] == ProductStateEnums.OUTGOING && info.productionState == 2) {
+//                                        ToastUtil.showShortToast( "条码为" + info.barCode + "的产品已出仓");
+                                                    containOutgoing = true;
+                                                }
+                                            }
+                                            if( containInComing || containOutgoing ){
                                                 continue;
                                             }
                                             cacheBarcodes.add( info.barCode );

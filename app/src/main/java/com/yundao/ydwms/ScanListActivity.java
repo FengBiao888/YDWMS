@@ -60,8 +60,6 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         workday.setGravity(Gravity.LEFT);
         list.add(workday);
 
-
-
         ItemCheckbox halfProductionIncoming = new ItemCheckbox( getActivity(), ScanTypeEnum.HALF_PRODUCT_INCOMING.getCodeName() );
         halfProductionIncoming.setExtraObj( ScanTypeEnum.HALF_PRODUCT_INCOMING );
         ScanTypeClickListener clickListener = new ScanTypeClickListener( halfProductionIncoming );
@@ -117,6 +115,11 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         clickListener = new ScanTypeClickListener( substandardProductIncoming );
         substandardProductIncoming.setClickListener( clickListener ) ;
 
+        ItemCheckbox substandardProductOutGoing = new ItemCheckbox( getActivity(), ScanTypeEnum.SUBSTANDARD_PRODUCT_OUTGOING.getCodeName() );
+        substandardProductOutGoing.setExtraObj(ScanTypeEnum.SUBSTANDARD_PRODUCT_OUTGOING);
+        clickListener = new ScanTypeClickListener( substandardProductOutGoing );
+        substandardProductOutGoing.setClickListener( clickListener ) ;
+
 
 //        HALF_PRODUCT_INCOMING( "半成品进仓", 1 ),
 //                HALF_PRODUCT_OUTGOING( "半成品出仓", 2 ),
@@ -139,6 +142,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         list.add( warehouseChanging );
         list.add( productInfoChanging );
         list.add( substandardProductIncoming );
+        list.add( substandardProductOutGoing );
 
         checkboxes.add( halfProductionIncoming );
         checkboxes.add( halfProductionOutgoing );
@@ -151,6 +155,7 @@ public class ScanListActivity extends BaseAbsListItemActivity {
         checkboxes.add( warehouseChanging );
         checkboxes.add( productInfoChanging );
         checkboxes.add( substandardProductIncoming );
+        checkboxes.add( substandardProductOutGoing );
 
         list.add( new BlankItem( getActivity(), 30, false) );
         confirm = new EditItemSubmitButton(getActivity(), "确定");
@@ -194,6 +199,9 @@ public class ScanListActivity extends BaseAbsListItemActivity {
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }else if( ScanTypeEnum.SUBSTANDARD_PRODUCT_INCOMING.equals( checkboxSelected.getExtraObj() ) ){
                 intent = new Intent(getActivity(), SubstandardProductIncomingActivity.class);
+                intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
+            }else if( ScanTypeEnum.SUBSTANDARD_PRODUCT_OUTGOING.equals( checkboxSelected.getExtraObj() ) ){
+                intent = new Intent(getActivity(), SubstandardProductOutgoingActivity.class);
                 intent.putExtra("pickScanType", (Serializable) checkboxSelected.getExtraObj());
             }
             startActivity( intent );

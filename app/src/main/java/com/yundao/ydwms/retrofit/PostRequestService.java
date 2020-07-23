@@ -72,7 +72,7 @@ public interface PostRequestService {
      */
     @GET(URLConstant.BALING_PRODUCTION_LOG)
     Call<BalingQueryRespone> balingProductionLog(@Query("balingBarCode") String barCode);
- /**
+    /**
      * 产品查询接口
      * @return
      */

@@ -14,7 +14,8 @@ public enum ScanTypeEnum {
     REJECTED_PRODUCT_INCOMING( "退货进仓", 8 ),
     WAREHOUSE_CHANGING( "仓位变更",9 ),
     PRODUCT_INFO_CHANGING( "产品信息变更", 10 ) ,
-    SUBSTANDARD_PRODUCT_INCOMING( "不良品进仓", 11 );
+    SUBSTANDARD_PRODUCT_INCOMING( "不良品进仓", 11 ),
+    SUBSTANDARD_PRODUCT_OUTGOING( "不良品出仓", 12 );
 
 
     /**

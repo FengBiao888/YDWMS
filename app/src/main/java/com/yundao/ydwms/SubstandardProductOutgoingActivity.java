@@ -1,18 +1,9 @@
 package com.yundao.ydwms;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.yundao.ydwms.common.avoidonresult.AvoidOnResult;
 import com.yundao.ydwms.protocal.ProductionLogDto;
@@ -29,13 +20,12 @@ import com.yundao.ydwms.util.SharedPreferenceUtil;
 import com.yundao.ydwms.util.ToastUtil;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
+public class SubstandardProductOutgoingActivity extends ScanProductBaseActivity {
 
     private int index = 0 ;
     private String[] codes = new String[]{ "15927936989721","15927926036211","15927919513571" };
@@ -113,7 +103,7 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
         volumeSume = findViewById( R.id.volume_sum_value ); //出库总卷数
         weightSum = findViewById( R.id.weight_sum_value ); //出库总量（kg）
 
-        warehouseName.setText( "半成品仓" );
+        warehouseName.setText( "不良品仓" );
 //        orderId.setText( "XS2020011502" );
         submit.setOnClickListener( v->{
 
@@ -240,6 +230,7 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
                                     if( containInComing || containOutgoing ){
                                         continue;
                                     }
+
                                     deleteOperators.add( "delete" );
 //                                    cachedBarcodes.add( code );
                                     productInfos.add( info );
@@ -304,7 +295,7 @@ public class HalfProductOutgoingActivity extends ScanProductBaseActivity {
 
         WarehouseVo vo = new WarehouseVo();
         vo.ids = genCodes();
-        vo.warehouseName = "半成品仓" ;
+        vo.warehouseName = "不良品仓" ;
         vo.ordersCode = orderId.getText().toString() ;
         vo.amountTotal = new BigDecimal( productInfos.size() ) ;
         vo.number = new BigDecimal(  weightSum.getText().toString() ) ;

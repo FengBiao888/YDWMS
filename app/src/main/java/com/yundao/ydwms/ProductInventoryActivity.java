@@ -30,7 +30,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
 
     @Override
     public void dealwithBarcode(String barcodeStr) {
-        productionLog( getActivity(), true, barcodeStr, null );
+        productionLog( getActivity(), true, barcodeStr, ProductStateEnums.NONE );
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ProductInventoryActivity extends ScanProductBaseActivity {
      * @param code
      */
     @Override
-    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums state){
+    public void productionLog(Activity activity, boolean showProgressDialog, String code, ProductStateEnums... state){
 
         HttpConnectManager manager = new HttpConnectManager.HttpConnectBuilder()
                 .setShowProgress(showProgressDialog)
